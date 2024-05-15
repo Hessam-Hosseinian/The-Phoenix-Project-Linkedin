@@ -54,6 +54,7 @@ public class User {
         return ID;
     }
 
+
     public void setID(String ID) {
         this.ID = ID;
     }
@@ -146,7 +147,22 @@ public class User {
         this.seekingOpportunity = seekingOpportunity;
     }
 
-    public User(String ID, String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title  , String location, String profession , String seekingOpportunity) {
+    public User(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) {
+
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.additionalName = additionalName;
+        this.profilePicture = profilePicture;
+        this.backgroundPicture = backgroundPicture;
+        this.title = title;
+        this.location = location;
+        this.profession = profession;
+        this.seekingOpportunity = seekingOpportunity;
+    }
+
+    public User(String ID, String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) {
         this.ID = ID;
         this.email = email;
         this.password = password;
@@ -166,247 +182,10 @@ public class User {
 
 
 
-    public static class CurrentJobPosition {
-
-        private String userID;
-
-        private String jobTitle;//40
-
-        private int employmentType;//1-8
-        private String companyName;//40
-        private String workLocation;//40
-        private int workplaceType;//1-3
-        private boolean isActive;
-        private Date startDate;
-        private Date endDate;
-        private String description;//1000
-        private String skills;//40
-        private boolean notifyChanges;
 
 
-        public CurrentJobPosition(String userID, String jobTitle, int employmentType, String companyName, String workLocation, int workplaceType, boolean isActive, Date startDate, Date endDate, String description, String skills, boolean notifyChanges) {
-            this.userID = userID;
-            this.jobTitle = jobTitle;
-            this.employmentType = employmentType;
-            this.companyName = companyName;
-            this.workLocation = workLocation;
-            this.workplaceType = workplaceType;
-            this.isActive = isActive;
-            this.startDate = startDate;
-            this.endDate = endDate;
-            this.description = description;
-            this.skills = skills;
-            this.notifyChanges = notifyChanges;
-        }
-
-        public CurrentJobPosition() {
-        }
 
 
-        public String getUserID() {
-            return userID;
-        }
-
-        public void setUserID(String userID) {
-            this.userID = userID;
-        }
-
-        public String getJobTitle() {
-            return jobTitle;
-        }
-
-        public void setJobTitle(String jobTitle) {
-            this.jobTitle = jobTitle;
-        }
-
-        public int getEmploymentType() {
-            return employmentType;
-        }
-
-        public void setEmploymentType(int employmentType) {
-            this.employmentType = employmentType;
-        }
-
-        public String getCompanyName() {
-            return companyName;
-        }
-
-        public void setCompanyName(String companyName) {
-            this.companyName = companyName;
-        }
-
-        public String getWorkLocation() {
-            return workLocation;
-        }
-
-        public void setWorkLocation(String workLocation) {
-            this.workLocation = workLocation;
-        }
-
-        public int getWorkplaceType() {
-            return workplaceType;
-        }
-
-        public void setWorkplaceType(int workplaceType) {
-            this.workplaceType = workplaceType;
-        }
-
-        public boolean isActive() {
-            return isActive;
-        }
-
-        public void setActive(boolean active) {
-            isActive = active;
-        }
-
-        public Date getStartDate() {
-            return startDate;
-        }
-
-        public void setStartDate(Date startDate) {
-            this.startDate = startDate;
-        }
-
-        public Date getEndDate() {
-            return endDate;
-        }
-
-        public void setEndDate(Date endDate) {
-            this.endDate = endDate;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public String getSkills() {
-            return skills;
-        }
-
-        public void setSkills(String skills) {
-            this.skills = skills;
-        }
-
-        public boolean isNotifyChanges() {
-            return notifyChanges;
-        }
-
-        public void setNotifyChanges(boolean notifyChanges) {
-            this.notifyChanges = notifyChanges;
-        }
-    }
-
-    public class Education {
-
-        private String UserID;
-        private String schoolName;//40
-        private String fieldOfStudy;//40
-        private Date educationStartDate;
-        private Date educationEndDate;
-        private String grade;//40
-        private String activitiesDescription;//500
-        private String description;//1000
-        private String skills;//40
-        private boolean notifyChanges;
-
-
-        public Education(String userID, String schoolName, String fieldOfStudy, Date educationStartDate, Date educationEndDate, String grade, String activitiesDescription, String description, String skills, boolean notifyChanges) {
-            UserID = userID;
-            this.schoolName = schoolName;
-            this.fieldOfStudy = fieldOfStudy;
-            this.educationStartDate = educationStartDate;
-            this.educationEndDate = educationEndDate;
-            this.grade = grade;
-            this.activitiesDescription = activitiesDescription;
-            this.description = description;
-            this.skills = skills;
-            this.notifyChanges = notifyChanges;
-        }
-
-        public String getUserID() {
-            return UserID;
-        }
-
-        public void setUserID(String userID) {
-            UserID = userID;
-        }
-
-        public String getSchoolName() {
-            return schoolName;
-        }
-
-        public void setSchoolName(String schoolName) {
-            this.schoolName = schoolName;
-        }
-
-        public String getFieldOfStudy() {
-            return fieldOfStudy;
-        }
-
-        public void setFieldOfStudy(String fieldOfStudy) {
-            this.fieldOfStudy = fieldOfStudy;
-        }
-
-        public Date getEducationStartDate() {
-            return educationStartDate;
-        }
-
-        public void setEducationStartDate(Date educationStartDate) {
-            this.educationStartDate = educationStartDate;
-        }
-
-        public Date getEducationEndDate() {
-            return educationEndDate;
-        }
-
-        public void setEducationEndDate(Date educationEndDate) {
-            this.educationEndDate = educationEndDate;
-        }
-
-        public String getGrade() {
-            return grade;
-        }
-
-        public void setGrade(String grade) {
-            this.grade = grade;
-        }
-
-        public String getActivitiesDescription() {
-            return activitiesDescription;
-        }
-
-        public void setActivitiesDescription(String activitiesDescription) {
-            this.activitiesDescription = activitiesDescription;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public String getSkills() {
-            return skills;
-        }
-
-        public void setSkills(String skills) {
-            this.skills = skills;
-        }
-
-        public boolean isNotifyChanges() {
-            return notifyChanges;
-        }
-
-        public void setNotifyChanges(boolean notifyChanges) {
-            this.notifyChanges = notifyChanges;
-        }
-    }
 
     public class ContactInformation {
 

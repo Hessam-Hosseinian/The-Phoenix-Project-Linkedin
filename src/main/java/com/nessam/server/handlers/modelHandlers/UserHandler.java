@@ -64,11 +64,11 @@ public class UserHandler implements HttpHandler {
                 String newUser = body.toString();
                 JSONObject jsonObject = new JSONObject(newUser);
                 try {
-                    userController.createUser(null, jsonObject.getString("email"), jsonObject.getString("password"), jsonObject.getString("firstName"), jsonObject.getString("lastName"), jsonObject.getString("additionalName"), jsonObject.getString("profilePicture"), jsonObject.getString("backgroundPicture"), jsonObject.getString("title"),jsonObject.getString("location"), jsonObject.getString("profession"),  jsonObject.getString("seekingOpportunity"));
+                    userController.createUser( jsonObject.getString("email"), jsonObject.getString("password"), jsonObject.getString("firstName"), jsonObject.getString("lastName"), jsonObject.getString("additionalName"), jsonObject.getString("profilePicture"), jsonObject.getString("backgroundPicture"), jsonObject.getString("title"),jsonObject.getString("location"), jsonObject.getString("profession"),  jsonObject.getString("seekingOpportunity"));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                Files.createDirectories(Paths.get("src/main/resources/assets/users/user" + jsonObject.getString("ID")));
+                Files.createDirectories(Paths.get("src/main/resources/assets/users/user" + jsonObject.getString("email")));
                 response = "this is done!";
                 break;
             case "PUT":

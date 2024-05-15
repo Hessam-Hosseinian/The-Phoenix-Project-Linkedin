@@ -38,6 +38,27 @@ public class UserController {
             userDAO.saveUser(user);
     }
 
+    public void createUser(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) throws SQLException {
+        User user = new User();
+
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setAdditionalName(additionalName);
+        user.setProfilePicture(profilePicture);
+        user.setBackgroundPicture(backgroundPicture);
+        user.setTitle(title);
+        user.setLocation(location);
+        user.setProfession(profession);
+        user.setSeekingOpportunity(seekingOpportunity);
+
+        if (isUserExists(email))
+            userDAO.updateUser(user);
+        else
+            userDAO.saveUser(user);
+    }
+
 
     public boolean isUserExists(String ID) {
         if (ID == null) return false;
