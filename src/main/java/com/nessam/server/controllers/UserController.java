@@ -17,7 +17,7 @@ public class UserController {
         this.userDAO = new UserDAO();
     }
 
-    public void createUser(String ID, String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, User.CurrentJobPosition currentJobPosition, User.Education education, String location, String profession, User.ContactInformation contactInformation, String seekingOpportunity) throws SQLException {
+    public void createUser(String ID, String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) throws SQLException {
         User user = new User();
         user.setID(ID);
         user.setEmail(email);
@@ -28,11 +28,8 @@ public class UserController {
         user.setProfilePicture(profilePicture);
         user.setBackgroundPicture(backgroundPicture);
         user.setTitle(title);
-        user.setCurrentJobPosition(currentJobPosition);
-        user.setEducation(education);
         user.setLocation(location);
         user.setProfession(profession);
-        user.setContactInformation(contactInformation);
         user.setSeekingOpportunity(seekingOpportunity);
 
         if (isUserExists(email))
@@ -80,7 +77,9 @@ public class UserController {
     }
 
     public void deleteUser(String userId) {
-        //TODO..................
+        User user = new User();
+        user.setID(userId);
+        userDAO.deleteUser(user);
 
     }
 }

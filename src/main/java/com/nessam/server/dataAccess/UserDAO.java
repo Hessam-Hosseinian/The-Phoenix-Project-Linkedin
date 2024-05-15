@@ -76,21 +76,20 @@ public class UserDAO {
 
     public void saveUser(User user) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO users (ID, email, password, firstName, lastName, additionalName, profilePicture, backgroundPicture, title, location, profession, seekingOpportunity) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "INSERT INTO users (email, password, firstName, lastName, additionalName, profilePicture, backgroundPicture, title, location, profession, seekingOpportunity) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        statement.setString(1, user.getID());
-        statement.setString(2, user.getEmail());
-        statement.setString(3, user.getPassword());
-        statement.setString(4, user.getFirstName());
-        statement.setString(5, user.getLastName());
-        statement.setString(6, user.getAdditionalName());
-        statement.setString(7, user.getProfilePicture());
-        statement.setString(8, user.getBackgroundPicture());
-        statement.setString(9, user.getTitle());
-        statement.setString(10, user.getLocation());
-        statement.setString(11, user.getProfession());
-        statement.setString(12, user.getSeekingOpportunity());
+        statement.setString(1, user.getEmail());
+        statement.setString(2, user.getPassword());
+        statement.setString(3, user.getFirstName());
+        statement.setString(4, user.getLastName());
+        statement.setString(5, user.getAdditionalName());
+        statement.setString(6, user.getProfilePicture());
+        statement.setString(7, user.getBackgroundPicture());
+        statement.setString(8, user.getTitle());
+        statement.setString(9, user.getLocation());
+        statement.setString(10, user.getProfession());
+        statement.setString(11, user.getSeekingOpportunity());
 
         statement.executeUpdate();
     }
@@ -280,4 +279,6 @@ public class UserDAO {
         return users;
     }
 
+    public void deleteUser(User user) {
+    }
 }

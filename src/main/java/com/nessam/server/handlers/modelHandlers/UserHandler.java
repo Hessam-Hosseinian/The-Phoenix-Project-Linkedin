@@ -64,35 +64,27 @@ public class UserHandler implements HttpHandler {
                 String newUser = body.toString();
                 JSONObject jsonObject = new JSONObject(newUser);
                 try {
-                    userController.createUser(jsonObject.getString("ID"), jsonObject.getString("email"), jsonObject.getString("password"), jsonObject.getString("firstName"), jsonObject.getString("lastName"), jsonObject.getString("additionalName"), jsonObject.getString("profilePicture"), jsonObject.getString("backgroundPicture"), jsonObject.getString("title"), null, null, jsonObject.getString("location"), jsonObject.getString("profession"), null, jsonObject.getString("seekingOpportunity"));
+                    userController.createUser(null, jsonObject.getString("email"), jsonObject.getString("password"), jsonObject.getString("firstName"), jsonObject.getString("lastName"), jsonObject.getString("additionalName"), jsonObject.getString("profilePicture"), jsonObject.getString("backgroundPicture"), jsonObject.getString("title"),jsonObject.getString("location"), jsonObject.getString("profession"),  jsonObject.getString("seekingOpportunity"));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                Files.createDirectories(Paths.get("src/main/java/com/server/assets/" + jsonObject.getString("ID")));
+                Files.createDirectories(Paths.get("src/main/resources/assets/users/user" + jsonObject.getString("ID")));
                 response = "this is done!";
                 break;
             case "PUT":
                 response = "This is the response users Put";
                 break;
-//            case "DELETE":
-//                if (splittedPath.length == 2) {
-//                    try {
-//                        userController.deleteUsers();
-//                        response = "All users deleted";
-//                    } catch (SQLException e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    // Extract the user ID from the path
-//                    String userId = splittedPath[splittedPath.length - 1];
-//                    try {
-//                        userController.deleteUser(userId);
-//                    } catch (SQLException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//                response = "This is the response users Delete\nDone!";
-//                break;
+            case "DELETE":
+                if (splittedPath.length == 2) {
+                    userController.deleteUsers();
+                    response = "All users deleted";
+                } else {
+                    // Extract the user ID from the path
+                    String userId = splittedPath[splittedPath.length - 1];
+                    userController.deleteUser(userId);
+                }
+                response = "This is the response users Delete\nDone!";
+                break;
             default:
                 break;
         }

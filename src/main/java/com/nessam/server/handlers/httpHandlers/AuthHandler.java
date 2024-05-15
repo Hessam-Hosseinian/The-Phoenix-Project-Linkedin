@@ -41,7 +41,7 @@ public class AuthHandler implements HttpHandler {
                     response = "incorrect userID or password";
                 } else {
                     Headers headers = exchange.getResponseHeaders();
-                    headers.add("JWT", tmpUserID + "!" + JwtAuth.jwt(tmpUserID));
+                    headers.add("JWT", tmpUserID + "!" + JwtAuth.jws(tmpUserID));
                     response = "logged in successfully";
                 }
                 break;

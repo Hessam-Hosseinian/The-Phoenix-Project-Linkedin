@@ -1,6 +1,6 @@
-CREATE TABLE Users
+CREATE TABLE users
 (
-    ID                 INT PRIMARY KEY AUTO_INCREMENT,
+    Id                INT PRIMARY KEY AUTO_INCREMENT,
     email              VARCHAR(255),
     password           VARCHAR(255),
     firstName          VARCHAR(20),
@@ -61,7 +61,7 @@ CREATE TABLE ContactInformation
     FOREIGN KEY (userID) REFERENCES Users (ID)
 );
 
-INSERT INTO Users (email, password, firstName, lastName, additionalName, profilePicture, backgroundPicture, title,
+INSERT INTO USERS (email, password, firstName, lastName, additionalName, profilePicture, backgroundPicture, title,
                    location, profession, seekingOpportunity)
 VALUES ('user1@example.com', 'password1', 'John', 'Doe', NULL, 'profile1.jpg', 'background1.jpg',
         'Software Engineer', 'New York', 'Software Developer', 'Yes'),

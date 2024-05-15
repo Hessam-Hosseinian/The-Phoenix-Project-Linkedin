@@ -29,6 +29,7 @@ public class Server {
             Files.createDirectories(Paths.get("src/main/java/com/nessam/server/assets"));
             server.createContext("/users", new UserHandler());
             server.createContext("/auth", new AuthHandler());
+            server.setExecutor(null);
             server.start();
 
 
@@ -37,5 +38,6 @@ public class Server {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+
     }
 }

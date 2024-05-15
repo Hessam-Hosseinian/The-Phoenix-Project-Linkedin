@@ -1,79 +1,53 @@
 package com.nessam.server.models;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 
 import java.sql.Date;
 
-
+@Entity
+@Table(name = "users")
 public class User {
 
-
-    @JsonProperty("ID")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String ID;
 
-    @JsonProperty("email")
+    @Column(name = "email")
     private String email;
 
-    @JsonProperty("password")
+    @Column(name = "password")
     private String password;
 
-    @JsonProperty("firstName")
+    @Column(name = "firstName")
     private String firstName;//20
 
-    @JsonProperty("lastName")
+    @Column(name = "lastName")
     private String lastName;//40
 
-    @JsonProperty("additionalName")
+    @Column(name = "additionalName")
     private String additionalName;//40
 
-    @JsonProperty("profilePicture")
+    @Column(name = "profilePicture")
     private String profilePicture;//path
 
-    @JsonProperty("backgroundPicture")
+    @Column(name = "backgroundPicture")
     private String backgroundPicture;//path
 
-    @JsonProperty("title")
+    @Column(name = "title")
     private String title;//220
 
-    @JsonProperty("currentJobPosition")
-    private CurrentJobPosition currentJobPosition;
-
-    @JsonProperty("education")
-    private Education education;
-
-    @JsonProperty("location")
+    @Column(name = "location")
     private String location;
 
-    @JsonProperty("profession")
+    @Column(name = "profession")
     private String profession;
 
-    @JsonProperty("contactInformation")
-    private ContactInformation contactInformation;
-
-    @JsonProperty("seekingOpportunity")
+    @Column(name = "seekingOpportunity")
     private String seekingOpportunity;
 
     public User() {
 
-    }
-
-    public User(String ID, String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, CurrentJobPosition currentJobPosition, Education education, String location, String profession, ContactInformation contactInformation, String seekingOpportunity) {
-        this.ID = ID;
-        this.email = email;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.additionalName = additionalName;
-        this.profilePicture = profilePicture;
-        this.backgroundPicture = backgroundPicture;
-        this.title = title;
-        this.currentJobPosition = currentJobPosition;
-        this.education = education;
-        this.location = location;
-        this.profession = profession;
-        this.contactInformation = contactInformation;
-        this.seekingOpportunity = seekingOpportunity;
     }
 
     public String getID() {
@@ -148,22 +122,6 @@ public class User {
         this.title = title;
     }
 
-    public CurrentJobPosition getCurrentJobPosition() {
-        return currentJobPosition;
-    }
-
-    public void setCurrentJobPosition(CurrentJobPosition currentJobPosition) {
-        this.currentJobPosition = currentJobPosition;
-    }
-
-    public Education getEducation() {
-        return education;
-    }
-
-    public void setEducation(Education education) {
-        this.education = education;
-    }
-
     public String getLocation() {
         return location;
     }
@@ -180,14 +138,6 @@ public class User {
         this.profession = profession;
     }
 
-    public ContactInformation getContactInformation() {
-        return contactInformation;
-    }
-
-    public void setContactInformation(ContactInformation contactInformation) {
-        this.contactInformation = contactInformation;
-    }
-
     public String getSeekingOpportunity() {
         return seekingOpportunity;
     }
@@ -196,30 +146,41 @@ public class User {
         this.seekingOpportunity = seekingOpportunity;
     }
 
+    public User(String ID, String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title  , String location, String profession , String seekingOpportunity) {
+        this.ID = ID;
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.additionalName = additionalName;
+        this.profilePicture = profilePicture;
+        this.backgroundPicture = backgroundPicture;
+        this.title = title;
+        this.location = location;
+        this.profession = profession;
+        this.seekingOpportunity = seekingOpportunity;
+    }
+
+
+
+
+
+
     public static class CurrentJobPosition {
-        @JsonProperty("userID")
+
         private String userID;
-        @JsonProperty("jobTitle")
+
         private String jobTitle;//40
-        @JsonProperty("employmentType")
+
         private int employmentType;//1-8
-        @JsonProperty("companyName")
         private String companyName;//40
-        @JsonProperty("workLocation")
         private String workLocation;//40
-        @JsonProperty("workplaceType")
         private int workplaceType;//1-3
-        @JsonProperty("isActive")
         private boolean isActive;
-        @JsonProperty("startDate")
         private Date startDate;
-        @JsonProperty("endDate")
         private Date endDate;
-        @JsonProperty("description")
         private String description;//1000
-        @JsonProperty("skills")
         private String skills;//40
-        @JsonProperty("notifyChanges")
         private boolean notifyChanges;
 
 
@@ -241,12 +202,13 @@ public class User {
         public CurrentJobPosition() {
         }
 
+
         public String getUserID() {
             return userID;
         }
 
-        public void setUserID(String userId) {
-            this.userID = userId;
+        public void setUserID(String userID) {
+            this.userID = userID;
         }
 
         public String getJobTitle() {
@@ -336,8 +298,6 @@ public class User {
         public void setNotifyChanges(boolean notifyChanges) {
             this.notifyChanges = notifyChanges;
         }
-
-
     }
 
     public class Education {
