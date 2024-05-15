@@ -77,6 +77,7 @@ public class UserDAO {
         statement.setString(10, user.getProfession());
         statement.setString(11, user.getSeekingOpportunity());
 
+
         statement.executeUpdate();
     }
 
