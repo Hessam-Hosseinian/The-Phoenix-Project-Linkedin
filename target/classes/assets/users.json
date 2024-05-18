@@ -1,6 +1,6 @@
 {"email":"user1@example.com", "password":"password1", "firstName":"John", "lastName":"Doe", "additionalName": "HESSAM", "profilePicture":"profile1.jpg", "backgroundPicture":"background1.jpg",
 
   "title":"Software Engineer", "location":"New York", "profession":"Software Developer", "seekingOpportunity":"Yes"
-"email":"user2@example.com", "password":"password2", "firstName":"John", "lastName":"Doe", "additionalName": "HESSAM", "profilePicture":"profile1.jpg", "backgroundPicture":"background1.jpg",
+"email":"user1@example.com", "password":"password1", "firstName":"John", "lastName":"Doe", "additionalName": "HESSAM", "profilePicture":"profile1.jpg", "backgroundPicture":"background1.jpg",
 
   "title":"Software Engineer", "location":"New York", "profession":"Software Developer", "seekingOpportunity":"Yes"}

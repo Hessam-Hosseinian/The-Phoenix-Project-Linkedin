@@ -3,6 +3,7 @@ package com.nessam.server;
 import com.nessam.server.config.Configuration;
 import com.nessam.server.config.ConfigurationManager;
 import com.nessam.server.handlers.httpHandlers.AuthHandler;
+import com.nessam.server.handlers.modelHandlers.FollowHandler;
 import com.nessam.server.handlers.modelHandlers.UserHandler;
 import com.sun.net.httpserver.HttpServer;
 
@@ -34,6 +35,7 @@ public class Server {
             Files.createDirectories(Paths.get("src/main/java/com/nessam/server/assets"));
             server.createContext("/users", new UserHandler());
             server.createContext("/auth", new AuthHandler());
+            server.createContext("/follows", new FollowHandler());
             server.setExecutor(null);
             server.start();
 

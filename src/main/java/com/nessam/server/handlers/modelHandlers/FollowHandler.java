@@ -52,7 +52,7 @@ public class FollowHandler implements HttpHandler {
                     }
                 }
                 else {
-                    if (splittedPath.length == 4 && splittedPath[2].equals("followrs")) {
+                    if (splittedPath.length == 4 && splittedPath[2].equals("followers")) {
                         try {
                             response = followController.getFollowers(splittedPath[3]);
                         } catch (SQLException e) {
