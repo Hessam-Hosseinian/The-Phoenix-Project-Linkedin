@@ -5,7 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 
 import java.util.List;
 
-public class ExtractUserAut {
+public class ExtractUserAuth {
 
 
     public static String extract(HttpExchange exchange) {

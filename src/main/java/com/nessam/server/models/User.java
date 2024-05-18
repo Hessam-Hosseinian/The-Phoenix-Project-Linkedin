@@ -1,9 +1,8 @@
 package com.nessam.server.models;
 
+//import jakarta.persistence.*;
 
 import jakarta.persistence.*;
-
-import java.sql.Date;
 
 @Entity
 @Table(name = "users")
@@ -11,31 +10,31 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String ID;
+    private Long id;
 
-    @Column(name = "email")
+    @Column(name = "email", length = 50, nullable = false)
     private String email;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "firstName")
-    private String firstName;//20
+    @Column(name = "first_name", length = 20)
+    private String firstName;
 
-    @Column(name = "lastName")
-    private String lastName;//40
+    @Column(name = "last_name", length = 40)
+    private String lastName;
 
-    @Column(name = "additionalName")
-    private String additionalName;//40
+    @Column(name = "additional_name", length = 40)
+    private String additionalName;
 
-    @Column(name = "profilePicture")
-    private String profilePicture;//path
+    @Column(name = "profile_picture")
+    private String profilePicture;
 
-    @Column(name = "backgroundPicture")
-    private String backgroundPicture;//path
+    @Column(name = "background_picture")
+    private String backgroundPicture;
 
-    @Column(name = "title")
-    private String title;//220
+    @Column(name = "title", length = 220)
+    private String title;
 
     @Column(name = "location")
     private String location;
@@ -43,15 +42,15 @@ public class User {
     @Column(name = "profession")
     private String profession;
 
-    @Column(name = "seekingOpportunity")
+    @Column(name = "seeking_opportunity")
     private String seekingOpportunity;
 
-    public User() {
+    // Constructors, getters, and setters
 
+    public User() {
     }
 
     public User(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) {
-
         this.email = email;
         this.password = password;
         this.firstName = firstName;
@@ -65,28 +64,12 @@ public class User {
         this.seekingOpportunity = seekingOpportunity;
     }
 
-    public User(String ID, String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) {
-        this.ID = ID;
-        this.email = email;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.additionalName = additionalName;
-        this.profilePicture = profilePicture;
-        this.backgroundPicture = backgroundPicture;
-        this.title = title;
-        this.location = location;
-        this.profession = profession;
-        this.seekingOpportunity = seekingOpportunity;
+    public Long getId() {
+        return id;
     }
 
-    public String getID() {
-        return ID;
-    }
-
-
-    public void setID(String ID) {
-        this.ID = ID;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getEmail() {

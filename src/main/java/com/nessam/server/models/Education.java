@@ -1,21 +1,55 @@
 package com.nessam.server.models;
 
+//import jakarta.persistence.*;
+
+import jakarta.persistence.*;
+
 import java.sql.Date;
 
+@Entity
+@Table(name = "education")
 public class Education {
-    private String UserID;
-    private String schoolName;//40
-    private String fieldOfStudy;//40
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(name = "school_name", length = 40, nullable = false)
+    private String schoolName;
+
+    @Column(name = "field_of_study", length = 40, nullable = false)
+    private String fieldOfStudy;
+
+    @Column(name = "education_start_date")
     private Date educationStartDate;
+
+    @Column(name = "education_end_date")
     private Date educationEndDate;
-    private String grade;//40
-    private String activitiesDescription;//500
-    private String description;//1000
-    private String skills;//40
+
+    @Column(name = "grade", length = 40)
+    private String grade;
+
+    @Column(name = "activities_description", length = 500)
+    private String activitiesDescription;
+
+    @Column(name = "description", length = 1000)
+    private String description;
+
+    @Column(name = "skills", length = 40)
+    private String skills;
+
+    @Column(name = "notify_changes", nullable = false)
     private boolean notifyChanges;
 
-    public Education(String userID, String schoolName, String fieldOfStudy, Date educationStartDate, Date educationEndDate, String grade, String activitiesDescription, String description, String skills, boolean notifyChanges) {
-        UserID = userID;
+    public Education() {
+    }
+
+    public Education(User user, String schoolName, String fieldOfStudy, Date educationStartDate, Date educationEndDate, String grade, String activitiesDescription, String description, String skills, boolean notifyChanges) {
+        this.user = user;
         this.schoolName = schoolName;
         this.fieldOfStudy = fieldOfStudy;
         this.educationStartDate = educationStartDate;
@@ -27,12 +61,22 @@ public class Education {
         this.notifyChanges = notifyChanges;
     }
 
-    public String getUserID() {
-        return UserID;
+    // Getters and Setters
+
+    public Long getId() {
+        return id;
     }
 
-    public void setUserID(String userID) {
-        UserID = userID;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getSchoolName() {

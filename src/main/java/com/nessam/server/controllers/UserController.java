@@ -17,9 +17,9 @@ public class UserController {
         this.userDAO = new UserDAO();
     }
 
-    public void createUser(String ID, String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) throws SQLException {
+    public void createUser(Long ID, String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) throws SQLException {
         User user = new User();
-        user.setID(ID);
+        user.setId(ID);
         user.setEmail(email);
         user.setPassword(password);
         user.setFirstName(firstName);
@@ -60,32 +60,28 @@ public class UserController {
     }
 
 
-    public boolean isUserExists(String ID) {
-        if (ID == null) return false;
-        try {
-            return (userDAO.getUser(ID) != null);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public boolean isUserExists(String email) {
+//        if (ID == null) return false;
+        return (userDAO.getUserByEmail(email) != null);
     }
 
     public String getUsers() throws SQLException, JsonProcessingException {
-        ArrayList<User> users = userDAO.getUsers();
+        ArrayList<User> users = (ArrayList<User>) userDAO.getAllUsers();
         ObjectMapper objectMapper = new ObjectMapper();
         String response = objectMapper.writeValueAsString(users);
         return response;
     }
 
-    public String getUserById(String id) throws SQLException, JsonProcessingException {
-        User user = userDAO.getUser(id);
+    public String getUserById(String email) throws SQLException, JsonProcessingException {
+        User user = userDAO.getUserByEmail(email);
         if (user == null) return "No User";
         ObjectMapper objectMapper = new ObjectMapper();
         String response = objectMapper.writeValueAsString(user);
         return response;
     }
 
-    public String getUserByIdAndPass(String id, String pass) throws SQLException, JsonProcessingException {
-        User user = userDAO.getUser(id, pass);
+    public String getUserByEmailAndPass(String email, String pass) throws SQLException, JsonProcessingException {
+        User user = userDAO.getUserByEmailAndPassword(email, pass);
         if (user == null) return null;
         ObjectMapper objectMapper = new ObjectMapper();
         String response = objectMapper.writeValueAsString(user);
@@ -94,13 +90,17 @@ public class UserController {
     }
 
     public void deleteUsers() {
-        //TODO..................
+      userDAO.deleteAllUsers();
     }
 
-    public void deleteUser(String userId) {
-        User user = new User();
-        user.setID(userId);
-        userDAO.deleteUser(user);
+    public void deleteUser(Long userId) {
+//
+        userDAO.deleteUser(userId);
+
+    }
+    public void deleteUser(String email) {
+//
+        userDAO.deleteUser(email);
 
     }
 }

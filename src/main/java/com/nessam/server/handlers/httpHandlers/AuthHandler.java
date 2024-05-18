@@ -27,11 +27,11 @@ public class AuthHandler implements HttpHandler {
         String[] splittedPath = path.split("/");
         switch (method) {
             case "GET":
-                String tmpUserID = splittedPath[splittedPath.length - 2];
+                String tmpUserEmail = splittedPath[splittedPath.length - 2];
                 String tmpUserPass = splittedPath[splittedPath.length - 1];
                 String res = null;
                 try {
-                    res = userController.getUserByIdAndPass(tmpUserID, tmpUserPass);
+                    res = userController.getUserByEmailAndPass(tmpUserEmail, tmpUserPass);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 } catch (JsonProcessingException e) {
@@ -41,7 +41,7 @@ public class AuthHandler implements HttpHandler {
                     response = "incorrect userID or password";
                 } else {
                     Headers headers = exchange.getResponseHeaders();
-                    headers.add("JWT", tmpUserID + "!" + JwtAuth.jws(tmpUserID));
+                    headers.add("JWT", tmpUserEmail + "!" + JwtAuth.jws(tmpUserEmail));
                     response = "logged in successfully";
                 }
                 break;

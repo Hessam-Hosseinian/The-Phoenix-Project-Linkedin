@@ -1,6 +1,7 @@
 package com.nessam.server.handlers.modelHandlers;
 
 import com.nessam.server.Server;
+//import com.nessam.server.controllers.UserController;
 import com.nessam.server.controllers.UserController;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -64,7 +65,12 @@ public class UserHandler implements HttpHandler {
                 String newUser = body.toString();
                 JSONObject jsonObject = new JSONObject(newUser);
                 try {
-                    userController.createUser( jsonObject.getString("email"), jsonObject.getString("password"), jsonObject.getString("firstName"), jsonObject.getString("lastName"), jsonObject.getString("additionalName"), jsonObject.getString("profilePicture"), jsonObject.getString("backgroundPicture"), jsonObject.getString("title"),jsonObject.getString("location"), jsonObject.getString("profession"),  jsonObject.getString("seekingOpportunity"));
+                    userController.createUser( jsonObject.getString("email"), jsonObject.getString("password"),
+                            jsonObject.getString("firstName"), jsonObject.getString("lastName"),
+                            jsonObject.getString("additionalName"), jsonObject.getString("profilePicture"),
+                            jsonObject.getString("backgroundPicture"), jsonObject.getString("title"),
+                            jsonObject.getString("location"), jsonObject.getString("profession"),
+                            jsonObject.getString("seekingOpportunity"));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -82,8 +88,9 @@ public class UserHandler implements HttpHandler {
                     // Extract the user ID from the path
                     String userId = splittedPath[splittedPath.length - 1];
                     userController.deleteUser(userId);
+                    response = "This is the response users Delete\nDone!";
+
                 }
-                response = "This is the response users Delete\nDone!";
                 break;
             default:
                 break;

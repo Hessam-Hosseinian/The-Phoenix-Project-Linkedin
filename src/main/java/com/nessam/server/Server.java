@@ -12,11 +12,16 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
 
+
 public class Server {
     private final static Logger LOGGER = Logger.getLogger(String.valueOf(Server.class));
 
     public static void main(String[] args) {
         LOGGER.info("Server starting...");
+
+
+
+
 
         ConfigurationManager.getInstance().loadConfigurationFile("C:\\Users\\as\\Desktop\\The Phoenix Project 11.0\\src\\main\\resources\\http.json");
         Configuration conf = ConfigurationManager.getInstance().getCurrentConfiguration();
@@ -41,3 +46,4 @@ public class Server {
 
     }
 }
+
