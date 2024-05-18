@@ -62,9 +62,9 @@ public class EducationDAO {
         }
     }
 
-    public Education getEducationById(Long id) {
+    public Education getEducationById(String userId) {
         try (Session session = sessionFactory.openSession()) {
-            return session.get(Education.class, id);
+            return session.get(Education.class, userId);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

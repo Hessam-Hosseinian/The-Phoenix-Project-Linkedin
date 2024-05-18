@@ -71,5 +71,10 @@ CREATE TABLE contact_information
         FOREIGN KEY (user_id)
             REFERENCES users (id)
 );
+CREATE TABLE Follow (
+                        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                        follower VARCHAR(255) NOT NULL,
+                        followed VARCHAR(255) NOT NULL
+);
 
 

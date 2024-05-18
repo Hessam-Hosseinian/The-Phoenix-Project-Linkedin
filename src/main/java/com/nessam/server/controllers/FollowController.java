@@ -17,9 +17,7 @@ public class FollowController {
         followDAO = new FollowDAO();
     }
 
-    public void createFollowTable () throws SQLException {
-        followDAO.createFollowTable();
-    }
+
 
     public void saveFollow(String follower, String followed) throws SQLException {
         Follow follow = new Follow(follower, followed);
@@ -32,11 +30,11 @@ public class FollowController {
     }
 
     public void deleteAll () throws SQLException {
-        followDAO.deleteAll();
+        followDAO.deleteAllFollows();
     }
 
     public String getFollows(String userId) throws SQLException, JsonProcessingException {
-        List<Follow> follows = followDAO.getFollows(userId);
+        List<Follow> follows = followDAO.getFollowsByFollower(userId);
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(follows);
     }
@@ -48,7 +46,7 @@ public class FollowController {
     }
 
     public String getAll() throws SQLException, JsonProcessingException {
-        List<Follow> follows = followDAO.getAll();
+        List<Follow> follows = followDAO.getAllFollows();
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(follows);
     }

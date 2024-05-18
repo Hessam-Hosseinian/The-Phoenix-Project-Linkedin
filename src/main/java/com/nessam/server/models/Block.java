@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 public class Block {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -50,6 +51,10 @@ public class Block {
 
     @Override
     public String toString() {
-        return "Block{" + "blocker='" + blocker + '\'' + ", blocking='" + blocked + '\'' + '}';
+        return "Block{" +
+                "id=" + id +
+                ", blocker='" + blocker + '\'' +
+                ", blocked='" + blocked + '\'' +
+                '}';
     }
 }

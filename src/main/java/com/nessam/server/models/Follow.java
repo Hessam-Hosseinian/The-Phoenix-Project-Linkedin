@@ -2,7 +2,8 @@ package com.nessam.server.models;
 
 import jakarta.persistence.*;
 
-
+@Entity
+@Table(name = "Follow")
 public class Follow {
 
     @Id
@@ -19,7 +20,7 @@ public class Follow {
         this.followed = followed;
     }
 
-    public Follow () {
+    public Follow() {
 
     }
 
@@ -31,7 +32,7 @@ public class Follow {
         this.id = id;
     }
 
-    public String getFollower () {
+    public String getFollower() {
         return follower;
     }
 
@@ -50,7 +51,8 @@ public class Follow {
     @Override
     public String toString() {
         return "Follow{" +
-                "follower='" + follower + '\'' +
+                "id=" + id +
+                ", follower='" + follower + '\'' +
                 ", followed='" + followed + '\'' +
                 '}';
     }
