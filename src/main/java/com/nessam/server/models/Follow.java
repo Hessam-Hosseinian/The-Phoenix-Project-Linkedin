@@ -2,7 +2,8 @@ package com.nessam.server.models;
 
 import jakarta.persistence.*;
 
-
+@Entity
+@Table(name = "Follow")
 public class Follow {
 
     @Id
