@@ -50,14 +50,27 @@ public class FollowDAO {
     }
 
 
+//    public void deleteAllFollows() {
+//        Transaction transaction = null;
+//        try (Session session = sessionFactory.openSession()) {
+//            transaction = session.beginTransaction();
+//            List<Follow> followList = session.createQuery("FROM Follow", Follow.class).list();
+//            for (Follow follow : followList) {
+//                session.delete(follow);
+//            }
+//            transaction.commit();
+//        } catch (Exception e) {
+//            if (transaction != null) {
+//                transaction.rollback();
+//            }
+//            e.printStackTrace();
+//        }
+//    }
     public void deleteAllFollows() {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            List<Follow> followList = session.createQuery("FROM Follow", Follow.class).list();
-            for (Follow follow : followList) {
-                session.delete(follow);
-            }
+            session.createQuery("DELETE FROM Follow").executeUpdate();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
