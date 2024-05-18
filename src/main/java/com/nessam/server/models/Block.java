@@ -4,7 +4,9 @@ package com.nessam.server.models;
 import jakarta.persistence.*;
 
 
+
 public class Block {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,4 +54,5 @@ public class Block {
     public String toString() {
         return "Block{" + "blocker='" + blocker + '\'' + ", blocking='" + blocked + '\'' + '}';
     }
+
 }
