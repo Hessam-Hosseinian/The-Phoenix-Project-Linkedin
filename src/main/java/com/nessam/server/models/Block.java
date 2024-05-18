@@ -4,9 +4,7 @@ package com.nessam.server.models;
 import jakarta.persistence.*;
 
 
-
 public class Block {
-
 
 
     @Id
@@ -53,7 +51,10 @@ public class Block {
 
     @Override
     public String toString() {
-        return "Block{" + "blocker='" + blocker + '\'' + ", blocking='" + blocked + '\'' + '}';
+        return "Block{" +
+                "id=" + id +
+                ", blocker='" + blocker + '\'' +
+                ", blocked='" + blocked + '\'' +
+                '}';
     }
-
 }
