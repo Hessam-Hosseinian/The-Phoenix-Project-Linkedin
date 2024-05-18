@@ -1,11 +1,18 @@
 package com.nessam.server.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.*;
+
+
 public class Block {
-    @JsonProperty("blocker")
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "blocker", nullable = false)
     private String blocker;
 
-    @JsonProperty("blocked")
+    @Column(name = "blocked", nullable = false)
     private String blocked;
 
     public Block(String blocker, String blocked) {
@@ -15,6 +22,14 @@ public class Block {
 
     public Block() {
 
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getBlocker() {
@@ -35,9 +50,6 @@ public class Block {
 
     @Override
     public String toString() {
-        return "Block{" +
-                "blocker='" + blocker + '\'' +
-                ", blocking='" + blocked + '\'' +
-                '}';
+        return "Block{" + "blocker='" + blocker + '\'' + ", blocking='" + blocked + '\'' + '}';
     }
 }
