@@ -28,6 +28,7 @@
         <mapping class="com.nessam.server.models.User"/>
         <mapping class="com.nessam.server.models.ContactInformation"/>
         <mapping class="com.nessam.server.models.CurrentJobPosition"/>
+        <mapping class="com.nessam.server.models.Education"/>
 
     </session-factory>
 </hibernate-configuration>
