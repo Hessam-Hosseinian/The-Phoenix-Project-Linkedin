@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 
 import java.util.List;
 
@@ -79,13 +80,57 @@ public class FollowDAO {
             e.printStackTrace();
         }
     }
-
+    public List<Follow> getFollowsByFollower(String followerId) {
+        try (Session session = sessionFactory.openSession()) {
+            String hql = "FROM Follow WHERE follower = :followerId";
+            Query<Follow> query = session.createQuery(hql, Follow.class);
+            query.setParameter("followerId", followerId);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     public Follow getFollowById(Long id) {
         try (Session session = sessionFactory.openSession()) {
             return session.get(Follow.class, id);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+    public List<Follow> getFollowers(String userId) {
+        try (Session session = sessionFactory.openSession()) {
+            String hql = "FROM Follow WHERE followed = :userId";
+            Query<Follow> query = session.createQuery(hql, Follow.class);
+            query.setParameter("userId", userId);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<Follow> getAllFollows() {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("FROM Follow", Follow.class).list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean isFollowing(String followerId, String followedId) {
+        try (Session session = sessionFactory.openSession()) {
+            String hql = "SELECT COUNT(*) FROM Follow WHERE follower = :followerId AND followed = :followedId";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("followerId", followerId);
+            query.setParameter("followedId", followedId);
+            Long count = query.uniqueResult();
+            return count != null && count > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
