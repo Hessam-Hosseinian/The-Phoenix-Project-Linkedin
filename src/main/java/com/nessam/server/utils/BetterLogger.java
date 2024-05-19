@@ -3,7 +3,7 @@ package com.nessam.server.utils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Logger {
+public class BetterLogger {
 
     // ANSI escape codes for text colors and styles
     public static final String RESET = "\u001B[0m";
@@ -28,15 +28,15 @@ public class Logger {
         CRITICAL
     }
 
-    private boolean includeTimestamp;
-    private boolean useStyles;
+    private static boolean includeTimestamp;
+    private static boolean useStyles;
 
-    public Logger() {
+    public BetterLogger() {
         this.includeTimestamp = true;
         this.useStyles = true;
     }
 
-    public void log(LogLevel level, String message) {
+    private static void log(LogLevel level, String message) {
         String color;
         switch (level) {
             case DEBUG:
@@ -65,13 +65,29 @@ public class Logger {
 
         String style = useStyles ? BOLD : "";
 
-
-        String classname[] = Thread.currentThread().getStackTrace()[2].getClassName().split("\\.");
-
+        String[] classname = Thread.currentThread().getStackTrace()[3].getClassName().split("\\.");
 
         System.out.println(color + style + timestamp + "[" + level + "] " + classname[classname.length - 1] + " " +
-                Thread.currentThread().getStackTrace()[2].getMethodName() + ": " + message + RESET);
+                Thread.currentThread().getStackTrace()[3].getMethodName() + ": " + message + RESET);
     }
 
+    public static void  DEBUG(String message) {
+        log(LogLevel.DEBUG, message);
+    }
 
+    public static void INFO(String message) {
+        log(LogLevel.INFO, message);
+    }
+
+    public static void WARNING(String message) {
+        log(LogLevel.WARNING, message);
+    }
+
+    public static void ERROR(String message) {
+        log(LogLevel.ERROR, message);
+    }
+
+    public void CRITICAL(String message) {
+        log(LogLevel.CRITICAL, message);
+    }
 }

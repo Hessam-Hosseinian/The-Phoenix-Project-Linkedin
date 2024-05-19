@@ -4,10 +4,10 @@ package com.nessam.server.handlers.modelHandlers;
 import com.nessam.server.controllers.BlockController;
 import com.nessam.server.controllers.FollowController;
 import com.nessam.server.controllers.UserController;
-import com.nessam.server.controllers.UserController;
+import com.nessam.server.utils.ExtractUserAuth;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.nessam.server.utils.ExtractUserAuth;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
