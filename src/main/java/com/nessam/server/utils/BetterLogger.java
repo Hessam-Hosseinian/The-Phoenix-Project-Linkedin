@@ -67,11 +67,11 @@ public class BetterLogger {
 
         String[] classname = Thread.currentThread().getStackTrace()[3].getClassName().split("\\.");
 
-        System.out.println(color + style + timestamp + "[" + level + "] " + classname[classname.length - 1] + " " +
-                Thread.currentThread().getStackTrace()[3].getMethodName() + ": " + message + RESET);
+        System.out.println(color + style + timestamp + "[" + level + "] " + RESET + classname[classname.length - 1] + " " +
+                Thread.currentThread().getStackTrace()[3].getMethodName() + color + ": " + message + RESET);
     }
 
-    public static void  DEBUG(String message) {
+    public static void DEBUG(String message) {
         log(LogLevel.DEBUG, message);
     }
 
