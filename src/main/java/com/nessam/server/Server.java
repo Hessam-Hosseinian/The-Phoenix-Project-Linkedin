@@ -11,24 +11,23 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 public class Server {
-    private final static Logger LOGGER = Logger.getLogger(String.valueOf(Server.class));
 
-    public static void main(String[] args) {
-        LOGGER.info("Server starting...");
+    public static void main(String[] args) throws IOException {
 
 
+        var log = Logger.getLogger("org.hibernate");
+        log.setLevel(Level.OFF);
 
-
-
-        ConfigurationManager.getInstance().loadConfigurationFile("C:\\Users\\as\\Desktop\\The Phoenix Project 11.0\\src\\main\\resources\\http.json");
+        ConfigurationManager.getInstance().loadConfigurationFile("src\\main\\resources\\http.json");
         Configuration conf = ConfigurationManager.getInstance().getCurrentConfiguration();
 
-        LOGGER.info("Using Port: " + conf.getPort());
-        LOGGER.info("Using WebRoot: " + conf.getWebroot());
+//        LOGGER.info("Using Port: " + conf.getPort());
+//        LOGGER.info("Using WebRoot: " + conf.getWebroot());
         try {
             HttpServer server = HttpServer.create(new InetSocketAddress(conf.getPort()), 0);
 
