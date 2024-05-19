@@ -1,44 +1,25 @@
 package com.nessam.server.controllers;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nessam.server.dataAccess.UserDAO;
 import com.nessam.server.models.User;
 
-
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class UserController {
     private final UserDAO userDAO;
+    private final ObjectMapper objectMapper;
 
     public UserController() throws SQLException {
         this.userDAO = new UserDAO();
-    }
-
-    public void createUser(Long ID, String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) throws SQLException {
-        User user = new User();
-        user.setId(ID);
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setAdditionalName(additionalName);
-        user.setProfilePicture(profilePicture);
-        user.setBackgroundPicture(backgroundPicture);
-        user.setTitle(title);
-        user.setLocation(location);
-        user.setProfession(profession);
-        user.setSeekingOpportunity(seekingOpportunity);
-
-        if (isUserExists(email))
-            userDAO.updateUser(user);
-        else
-            userDAO.saveUser(user);
+        this.objectMapper = new ObjectMapper();
     }
 
     public void createUser(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) throws SQLException {
+
         User user = new User();
 
         user.setEmail(email);
@@ -52,55 +33,43 @@ public class UserController {
         user.setLocation(location);
         user.setProfession(profession);
         user.setSeekingOpportunity(seekingOpportunity);
-
-        if (isUserExists(email))
+        if (isUserExists(user.getEmail())) {
             userDAO.updateUser(user);
-        else
+        } else {
             userDAO.saveUser(user);
+        }
     }
 
-
     public boolean isUserExists(String email) {
-//        if (ID == null) return false;
-        return (userDAO.getUserByEmail(email) != null);
+        return userDAO.getUserByEmail(email) != null;
     }
 
     public String getUsers() throws SQLException, JsonProcessingException {
-        ArrayList<User> users = (ArrayList<User>) userDAO.getAllUsers();
-        ObjectMapper objectMapper = new ObjectMapper();
-        String response = objectMapper.writeValueAsString(users);
-        return response;
+        List<User> users = userDAO.getAllUsers();
+        return objectMapper.writeValueAsString(users);
     }
 
     public String getUserById(String email) throws SQLException, JsonProcessingException {
         User user = userDAO.getUserByEmail(email);
-        if (user == null) return "No User";
-        ObjectMapper objectMapper = new ObjectMapper();
-        String response = objectMapper.writeValueAsString(user);
-        return response;
+        return user != null ? objectMapper.writeValueAsString(user) : "No User";
     }
 
-    public String getUserByEmailAndPass(String email, String pass) throws SQLException, JsonProcessingException {
+    public Optional<String> getUserByEmailAndPass(String email, String pass) throws SQLException, JsonProcessingException {
         User user = userDAO.getUserByEmailAndPassword(email, pass);
-        if (user == null) return null;
-        ObjectMapper objectMapper = new ObjectMapper();
-        String response = objectMapper.writeValueAsString(user);
-
-        return response;
+        return user != null ? Optional.of(objectMapper.writeValueAsString(user)) : Optional.empty();
     }
 
     public void deleteUsers() {
-      userDAO.deleteAllUsers();
+        userDAO.deleteAllUsers();
     }
 
-    public void deleteUser(Long userId) {
-//
-        userDAO.deleteUser(userId);
-
+    public void deleteUser(String identifier) {
+        if (identifier.matches("\\d+")) {
+            userDAO.deleteUser(Long.parseLong(identifier));
+        } else {
+            userDAO.deleteUserByEmail(identifier);
+        }
     }
-    public void deleteUser(String email) {
-//
-        userDAO.deleteUser(email);
 
-    }
+
 }

@@ -48,7 +48,7 @@ public class RequestHandler implements HttpHandler {
 
         String userResponse;
         try {
-            userResponse = userController.getUserByEmailAndPass(userEmail, userPass);
+            userResponse = String.valueOf(userController.getUserByEmailAndPass(userEmail, userPass));
         } catch (SQLException | JsonProcessingException e) {
             sendResponse(exchange, "Internal server error", 500);
             return;
