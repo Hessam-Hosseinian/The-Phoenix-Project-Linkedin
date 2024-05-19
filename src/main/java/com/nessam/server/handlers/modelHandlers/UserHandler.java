@@ -19,6 +19,8 @@ public class UserHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         UserController userController = null;
+        com.nessam.server.utils.Logger logger = new com.nessam.server.utils.Logger();
+
 
         try {
             userController = new UserController();
