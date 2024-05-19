@@ -20,10 +20,7 @@ public class Server {
         LOGGER.info("Server starting...");
 
 
-
-
-
-        ConfigurationManager.getInstance().loadConfigurationFile("C:\\Users\\as\\Desktop\\The Phoenix Project 11.0\\src\\main\\resources\\http.json");
+        ConfigurationManager.getInstance().loadConfigurationFile("C:\\Users\\Negar\\Desktop\\The-Phoenix-11Project\\src\\main\\resources\\http.json");
         Configuration conf = ConfigurationManager.getInstance().getCurrentConfiguration();
 
         LOGGER.info("Using Port: " + conf.getPort());

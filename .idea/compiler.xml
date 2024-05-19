@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="The Phoenix Project 11.0" />
+        <module name="my-project" />
       </profile>
     </annotationProcessing>
   </component>
