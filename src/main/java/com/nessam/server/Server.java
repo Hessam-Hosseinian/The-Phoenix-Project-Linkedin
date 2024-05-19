@@ -2,7 +2,8 @@ package com.nessam.server;
 
 import com.nessam.server.config.Configuration;
 import com.nessam.server.config.ConfigurationManager;
-import com.nessam.server.handlers.httpHandlers.AuthHandler;
+
+import com.nessam.server.handlers.httpHandlers.RequestHandler;
 import com.nessam.server.handlers.modelHandlers.FollowHandler;
 import com.nessam.server.handlers.modelHandlers.UserHandler;
 import com.nessam.server.utils.BetterLogger;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,7 +40,7 @@ public class Server {
 
             Files.createDirectories(Paths.get("src/main/java/com/nessam/server/assets"));
             server.createContext("/users", new UserHandler());
-            server.createContext("/auth", new AuthHandler());
+            server.createContext("/auth", new RequestHandler());
             server.createContext("/follows", new FollowHandler());
             server.setExecutor(null);
             server.start();
@@ -47,6 +49,8 @@ public class Server {
         } catch (
                 IOException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
