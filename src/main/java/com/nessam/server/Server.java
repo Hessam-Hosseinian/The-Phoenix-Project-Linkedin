@@ -5,6 +5,7 @@ import com.nessam.server.config.ConfigurationManager;
 import com.nessam.server.handlers.httpHandlers.AuthHandler;
 import com.nessam.server.handlers.modelHandlers.FollowHandler;
 import com.nessam.server.handlers.modelHandlers.UserHandler;
+import com.nessam.server.utils.BetterLogger;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
@@ -17,6 +18,8 @@ import java.util.logging.Logger;
 
 public class Server {
 
+
+
     public static void main(String[] args) throws IOException {
 
 
@@ -25,10 +28,12 @@ public class Server {
 
         ConfigurationManager.getInstance().loadConfigurationFile("src\\main\\resources\\http.json");
         Configuration conf = ConfigurationManager.getInstance().getCurrentConfiguration();
+        BetterLogger.INFO("Using Port: " + conf.getPort());
+        BetterLogger.INFO("Using WebRoot: " + conf.getWebroot());
 
-//        LOGGER.info("Using Port: " + conf.getPort());
-//        LOGGER.info("Using WebRoot: " + conf.getWebroot());
+
         try {
+
             HttpServer server = HttpServer.create(new InetSocketAddress(conf.getPort()), 0);
 
             Files.createDirectories(Paths.get("src/main/java/com/nessam/server/assets"));

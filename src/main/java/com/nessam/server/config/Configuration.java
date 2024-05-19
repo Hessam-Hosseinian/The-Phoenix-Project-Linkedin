@@ -2,7 +2,7 @@ package com.nessam.server.config;
 
 
 public class Configuration {
-    private int port = 000000;
+    private int port = 0000;
     private String webroot;
 
     public int getPort() {

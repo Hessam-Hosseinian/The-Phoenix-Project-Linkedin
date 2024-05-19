@@ -1,7 +1,5 @@
 package com.nessam.server.handlers.modelHandlers;
 
-import com.nessam.server.Server;
-//import com.nessam.server.controllers.UserController;
 import com.nessam.server.controllers.UserController;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -11,15 +9,15 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.logging.Logger;
+
 
 public class UserHandler implements HttpHandler {
 
-    private final static Logger LOGGER = Logger.getLogger(String.valueOf(Server.class));
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         UserController userController = null;
-        com.nessam.server.utils.Logger logger = new com.nessam.server.utils.Logger();
+
 
 
         try {
