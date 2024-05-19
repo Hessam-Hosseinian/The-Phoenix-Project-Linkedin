@@ -40,7 +40,7 @@ public class Server {
 
             Files.createDirectories(Paths.get("src/main/java/com/nessam/server/assets"));
             server.createContext("/users", new UserHandler());
-            server.createContext("/auth", new RequestHandler());
+            server.createContext("/req", new RequestHandler());
             server.createContext("/follows", new FollowHandler());
             server.setExecutor(null);
             server.start();

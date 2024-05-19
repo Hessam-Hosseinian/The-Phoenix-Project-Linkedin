@@ -61,20 +61,20 @@ public class UserHandler implements HttpHandler {
     private String handleGetRequest(String[] splittedPath) {
         if (splittedPath.length == 2) {
             try {
+                BetterLogger.INFO("Users received");
                 return userController.getUsers();
             } catch (SQLException | JsonProcessingException e) {
                 BetterLogger.ERROR(e.toString());
-                e.printStackTrace();
                 return "Error fetching users";
             }
         } else {
             String userId = splittedPath[splittedPath.length - 1];
             try {
                 String response = userController.getUserById(userId);
+                BetterLogger.INFO("User received");
                 return response != null ? response : "No User";
             } catch (SQLException | JsonProcessingException e) {
                 BetterLogger.ERROR(e.toString());
-                e.printStackTrace();
                 return "Error fetching users";
             }
         }
