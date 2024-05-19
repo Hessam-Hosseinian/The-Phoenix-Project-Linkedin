@@ -4,7 +4,6 @@ package com.nessam.server.handlers.modelHandlers;
 import com.nessam.server.controllers.BlockController;
 import com.nessam.server.controllers.FollowController;
 import com.nessam.server.controllers.UserController;
-import com.nessam.server.utils.ExtractUserAuth;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -78,7 +77,7 @@ public class FollowHandler implements HttpHandler {
                     response = "you idiot!!!";
                 } else if (!userController.isUserExists(splittedPath[2])) {
                     response = "user-not-found";
-                } else if (!splittedPath[2].equals(ExtractUserAuth.extract(exchange))) {
+//                } else if (!splittedPath[2].equals(ExtractUserAuth.extract(exchange))) {
                     response = "permission-denied";
                 } else {
                     response = "Done!";
