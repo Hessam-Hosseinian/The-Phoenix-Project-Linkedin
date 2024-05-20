@@ -54,9 +54,9 @@ public class UserController {
         return user != null ? objectMapper.writeValueAsString(user) : "No User";
     }
 
-    public Optional<String> getUserByEmailAndPass(String email, String pass) throws SQLException, JsonProcessingException {
+    public String getUserByEmailAndPass(String email, String pass) throws SQLException, JsonProcessingException {
         User user = userDAO.getUserByEmailAndPassword(email, pass);
-        return user != null ? Optional.of(objectMapper.writeValueAsString(user)) : Optional.empty();
+        return user != null ? objectMapper.writeValueAsString(user) : "No User";
     }
 
     public void deleteUsers() {

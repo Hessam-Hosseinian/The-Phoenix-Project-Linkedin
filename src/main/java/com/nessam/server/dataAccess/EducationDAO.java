@@ -15,7 +15,6 @@ public class EducationDAO {
     private final SessionFactory sessionFactory;
 
     public EducationDAO() {
-        // Create Hibernate SessionFactory
         this.sessionFactory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
     }
 

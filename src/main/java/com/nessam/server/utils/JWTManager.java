@@ -4,15 +4,16 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.security.Keys;
 
+import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
 
 public class JWTManager {
-    private final String secretKey = "WithGreatPowerComesGreatResponsibilityRememberThat";
+    private final Key secretKey = Keys.hmacShaKeyFor("WithGreatPowerComesGreatResponsibilityRememberThat".getBytes());
     private final SignatureAlgorithm algorithm = SignatureAlgorithm.HS256;
-
 
     public String createToken(Map<String, Object> payload, int expirationMinutes) {
         long nowMillis = System.currentTimeMillis();
@@ -20,12 +21,21 @@ public class JWTManager {
 
         Date exp = new Date(nowMillis + expirationMinutes * 60 * 1000);
 
-        return Jwts.builder().setClaims(payload).setIssuedAt(now).setExpiration(exp).signWith(algorithm, secretKey).compact();
+        return Jwts.builder()
+                .setClaims(payload)
+                .setIssuedAt(now)
+                .setExpiration(exp)
+                .signWith(secretKey, algorithm)
+                .compact();
     }
 
     public Map<String, Object> decodeToken(String token) {
         try {
-            Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
             return new HashMap<>(claims);
         } catch (JwtException e) {
             // Handle token parsing exceptions, like expired or invalid tokens
@@ -33,6 +43,4 @@ public class JWTManager {
             return null;
         }
     }
-
 }
-

@@ -30,8 +30,8 @@ public class Education {
     private String endDate;
 
 
-    public Education(Long id, String userEmail, String institution, String degree, String fieldOfStudy, String startDate, String endDate) {
-        this.id = id;
+    public Education(String userEmail, String institution, String degree, String fieldOfStudy, String startDate, String endDate) {
+
         this.userEmail = userEmail;
         this.institution = institution;
         this.degree = degree;
@@ -39,6 +39,7 @@ public class Education {
         this.startDate = startDate;
         this.endDate = endDate;
     }
+
     public Education() {
 
     }

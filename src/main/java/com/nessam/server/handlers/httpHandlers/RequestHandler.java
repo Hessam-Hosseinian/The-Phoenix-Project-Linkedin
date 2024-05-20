@@ -38,7 +38,7 @@ public class RequestHandler implements HttpHandler {
     }
 
     private void handleGetRequest(String[] splittedPath, HttpExchange exchange) {
-        if (splittedPath.length < 2) {
+        if (splittedPath.length < 3) {
             sendResponse(exchange, "Invalid request path", 400);
             return;
         }
@@ -46,23 +46,21 @@ public class RequestHandler implements HttpHandler {
         String userEmail = splittedPath[splittedPath.length - 2];
         String userPass = splittedPath[splittedPath.length - 1];
 
-        String userResponse;
         try {
-            userResponse = String.valueOf(userController.getUserByEmailAndPass(userEmail, userPass));
+            String userResponse = String.valueOf(userController.getUserByEmailAndPass(userEmail, userPass));
+
+            if (userResponse == "No User") {
+                sendResponse(exchange, "Incorrect userID or password", 401);
+            } else {
+                Headers headers = exchange.getResponseHeaders();
+                Map<String, Object> payload = new HashMap<>();
+                payload.put("email", userEmail);
+                String token = jwtManager.createToken(payload, 60);
+                headers.add("Authorization", "Bearer " + token);
+                sendResponse(exchange, "Logged in successfully", 200);
+            }
         } catch (SQLException | JsonProcessingException e) {
             sendResponse(exchange, "Internal server error", 500);
-            return;
-        }
-
-        if (userResponse == null) {
-            sendResponse(exchange, "Incorrect userID or password", 401);
-        } else {
-            Headers headers = exchange.getResponseHeaders();
-            Map<String, Object> payload = new HashMap<>();
-            payload.put("email", userEmail);
-            String token = jwtManager.createToken(payload, 60);
-            headers.add("Authorization", "Bearer " + token);
-            sendResponse(exchange, "Logged in successfully", 200);
         }
     }
 
@@ -76,6 +74,4 @@ public class RequestHandler implements HttpHandler {
             e.printStackTrace();
         }
     }
-
-
 }
