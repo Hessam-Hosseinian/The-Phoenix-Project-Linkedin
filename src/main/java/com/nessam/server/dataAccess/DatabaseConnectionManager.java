@@ -1,6 +1,8 @@
 package com.nessam.server.dataAccess;
 
 
+import com.nessam.server.utils.BetterLogger;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -20,12 +22,12 @@ public class DatabaseConnectionManager {
         try {
             if (connection == null || connection.isClosed()) {
                 connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+                return connection;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            e.printStackTrace();
+            BetterLogger.ERROR(e.toString());
         }
-        return connection;
+      return null;
     }
 
 }

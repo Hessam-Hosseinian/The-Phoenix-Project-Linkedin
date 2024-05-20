@@ -127,8 +127,8 @@ public class UserHandler implements HttpHandler {
             BetterLogger.INFO("All user deleted successfully");
             return "All users deleted";
         } else {
-            String userId = splittedPath[splittedPath.length - 1];
-            userController.deleteUser(userId);
+            String userEmail = splittedPath[splittedPath.length - 1];
+            userController.deleteUser(userEmail);
             BetterLogger.INFO("One user deleted successfully");
             return "User deleted successfully";
         }
