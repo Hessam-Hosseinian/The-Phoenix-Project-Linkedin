@@ -26,8 +26,10 @@ public class DatabaseConnectionManager {
             }
         } catch (SQLException e) {
             BetterLogger.ERROR(e.toString());
+            BetterLogger.ERROR("database connection error");
         }
-      return null;
+
+        return connection;
     }
 
 }

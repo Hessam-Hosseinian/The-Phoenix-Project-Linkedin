@@ -1,4 +1,5 @@
 package com.nessam.server.controllers;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nessam.server.dataAccess.BlockDAO;
@@ -6,6 +7,7 @@ import com.nessam.server.models.Block;
 
 import java.sql.SQLException;
 import java.util.List;
+
 public class BlockController {
     private final BlockDAO blockDAO;
     public BlockController() throws SQLException {

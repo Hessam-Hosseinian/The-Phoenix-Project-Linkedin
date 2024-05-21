@@ -41,7 +41,11 @@ public class UserController {
     }
 
     public boolean isUserExists(String email) {
-        return userDAO.getUserByEmail(email) != null;
+        try {
+            return userDAO.getUserByEmail(email) != null;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String getUsers() throws SQLException, JsonProcessingException {
@@ -55,19 +59,24 @@ public class UserController {
     }
 
     public String getUserByEmailAndPass(String email, String pass) throws SQLException, JsonProcessingException {
-        User user = userDAO.getUserByEmailAndPassword(email, pass);
+        User user = userDAO.getUserByEmail(email, pass);
         return user != null ? objectMapper.writeValueAsString(user) : "No User";
     }
 
     public void deleteUsers() {
-        userDAO.deleteAllUsers();
+        try {
+            userDAO.deleteAllUsers();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void deleteUser(String identifier) {
-        if (identifier.matches("\\d+")) {
-            userDAO.deleteUser(Long.parseLong(identifier));
-        } else {
+        try {
+
             userDAO.deleteUserByEmail(identifier);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

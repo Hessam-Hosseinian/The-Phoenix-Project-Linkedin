@@ -8,133 +8,97 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FollowDAO {
 
-    private final SessionFactory sessionFactory;
 
-    public FollowDAO() {
-        // Create Hibernate SessionFactory
-        this.sessionFactory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
+    private final Connection connection;
+    public FollowDAO() throws SQLException {
+        connection = DatabaseConnectionManager.getConnection();
+        createFollowTable();
     }
 
-    public void saveFollow(Follow follow) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.save(follow);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
+    public void createFollowTable() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS follows (follower VARCHAR(36), followed VARCHAR(36), PRIMARY KEY (follower, followed))");
+        preparedStatement.executeUpdate();
     }
 
-    public void deleteFollow(Follow follow1) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            Follow follow = session.get(Follow.class, follow1.getId());
-            if (follow != null) {
-                session.delete(follow);
-            }
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
+    public void saveFollow(Follow follow) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO follows (follower, followed) VALUES (?, ?)");
+        preparedStatement.setString(1, follow.getFollower());
+        preparedStatement.setString(2, follow.getFollowed());
+        preparedStatement.executeUpdate();
+    }
+
+    public void deleteFollow(Follow follow) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM follows WHERE follower = ? AND followed = ?");
+        preparedStatement.setString(1, follow.getFollower());
+        preparedStatement.setString(2, follow.getFollowed());
+        preparedStatement.executeUpdate();
+    }
+
+    public void deleteAllFollows() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM follows");
+        preparedStatement.executeUpdate();
     }
 
 
-//    public void deleteAllFollows() {
-//        Transaction transaction = null;
-//        try (Session session = sessionFactory.openSession()) {
-//            transaction = session.beginTransaction();
-//            List<Follow> followList = session.createQuery("FROM Follow", Follow.class).list();
-//            for (Follow follow : followList) {
-//                session.delete(follow);
-//            }
-//            transaction.commit();
-//        } catch (Exception e) {
-//            if (transaction != null) {
-//                transaction.rollback();
-//            }
-//            e.printStackTrace();
-//        }
-//    }
-    public void deleteAllFollows() {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.createQuery("DELETE FROM Follow").executeUpdate();
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
+    public List<Follow> getFollows(String userId) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM follows WHERE follower = ?");
+        preparedStatement.setString(1, userId);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        List<Follow> follows = new ArrayList<>();
+        while (resultSet.next()) {
+            Follow follow = new Follow();
+            follow.setFollower(resultSet.getString("follower"));
+            follow.setFollowed(resultSet.getString("followed"));
+            follows.add(follow);
         }
-    }
-    public List<Follow> getFollowsByFollower(String followerId) {
-        try (Session session = sessionFactory.openSession()) {
-            String hql = "FROM Follow WHERE follower = :followerId";
-            Query<Follow> query = session.createQuery(hql, Follow.class);
-            query.setParameter("followerId", followerId);
-            return query.getResultList();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    public Follow getFollowById(Long id) {
-        try (Session session = sessionFactory.openSession()) {
-            return session.get(Follow.class, id);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    public List<Follow> getFollowers(String userId) {
-        try (Session session = sessionFactory.openSession()) {
-            String hql = "FROM Follow WHERE followed = :userId";
-            Query<Follow> query = session.createQuery(hql, Follow.class);
-            query.setParameter("userId", userId);
-            return query.getResultList();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return follows;
     }
 
-    public List<Follow> getAllFollows() {
-        try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("FROM Follow", Follow.class).list();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+    public List<Follow> getFollowers(String userId) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM follows WHERE followed = ?");
+        preparedStatement.setString(1, userId);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        List<Follow> follows = new ArrayList<>();
+        while (resultSet.next()) {
+            Follow follow = new Follow();
+            follow.setFollower(resultSet.getString("follower"));
+            follow.setFollowed(resultSet.getString("followed"));
+            follows.add(follow);
         }
+        return follows;
     }
 
-    public boolean isFollowing(String followerId, String followedId) {
-        try (Session session = sessionFactory.openSession()) {
-            String hql = "SELECT COUNT(*) FROM Follow WHERE follower = :followerId AND followed = :followedId";
-            Query<Long> query = session.createQuery(hql, Long.class);
-            query.setParameter("followerId", followerId);
-            query.setParameter("followedId", followedId);
-            Long count = query.uniqueResult();
-            return count != null && count > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+    public List<Follow> getAllFollow() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM follows");
+        ResultSet resultSet = preparedStatement.executeQuery();
+        List<Follow> follows = new ArrayList<>();
+        while (resultSet.next()) {
+            Follow follow = new Follow();
+            follow.setFollower(resultSet.getString("follower"));
+            follow.setFollowed(resultSet.getString("followed"));
+            follows.add(follow);
         }
+        return follows;
     }
 
-    public void close() {
-        sessionFactory.close();
+    public boolean isFollowing(String followerId, String followedId) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM follows WHERE follower = ? AND followed = ?");
+        preparedStatement.setString(1, followerId);
+        preparedStatement.setString(2, followedId);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        boolean isFollowing = resultSet.next();
+        return isFollowing;
     }
+
+
+
 }

@@ -108,7 +108,7 @@ public class UserHandler implements HttpHandler {
 
 
             Files.createDirectories(Paths.get("src/main/resources/assets/users/user" + jsonObject.getString("email")));
-          BetterLogger.INFO("User created successfully");
+            BetterLogger.INFO("User created successfully");
             return "User created successfully";
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,7 +118,40 @@ public class UserHandler implements HttpHandler {
     }
 
     private String handlePutRequest(HttpExchange exchange) {
-        return "This is the response for PUT request (UserHandler)";
+        try {
+            InputStream requestBody = exchange.getRequestBody();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(requestBody));
+            StringBuilder body = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                body.append(line);
+            }
+            requestBody.close();
+
+            JSONObject jsonObject = new JSONObject(body.toString());
+            userController.createUser(
+                    jsonObject.getString("email"),
+                    jsonObject.getString("password"),
+                    jsonObject.getString("firstName"),
+                    jsonObject.getString("lastName"),
+                    jsonObject.getString("additionalName"),
+                    jsonObject.getString("profilePicture"),
+                    jsonObject.getString("backgroundPicture"),
+                    jsonObject.getString("title"),
+                    jsonObject.getString("location"),
+                    jsonObject.getString("profession"),
+                    jsonObject.getString("seekingOpportunity")
+            );
+
+
+            Files.createDirectories(Paths.get("src/main/resources/assets/users/user" + jsonObject.getString("email")));
+            BetterLogger.INFO("User update successfully");
+            return "User update successfully";
+        } catch (Exception e) {
+            e.printStackTrace();
+            BetterLogger.ERROR("Can not update user");
+            return "Error update user";
+        }
     }
 
     private String handleDeleteRequest(String[] splittedPath) {
@@ -129,8 +162,14 @@ public class UserHandler implements HttpHandler {
         } else {
             String userEmail = splittedPath[splittedPath.length - 1];
             userController.deleteUser(userEmail);
-            BetterLogger.INFO("One user deleted successfully");
-            return "User deleted successfully";
+
+            if (userController.isUserExists(userEmail)) {
+                BetterLogger.INFO("One user deleted successfully");
+                return "User deleted successfully";
+            } else {
+                BetterLogger.ERROR("There is no user with this Email");
+                return "User deleted unsuccessfully";
+            }
         }
     }
 }
