@@ -12,6 +12,7 @@ public class BlockController {
     private final BlockDAO blockDAO;
     public BlockController() throws SQLException {
         blockDAO = new BlockDAO();
+        blockDAO.createBlockTable();
     }
 
     public void createBlockTable() throws SQLException {

@@ -17,16 +17,16 @@ CREATE TABLE user
 CREATE TABLE education
 (
     id                     BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id                BIGINT      NOT NULL,
-    school_name            VARCHAR(40) ,
-    field_of_study         VARCHAR(40) ,
+    user_id                BIGINT NOT NULL,
+    school_name            VARCHAR(40),
+    field_of_study         VARCHAR(40),
     education_start_date   DATE,
     education_end_date     DATE,
     grade                  VARCHAR(40),
     activities_description VARCHAR(500),
     description            VARCHAR(1000),
     skills                 VARCHAR(40),
-    notify_changes         BOOLEAN     ,
+    notify_changes         BOOLEAN,
     CONSTRAINT fk_user
         FOREIGN KEY (user_id)
             REFERENCES user (id)
@@ -71,10 +71,11 @@ CREATE TABLE contact_information
         FOREIGN KEY (user_id)
             REFERENCES user (id)
 );
-CREATE TABLE Follow (
-                        id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                        follower VARCHAR(255) NOT NULL,
-                        followed VARCHAR(255) NOT NULL
+CREATE TABLE Follow
+(
+    id       BIGINT PRIMARY KEY AUTO_INCREMENT,
+    follower VARCHAR(255) NOT NULL,
+    followed VARCHAR(255) NOT NULL
 );
 # CREATE TABLE post (
 #                       id BIGINT AUTO_INCREMENT PRIMARY KEY,

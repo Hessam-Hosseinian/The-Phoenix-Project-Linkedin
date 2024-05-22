@@ -6,6 +6,8 @@ import com.nessam.server.config.ConfigurationManager;
 import com.nessam.server.handlers.httpHandlers.RequestHandler;
 //import com.nessam.server.handlers.modelHandlers.EducationHandler;
 import com.nessam.server.handlers.modelHandlers.FollowHandler;
+import com.nessam.server.handlers.modelHandlers.MessageHandler;
+import com.nessam.server.handlers.modelHandlers.PostHandler;
 import com.nessam.server.handlers.modelHandlers.UserHandler;
 import com.nessam.server.utils.BetterLogger;
 import com.sun.net.httpserver.HttpServer;
@@ -45,6 +47,9 @@ public class Server {
 //            server.createContext("/education", new EducationHandler());
             server.createContext("/req", new RequestHandler());
             server.createContext("/follows", new FollowHandler());
+            server.createContext("/message",new MessageHandler());
+            server.createContext("/post",new PostHandler());
+
             server.setExecutor(null);
             server.start();
 

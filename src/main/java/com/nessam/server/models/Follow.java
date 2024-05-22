@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class Follow {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY )
     private Long id;
     @Column(name = "follower", nullable = false)
     private String follower;

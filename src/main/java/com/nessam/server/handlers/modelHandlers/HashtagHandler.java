@@ -32,7 +32,6 @@ public class HashtagHandler implements HttpHandler {
         try {
             postController = new PostController();
         } catch (SQLException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
         String method = exchange.getRequestMethod();
@@ -57,23 +56,23 @@ public class HashtagHandler implements HttpHandler {
                     response = "wtf";
                     break;
                 }
-                try {
-                    if (postController.getpostById(splittedPath[3]) == null) {
-                        response = "tweet-not-found";
-                    } else if (!userController.isUserExists(ExtractUserAuth.extract(exchange))) {
-                        response = "permission-denied";
-                    } else {
-                        try {
-                            hashtagController.addHashtag(splittedPath[2], splittedPath[3]);
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                            throw new RuntimeException(e);
-                        }
-                        response = "Done!";
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    if (postController.getPostById((splittedPath[3])) == null) {
+//                        response = "tweet-not-found";
+//                    } else if (!userController.isUserExists(ExtractUserAuth.extract(exchange))) {
+//                        response = "permission-denied";
+//                    } else {
+//                        try {
+//                            hashtagController.addHashtag(splittedPath[2], splittedPath[3]);
+//                        } catch (SQLException e) {
+//                            e.printStackTrace();
+//                            throw new RuntimeException(e);
+//                        }
+//                        response = "Done!";
+//                    }
+//                } catch (SQLException e) {
+//                    throw new RuntimeException(e);
+//                }
                 break;
             case "DELETE":
                 try {

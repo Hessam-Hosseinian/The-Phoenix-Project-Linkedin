@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FollowDAO {
-
-
     private final Connection connection;
     public FollowDAO() throws SQLException {
         connection = DatabaseConnectionManager.getConnection();
@@ -25,7 +23,7 @@ public class FollowDAO {
     }
 
     public void createFollowTable() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS follows (follower VARCHAR(36), followed VARCHAR(36), PRIMARY KEY (follower, followed))");
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS follows (id  BIGINT AUTO_INCREMENT PRIMARY KEY,follower VARCHAR(36), followed VARCHAR(36))");
         preparedStatement.executeUpdate();
     }
 

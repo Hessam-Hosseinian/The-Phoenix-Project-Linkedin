@@ -68,9 +68,9 @@ public class UserHandler implements HttpHandler {
                 return "Error fetching users";
             }
         } else {
-            String userId = splittedPath[splittedPath.length - 1];
+            String userEmail = splittedPath[splittedPath.length - 1];
             try {
-                String response = userController.getUserById(userId);
+                String response = userController.getUserById(userEmail);
                 BetterLogger.INFO("User received");
                 return response != null ? response : "No User";
             } catch (SQLException | JsonProcessingException e) {

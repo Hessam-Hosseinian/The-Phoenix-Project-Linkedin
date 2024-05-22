@@ -1,6 +1,8 @@
 package com.nessam.server.models;
 
 import jakarta.persistence.*;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
@@ -10,39 +12,37 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(nullable = false, length = 5000)
+    @Column(name = "content", nullable = false, length = 5000)
     private String content;
 
-    @Column(nullable = false)
-    private Date dateCreated;
+    @Column(name = "dateCreated")
+    private String dateCreated;
+    @Column(name = "author")
+    private String author;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
-    private User author;
-
-    @Column(nullable = false)
+    @Column(name = "likes")
     private int likes;
 
-    @Column(nullable = false)
+    @Column(name = "dislikes")
     private int dislikes;
 
-    public Post() {
-    }
 
-    public Post(String title, String content, User author) {
+    public Post(String title, String content, String author) {
         this.title = title;
         this.content = content;
         this.author = author;
-        this.dateCreated = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        this.dateCreated = formatter.format(new Date());
+
         this.likes = 0;
         this.dislikes = 0;
     }
 
-    public Post(long id, String title, String content, long authorId) {
 
+    public Post() {
     }
 
     public Long getId() {
@@ -69,19 +69,19 @@ public class Post {
         this.content = content;
     }
 
-    public Date getDateCreated() {
+    public String getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(Date dateCreated) {
+    public void setDateCreated(String dateCreated) {
         this.dateCreated = dateCreated;
     }
 
-    public User getAuthor() {
+    public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(User author) {
+    public void setAuthor(String author) {
         this.author = author;
     }
 
@@ -108,6 +108,13 @@ public class Post {
 
     public void dislikePost() {
         this.dislikes++;
+    }
+    public void onlikePost() {
+        this.likes--;
+    }
+
+    public void ondislikePost() {
+        this.dislikes--;
     }
 }
 

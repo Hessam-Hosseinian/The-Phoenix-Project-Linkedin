@@ -49,17 +49,32 @@ public class RequestHandler implements HttpHandler {
         try {
             String userResponse = String.valueOf(userController.getUserByEmailAndPass(userEmail, userPass));
 
-            if (userResponse == "No User") {
+            if (userResponse.equals("No User")) {
                 sendResponse(exchange, "Incorrect userID or password", 401);
             } else {
                 Headers headers = exchange.getResponseHeaders();
                 Map<String, Object> payload = new HashMap<>();
                 payload.put("email", userEmail);
-                String token = jwtManager.createToken(payload, 60);
-                headers.add("Authorization", "Bearer " + token);
+                String token = jwtManager.createToken(payload, 60); // Token valid for 60 minutes
+                System.out.println("Generated Token: " + token);
+
+                // Set the Authorization header with the token
+                headers.set("Authorization", "Bearer " + token);
+
+                System.out.println(exchange.getResponseHeaders());
+                System.out.println(exchange.getResponseHeaders().getFirst("Authorization"));
+                // Optionally decode the token for logging purposes
+                Map<String, Object> decodedPayload = jwtManager.decodeToken(token);
+                if (decodedPayload != null) {
+                    System.out.println("Decoded Payload: " + decodedPayload);
+                } else {
+                    System.out.println("Token is invalid or expired.");
+                }
+
                 sendResponse(exchange, "Logged in successfully", 200);
             }
         } catch (SQLException | JsonProcessingException e) {
+            e.printStackTrace();
             sendResponse(exchange, "Internal server error", 500);
         }
     }
@@ -67,9 +82,9 @@ public class RequestHandler implements HttpHandler {
     private void sendResponse(HttpExchange exchange, String response, int statusCode) {
         try {
             exchange.sendResponseHeaders(statusCode, response.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(response.getBytes());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
