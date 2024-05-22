@@ -1,36 +1,49 @@
 package com.nessam.server.models;
 
 import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Date;
 
 @Entity
-@Table(name = "post")
+@Table(name = "posts")
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(nullable = false)
+    private String title;
 
-    @Column(name = "text", length = 3000, nullable = false)
-    private String text;
+    @Column(nullable = false, length = 5000)
+    private String content;
 
-    @ManyToMany(mappedBy = "likedPosts", fetch = FetchType.LAZY)
-    private Set<User> likedBy = new HashSet<>();
+    @Column(nullable = false)
+    private Date dateCreated;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Comment> comments = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
 
-    public Post(Long id, User user, String text) {
-        this.id = id;
-        this.user = user;
-        this.text = text;
+    @Column(nullable = false)
+    private int likes;
+
+    @Column(nullable = false)
+    private int dislikes;
+
+    public Post() {
     }
 
-    public Post() {}
+    public Post(String title, String content, User author) {
+        this.title = title;
+        this.content = content;
+        this.author = author;
+        this.dateCreated = new Date();
+        this.likes = 0;
+        this.dislikes = 0;
+    }
+
+    public Post(long id, String title, String content, long authorId) {
+
+    }
 
     public Long getId() {
         return id;
@@ -40,35 +53,61 @@ public class Post {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public String getTitle() {
+        return title;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getText() {
-        return text;
+    public String getContent() {
+        return content;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public Set<User> getLikedBy() {
-        return likedBy;
+    public Date getDateCreated() {
+        return dateCreated;
     }
 
-    public void setLikedBy(Set<User> likedBy) {
-        this.likedBy = likedBy;
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
-    public Set<Comment> getComments() {
-        return comments;
+    public User getAuthor() {
+        return author;
     }
 
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public int getDislikes() {
+        return dislikes;
+    }
+
+    public void setDislikes(int dislikes) {
+        this.dislikes = dislikes;
+    }
+
+
+    public void likePost() {
+        this.likes++;
+    }
+
+    public void dislikePost() {
+        this.dislikes++;
     }
 }
+
