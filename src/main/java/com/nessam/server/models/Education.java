@@ -2,7 +2,6 @@ package com.nessam.server.models;
 
 import jakarta.persistence.*;
 
-
 @Entity
 @Table(name = "education")
 public class Education {
@@ -11,8 +10,9 @@ public class Education {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_email")
-    private String userEmail;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "institution")
     private String institution;
@@ -29,21 +29,17 @@ public class Education {
     @Column(name = "end_date")
     private String endDate;
 
+    public Education() {
+    }
 
-    public Education(String userEmail, String institution, String degree, String fieldOfStudy, String startDate, String endDate) {
-
-        this.userEmail = userEmail;
+    public Education(User user, String institution, String degree, String fieldOfStudy, String startDate, String endDate) {
+        this.user = user;
         this.institution = institution;
         this.degree = degree;
         this.fieldOfStudy = fieldOfStudy;
         this.startDate = startDate;
         this.endDate = endDate;
     }
-
-    public Education() {
-
-    }
-
 
     // Getters and Setters for all fields
     public Long getId() {
@@ -54,12 +50,12 @@ public class Education {
         this.id = id;
     }
 
-    public String getUserEmail() {
-        return userEmail;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getInstitution() {

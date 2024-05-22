@@ -1,12 +1,6 @@
 package com.nessam.server.models;
 
-
-
-//import jakarta.persistence.*;
-
-//import javax.persistence.*;
 import jakarta.persistence.*;
-
 import java.sql.Date;
 
 @Entity
@@ -17,7 +11,7 @@ public class ContactInformation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -48,8 +42,10 @@ public class ContactInformation {
     @Column(name = "instant_contact_method", length = 40)
     private String instantContactMethod;
 
-    public ContactInformation(Long id, User user, String profileLink, String email, String phoneNumber, int phoneType, String address, Date birthMonth, Date birthDay, int birthPrivacyPolicy, String instantContactMethod) {
-        this.id = id;
+    public ContactInformation() {
+    }
+
+    public ContactInformation(User user, String profileLink, String email, String phoneNumber, int phoneType, String address, Date birthMonth, Date birthDay, int birthPrivacyPolicy, String instantContactMethod) {
         this.user = user;
         this.profileLink = profileLink;
         this.email = email;
@@ -62,11 +58,7 @@ public class ContactInformation {
         this.instantContactMethod = instantContactMethod;
     }
 
-    public ContactInformation() {
-
-    }
-
-    // Getters and setters
+    // Getters and setters...
 
     public Long getId() {
         return id;

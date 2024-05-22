@@ -1,4 +1,4 @@
-CREATE TABLE users
+CREATE TABLE user
 (
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
     email               VARCHAR(50)  NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE education
     notify_changes         BOOLEAN     ,
     CONSTRAINT fk_user
         FOREIGN KEY (user_id)
-            REFERENCES users (id)
+            REFERENCES user (id)
 );
 
 
@@ -50,7 +50,7 @@ CREATE TABLE current_job_positions
     notify_changes  BOOLEAN,
     CONSTRAINT fk_user_cjp
         FOREIGN KEY (user_id)
-            REFERENCES users (id)
+            REFERENCES user (id)
 );
 
 
@@ -69,12 +69,36 @@ CREATE TABLE contact_information
     instant_contact_method VARCHAR(40),
     CONSTRAINT fk_user_ci
         FOREIGN KEY (user_id)
-            REFERENCES users (id)
+            REFERENCES user (id)
 );
 CREATE TABLE Follow (
                         id BIGINT PRIMARY KEY AUTO_INCREMENT,
                         follower VARCHAR(255) NOT NULL,
                         followed VARCHAR(255) NOT NULL
 );
+# CREATE TABLE post (
+#                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+#                       user_id BIGINT NOT NULL,
+#                       text VARCHAR(3000) NOT NULL,
+#                       FOREIGN KEY (user_id) REFERENCES user(id)
+# );
+#
+# CREATE TABLE post_likes (
+#                             post_id BIGINT NOT NULL,
+#                             user_id BIGINT NOT NULL,
+#                             PRIMARY KEY (post_id, user_id),
+#                             FOREIGN KEY (post_id) REFERENCES post(id),
+#                             FOREIGN KEY (user_id) REFERENCES user(id)
+# );
+#
+# CREATE TABLE comments (
+#                           id BIGINT AUTO_INCREMENT PRIMARY KEY,
+#                           text VARCHAR(2000) NOT NULL,
+#                           user_id BIGINT NOT NULL,
+#                           post_id BIGINT NOT NULL,
+#                           created_at TIMESTAMP NOT NULL,
+#                           FOREIGN KEY (user_id) REFERENCES user(id),
+#                           FOREIGN KEY (post_id) REFERENCES post(id)
+# );
 
 
