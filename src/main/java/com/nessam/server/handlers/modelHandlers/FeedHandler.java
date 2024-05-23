@@ -12,9 +12,9 @@ public class FeedHandler {
         this.postDAO = postDAO;
     }
 
-    public List<Post> getFeedForUser(Long userId) {
-        return postDAO.getPostsForUserFeed(userId);
-    }
+//    public List<Post> getFeedForUser(Long userId) {
+//        return postDAO.getPostsForUserFeed(userId);
+//    }
 }
 
 

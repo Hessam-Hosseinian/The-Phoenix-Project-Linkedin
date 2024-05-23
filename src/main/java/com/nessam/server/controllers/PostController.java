@@ -35,22 +35,25 @@ public class PostController {
 
     public String getPosts() throws SQLException, JsonProcessingException {
         List<Post> posts = postDAO.getAllPosts();
+
         return objectMapper.writeValueAsString(posts);
     }
 
-    public String getPostByEmail(String email) throws SQLException, JsonProcessingException {
-        Post post = postDAO.getPostByEmail(email);
-        return post != null ? objectMapper.writeValueAsString(post) : "No Post";
+    public String getPostByAuthor(String email) throws SQLException, JsonProcessingException {
+        List<Post> posts = postDAO.getPostsByAuthor(email);
+        return posts != null ? objectMapper.writeValueAsString(posts) : "No Post";
     }
 
-    //    public String getPostById(String email) throws SQLException, JsonProcessingException {
-//        Post post = postDAO.getPostByEmail(email);
-//        return post != null ? objectMapper.writeValueAsString(post) : "No Post";
-//    }
+    public String getPostByAuthorAndTitle(String email, String title) throws SQLException, JsonProcessingException {
+        Post posts = postDAO.getPostByAuthorAndTitle(email, title);
+        return posts != null ? objectMapper.writeValueAsString(posts) : "No Post";
+    }
+
+
     public void updatePost(String email, String title, String content) throws SQLException {
-        Post post = postDAO.getPostByEmail(email);
+        Post post = postDAO.getPostByAuthorAndTitle(email, title);
         if (post != null) {
-            post.setTitle(title);
+
             post.setContent(content);
             postDAO.updatePost(post);
         } else {
@@ -66,9 +69,9 @@ public class PostController {
         }
     }
 
-    public void deletePost(Long id) {
+    public void deletePostByAuthorAndTitle(String author, String title) {
         try {
-            postDAO.deletePostById(id);
+            postDAO.deletePostByAuthorAndTitle(author, title);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

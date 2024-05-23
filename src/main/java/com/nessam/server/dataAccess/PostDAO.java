@@ -60,51 +60,74 @@ public class PostDAO {
         try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
                 posts.add(mapResultSetToPost(resultSet));
+
             }
         }
         return posts;
     }
 
-    public Post getPostByEmail(String email) throws SQLException {
-        String query = "SELECT * FROM posts WHERE email = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, email);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return mapResultSetToPost(resultSet);
-                } else {
-                    return null;
+    public List<Post> getPostsByAuthor(String author) throws SQLException {
+        List<Post> posts = new ArrayList<>();
+        String query = "SELECT * FROM posts WHERE author = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, author);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    posts.add(mapResultSetToPost(rs));
                 }
             }
         }
+        return posts;
     }
 
+    public Post getPostByAuthorAndTitle(String author, String title) throws SQLException {
+        Post post = null;
+        String query = "SELECT * FROM posts WHERE author = ? AND title = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, author);
+            stmt.setString(2, title);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    post = mapResultSetToPost(rs);
+                }
+            }
+        }
+        return post;
+    }
+
+
+
+
     public void updatePost(Post post) throws SQLException {
-        String query = "UPDATE posts SET title = ?, content = ?, likes = ?, dislikes = ? WHERE id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, post.getTitle());
-            statement.setString(2, post.getContent());
-            statement.setInt(3, post.getLikes());
-            statement.setInt(4, post.getDislikes());
-            statement.setLong(5, post.getId());
-            statement.executeUpdate();
+        String query = "UPDATE posts SET content = ? WHERE author = ? AND title = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, post.getContent());
+            stmt.setString(2, post.getAuthor());
+            stmt.setString(3, post.getTitle());
+            stmt.executeUpdate();
         }
     }
+
+
+
 
     public void deleteAllPosts() throws SQLException {
         String query = "DELETE FROM posts";
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate(query);
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(query);
         }
     }
 
-    public void deletePostById(Long id) throws SQLException {
-        String query = "DELETE FROM posts WHERE id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, id);
-            statement.executeUpdate();
+    public void deletePostByAuthorAndTitle(String author, String title) throws SQLException {
+        String query = "DELETE FROM posts WHERE author = ? AND title = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, author);
+            stmt.setString(2, title);
+            stmt.executeUpdate();
         }
     }
+
+
 
     private Post mapResultSetToPost(ResultSet resultSet) throws SQLException {
         Post post = new Post();
@@ -112,19 +135,12 @@ public class PostDAO {
         post.setTitle(resultSet.getString("title"));
         post.setContent(resultSet.getString("content"));
         post.setDateCreated(resultSet.getString("dateCreated"));
+        post.setAuthor(resultSet.getString("author"));
         post.setLikes(resultSet.getInt("likes"));
         post.setDislikes(resultSet.getInt("dislikes"));
-
-        // Assuming you have a method to get a User by their ID
-        long authorId = resultSet.getLong("author_id");
-        UserDAO userDAO = new UserDAO();
-//        User author = userDAO.getUserById(authorId);
-//        post.setAuthor(author);
 
         return post;
     }
 
-    public List<Post> getPostsForUserFeed(Long userId) {
-        return null;
-    }
+
 }
