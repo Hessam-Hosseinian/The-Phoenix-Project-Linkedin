@@ -1,39 +1,60 @@
 package com.nessam.server.models;
 
 import jakarta.persistence.*;
-import java.util.Date;
+
+import java.util.Collection;
 
 @Entity
 @Table(name = "comments")
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, length = 1000)
+    private long id;
+    @Column(name = "content")
     private String content;
+    @Column(name = "author")
+    private String author;
+    @Column(name = "dateCreated")
+    private String dateCreated;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
-    private User author;
 
-    @Column(nullable = false)
-    private Date dateCreated;
 
-    public Comment() {
+
+    // Getters and Setters
+    public long getId() {
+        return id;
     }
 
-    public Comment(String content, Post post, User author) {
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
         this.content = content;
-        this.post = post;
-        this.author = author;
-        this.dateCreated = new Date();
     }
 
-    // Getters and setters
-}
+    public String getAuthor() {
+        return author;
+    }
 
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+
+
+
+}

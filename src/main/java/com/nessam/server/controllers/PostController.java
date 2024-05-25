@@ -3,6 +3,7 @@ package com.nessam.server.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nessam.server.dataAccess.PostDAO;
+import com.nessam.server.models.Comment;
 import com.nessam.server.models.Post;
 import com.nessam.server.models.User;
 
@@ -76,26 +77,6 @@ public class PostController {
             throw new RuntimeException(e);
         }
     }
-
-//    public void likePost(Long id) throws SQLException {
-//        Post post = postDAO.getPostById(id);
-//        if (post != null) {
-//            post.likePost();
-//            postDAO.updatePost(post);
-//        } else {
-//            throw new SQLException("Post not found");
-//        }
-//    }
-//
-//    public void dislikePost(Long id) throws SQLException {
-//        Post post = postDAO.getPostById(id);
-//        if (post != null) {
-//            post.dislikePost();
-//            postDAO.updatePost(post);
-//        } else {
-//            throw new SQLException("Post not found");
-//        }
-//    }
 
 
 }

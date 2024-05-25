@@ -1,5 +1,6 @@
 package com.nessam.server.dataAccess;
 
+import com.nessam.server.models.Comment;
 import com.nessam.server.models.Post;
 import com.nessam.server.models.User;
 
@@ -15,6 +16,7 @@ public class PostDAO {
 
         connection = DatabaseConnectionManager.getConnection();
         createPostTable();
+        createCommentTable();
 
     }
 
@@ -22,7 +24,7 @@ public class PostDAO {
     public void createPostTable() throws SQLException {
         PreparedStatement statement = connection.prepareStatement(
                 "CREATE TABLE IF NOT EXISTS posts (" +
-                        "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+                        "post_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                         "title VARCHAR(255) NOT NULL, " +
                         "content TEXT NOT NULL, " +
                         "dateCreated DATETIME NOT NULL, " +
@@ -33,6 +35,20 @@ public class PostDAO {
         );
         statement.executeUpdate();
     }
+    public void createCommentTable() throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(
+                "CREATE TABLE IF NOT EXISTS comments (" +
+                        "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+                        "content TEXT NOT NULL, " +
+                        "dateCreated DATETIME NOT NULL, " +
+                        "author VARCHAR(255) NOT NULL, " +
+                        "fk_post_Id BIGINT NOT NULL, " +
+                        "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id)" +
+                        ")"
+        );
+        statement.executeUpdate();
+    }
+
 
 
     public void savePost(Post post) throws SQLException {
@@ -96,8 +112,6 @@ public class PostDAO {
     }
 
 
-
-
     public void updatePost(Post post) throws SQLException {
         String query = "UPDATE posts SET content = ? WHERE author = ? AND title = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -107,8 +121,6 @@ public class PostDAO {
             stmt.executeUpdate();
         }
     }
-
-
 
 
     public void deleteAllPosts() throws SQLException {
@@ -128,10 +140,9 @@ public class PostDAO {
     }
 
 
-
     private Post mapResultSetToPost(ResultSet resultSet) throws SQLException {
         Post post = new Post();
-        post.setId(resultSet.getLong("id"));
+        post.setId(resultSet.getLong("post_Id"));
         post.setTitle(resultSet.getString("title"));
         post.setContent(resultSet.getString("content"));
         post.setDateCreated(resultSet.getString("dateCreated"));
@@ -141,6 +152,10 @@ public class PostDAO {
 
         return post;
     }
+
+
+
+
 
 
 }

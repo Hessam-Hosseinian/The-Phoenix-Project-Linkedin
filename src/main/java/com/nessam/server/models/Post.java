@@ -3,13 +3,16 @@ package com.nessam.server.models;
 import jakarta.persistence.*;
 
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "posts")
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_Id")
     private Long id;
 
     @Column(name = "title", nullable = false)
@@ -29,6 +32,10 @@ public class Post {
     @Column(name = "dislikes")
     private int dislikes;
 
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "fk_post_Id", referencedColumnName = "post_Id")
+    private List<Comment> comments;
 
     public Post(String title, String content, String author) {
         this.title = title;
@@ -109,12 +116,21 @@ public class Post {
     public void dislikePost() {
         this.dislikes++;
     }
+
     public void onlikePost() {
         this.likes--;
     }
 
     public void ondislikePost() {
         this.dislikes--;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }
 

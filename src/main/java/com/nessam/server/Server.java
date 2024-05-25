@@ -5,10 +5,7 @@ import com.nessam.server.config.ConfigurationManager;
 
 import com.nessam.server.handlers.httpHandlers.RequestHandler;
 //import com.nessam.server.handlers.modelHandlers.EducationHandler;
-import com.nessam.server.handlers.modelHandlers.FollowHandler;
-import com.nessam.server.handlers.modelHandlers.MessageHandler;
-import com.nessam.server.handlers.modelHandlers.PostHandler;
-import com.nessam.server.handlers.modelHandlers.UserHandler;
+import com.nessam.server.handlers.modelHandlers.*;
 import com.nessam.server.utils.BetterLogger;
 import com.sun.net.httpserver.HttpServer;
 
@@ -33,13 +30,14 @@ public class Server {
 
         ConfigurationManager.getInstance().loadConfigurationFile("src\\main\\resources\\http.json");
         Configuration conf = ConfigurationManager.getInstance().getCurrentConfiguration();
+
         BetterLogger.INFO("Using Port: " + conf.getPort());
         BetterLogger.INFO("Using WebRoot: " + conf.getWebroot());
 
 
         try {
 
-            HttpServer server = HttpServer.create(new InetSocketAddress(conf.getPort()), 0);
+            HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0",conf.getPort()), 0);
 
             Files.createDirectories(Paths.get("src/main/java/com/nessam/server/assets"));
             server.createContext("/users", new UserHandler());
@@ -49,6 +47,7 @@ public class Server {
             server.createContext("/follows", new FollowHandler());
             server.createContext("/message",new MessageHandler());
             server.createContext("/post",new PostHandler());
+            server.createContext("/comment", new CommentHandler());
 
             server.setExecutor(null);
             server.start();

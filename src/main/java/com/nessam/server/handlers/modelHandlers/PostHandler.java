@@ -27,7 +27,7 @@ public class PostHandler implements HttpHandler {
         String method = exchange.getRequestMethod();
         String path = exchange.getRequestURI().getPath();
         String[] splittedPath = path.split("/");
-        String response = "This is the response for posts";
+        String response = "This is the response follows";
         int statusCode = 200;
 
         // Extract and verify token
@@ -35,6 +35,7 @@ public class PostHandler implements HttpHandler {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response = "Unauthorized";
             statusCode = 401;
+
             BetterLogger.WARNING("Unauthorized access detected.");
         } else {
             String token = authHeader.substring(7);
@@ -77,7 +78,7 @@ public class PostHandler implements HttpHandler {
         }
     }
 
-    private String handleGetRequest(String[] splittedPath) throws SQLException, JsonProcessingException {
+    private String handleGetRequest(String[] splittedPath) throws SQLException {
         if (splittedPath.length == 2) {
             try {
                 String posts = postController.getPosts();
@@ -115,7 +116,7 @@ public class PostHandler implements HttpHandler {
     }
 
     private String handlePostRequest(String[] splittedPath, HttpExchange exchange) throws
-            SQLException, IOException {
+            SQLException {
         if (splittedPath.length != 5) {
             BetterLogger.WARNING("Invalid request format for POST.");
             return "Invalid request format";
