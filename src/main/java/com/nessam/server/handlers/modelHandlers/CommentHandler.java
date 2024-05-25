@@ -1,22 +1,36 @@
-package com.nessam.server.handlers.modelHandlers;
+public class CommentHandler {
+    private CommentDAO commentDAO;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.nessam.server.controllers.PostController;
-import com.nessam.server.utils.BetterLogger;
-import com.nessam.server.utils.JWTManager;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
+    public CommentHandler(EntityManager entityManager) {
+        this.commentDAO = new CommentDAO(entityManager);
+    }
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.sql.SQLException;
-import java.util.Map;
+    public Comment addCommentToPost(Long postId, String content, String filePath) {
+        Post post = entityManager.find(Post.class, postId);
+        if (post == null) {
+            throw new IllegalArgumentException("Post not found");
+        }
+        Comment comment = new Comment();
+        comment.setPost(post);
+        comment.setContent(content);
+        comment.setFilePath(filePath);
+        return commentDAO.saveComment(comment);
+    }
 
-public class CommentHandler implements HttpHandler {
+    public void removeComment(Long commentId) {
+        commentDAO.deleteComment(commentId);
+    }
 
+    public Comment updateCommentContent(Long commentId, String newContent) {
+        Comment comment = entityManager.find(Comment.class, commentId);
+        if (comment == null) {
+            throw new IllegalArgumentException("Comment not found");
+        }
+        comment.setContent(newContent);
+        return commentDAO.updateComment(comment);
+    }
 
-    @Override
-    public void handle(HttpExchange exchange) throws IOException {
-
+    public List<Comment> getCommentsForPost(Long postId) {
+        return commentDAO.getCommentsByPostId(postId);
     }
 }

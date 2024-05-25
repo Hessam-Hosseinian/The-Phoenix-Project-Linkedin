@@ -21,6 +21,9 @@ public class Post {
     @Column(name = "content", nullable = false, length = 5000)
     private String content;
 
+    @Column(name = "file_path")
+    private String filePath;
+
     @Column(name = "dateCreated")
     private String dateCreated;
     @Column(name = "author")
