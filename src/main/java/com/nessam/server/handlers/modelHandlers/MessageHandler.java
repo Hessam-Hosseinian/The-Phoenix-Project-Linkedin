@@ -1,7 +1,6 @@
 package com.nessam.server.handlers.modelHandlers;
 
 import com.nessam.server.controllers.MessageController;
-import com.nessam.server.utils.ExtractUserAuth;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.json.JSONObject;

@@ -15,13 +15,15 @@ public class Post {
     @Column(name = "post_Id")
     private Long id;
 
+
     @Column(name = "title", nullable = false)
     private String title;
 
     @Column(name = "content", nullable = false, length = 5000)
     private String content;
 
-    @Column(name = "file_path")
+
+    @Column(name = "file-PATH")
     private String filePath;
 
     @Column(name = "dateCreated")
