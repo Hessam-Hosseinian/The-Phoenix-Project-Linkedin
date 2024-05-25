@@ -3,10 +3,8 @@ package com.nessam.server.handlers.modelHandlers;
 import com.nessam.server.controllers.HashtagController;
 import com.nessam.server.controllers.PostController;
 import com.nessam.server.controllers.UserController;
-import com.nessam.server.utils.ExtractUserAuth;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.json.JSONArray;
 
 import java.io.IOException;
 import java.io.OutputStream;
