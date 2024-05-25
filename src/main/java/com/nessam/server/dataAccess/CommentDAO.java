@@ -1,10 +1,3 @@
-package com.nessam.server.dataAccess;
-
-
-import com.nessam.server.models.Comment;
-import java.util.List;
-import jakarta.persistence.*;
-
 public class CommentDAO {
     private EntityManager entityManager;
 
@@ -12,31 +5,32 @@ public class CommentDAO {
         this.entityManager = entityManager;
     }
 
-    public void createComment(Comment comment) {
+    public Comment saveComment(Comment comment) {
         entityManager.getTransaction().begin();
         entityManager.persist(comment);
         entityManager.getTransaction().commit();
+        return comment;
     }
 
-    public Comment findComment(Long id) {
-        return entityManager.find(Comment.class, id);
-    }
-
-    public List<Comment> findAllComments() {
-        TypedQuery<Comment> query = entityManager.createQuery("SELECT c FROM Comment c", Comment.class);
-        return query.getResultList();
-    }
-
-    public void updateComment(Comment comment) {
+    public void deleteComment(Long commentId) {
         entityManager.getTransaction().begin();
-        entityManager.merge(comment);
+        Comment comment = entityManager.find(Comment.class, commentId);
+        if (comment != null) {
+            entityManager.remove(comment);
+        }
         entityManager.getTransaction().commit();
     }
 
-    public void deleteComment(Comment comment) {
+    public Comment updateComment(Comment comment) {
         entityManager.getTransaction().begin();
-        entityManager.remove(comment);
+        Comment updatedComment = entityManager.merge(comment);
         entityManager.getTransaction().commit();
+        return updatedComment;
+    }
+
+    public List<Comment> getCommentsByPostId(Long postId) {
+        return entityManager.createQuery("SELECT c FROM Comment c WHERE c.post.id = :postId", Comment.class)
+                .setParameter("postId", postId)
+                .getResultList();
     }
 }
-

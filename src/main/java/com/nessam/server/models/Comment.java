@@ -12,6 +12,10 @@ public class Comment {
     private long id;
     @Column(name = "content")
     private String content;
+
+    @Column(name = "file_path")
+    private String filePath;
+
     @Column(name = "author")
     private String author;
     @Column(name = "dateCreated")

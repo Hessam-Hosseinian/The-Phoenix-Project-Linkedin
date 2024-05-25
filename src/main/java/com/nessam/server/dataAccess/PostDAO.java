@@ -27,6 +27,7 @@ public class PostDAO {
                         "post_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                         "title VARCHAR(255) NOT NULL, " +
                         "content TEXT NOT NULL, " +
+                        "file_path TEXT" +
                         "dateCreated DATETIME NOT NULL, " +
                         "author VARCHAR(255) NOT NULL, " +
                         "likes INT NOT NULL DEFAULT 0, " +
@@ -35,11 +36,14 @@ public class PostDAO {
         );
         statement.executeUpdate();
     }
+
+
     public void createCommentTable() throws SQLException {
         PreparedStatement statement = connection.prepareStatement(
                 "CREATE TABLE IF NOT EXISTS comments (" +
                         "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                         "content TEXT NOT NULL, " +
+                        "file_path TEXT" +
                         "dateCreated DATETIME NOT NULL, " +
                         "author VARCHAR(255) NOT NULL, " +
                         "fk_post_Id BIGINT NOT NULL, " +

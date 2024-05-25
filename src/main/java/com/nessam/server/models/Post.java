@@ -22,6 +22,7 @@ public class Post {
     @Column(name = "content", nullable = false, length = 5000)
     private String content;
 
+
     @Column(name = "file-PATH")
     private String filePath;
 
