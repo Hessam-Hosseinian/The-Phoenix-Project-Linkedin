@@ -71,6 +71,7 @@ public class CommentDAO {
         }
     }
 
+
     private Comment mapResultSetToComment(ResultSet resultSet) throws SQLException {
         Comment comment = new Comment();
         comment.setId(resultSet.getLong("comment_Id"));
