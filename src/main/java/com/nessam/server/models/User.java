@@ -21,6 +21,9 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "reapetedPass")
+    private String repeatedPass;
+
     @Column(name = "first_name", length = 20)
     private String firstName;
 
@@ -174,6 +177,14 @@ public class User {
 
     public String getSeekingOpportunity() {
         return seekingOpportunity;
+    }
+
+    public String getRepeatedPass() {
+        return repeatedPass;
+    }
+
+    public void setRepeatedPass(String repeatedPass) {
+        this.repeatedPass = repeatedPass;
     }
 
     public void setSeekingOpportunity(String seekingOpportunity) {

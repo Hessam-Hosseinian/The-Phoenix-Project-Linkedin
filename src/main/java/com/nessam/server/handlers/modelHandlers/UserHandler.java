@@ -95,6 +95,7 @@ public class UserHandler implements HttpHandler {
             userController.createUser(
                     jsonObject.getString("email"),
                     jsonObject.getString("password"),
+                    jsonObject.getString("reapetedPass"),
                     jsonObject.getString("firstName"),
                     jsonObject.getString("lastName"),
                     jsonObject.getString("additionalName"),
@@ -132,6 +133,7 @@ public class UserHandler implements HttpHandler {
             userController.createUser(
                     jsonObject.getString("email"),
                     jsonObject.getString("password"),
+                    jsonObject.getString("reapetedPass"),
                     jsonObject.getString("firstName"),
                     jsonObject.getString("lastName"),
                     jsonObject.getString("additionalName"),
@@ -157,7 +159,7 @@ public class UserHandler implements HttpHandler {
     private String handleDeleteRequest(String[] splittedPath) {
         if (splittedPath.length == 2) {
             userController.deleteUsers();
-            BetterLogger.INFO("All user deleted successfully");
+            BetterLogger.INFO("All users deleted successfully");
             return "All users deleted";
         } else {
             String userEmail = splittedPath[splittedPath.length - 1];
