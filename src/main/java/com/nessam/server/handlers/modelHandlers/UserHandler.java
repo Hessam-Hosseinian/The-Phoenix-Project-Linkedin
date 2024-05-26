@@ -92,10 +92,10 @@ public class UserHandler implements HttpHandler {
             requestBody.close();
 
             JSONObject jsonObject = new JSONObject(body.toString());
+            checkMatchingPasswords(jsonObject.getString("password"), jsonObject.getString("reapetedPass"));
             userController.createUser(
                     jsonObject.getString("email"),
                     jsonObject.getString("password"),
-                    jsonObject.getString("reapetedPass"),
                     jsonObject.getString("firstName"),
                     jsonObject.getString("lastName"),
                     jsonObject.getString("additionalName"),
@@ -118,6 +118,12 @@ public class UserHandler implements HttpHandler {
         }
     }
 
+    private void checkMatchingPasswords(String password, String reapetedPass) throws SQLException{
+        if (!password.equals(reapetedPass)) {
+            throw new SQLException("Passwords do not match");
+        }
+    }
+
     private String handlePutRequest(HttpExchange exchange) {
         try {
             InputStream requestBody = exchange.getRequestBody();
@@ -133,7 +139,6 @@ public class UserHandler implements HttpHandler {
             userController.createUser(
                     jsonObject.getString("email"),
                     jsonObject.getString("password"),
-                    jsonObject.getString("reapetedPass"),
                     jsonObject.getString("firstName"),
                     jsonObject.getString("lastName"),
                     jsonObject.getString("additionalName"),

@@ -18,11 +18,9 @@ public class UserController {
         this.objectMapper = new ObjectMapper();
     }
 
-    public void createUser(String email, String password, String reapetedPass, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) throws SQLException {
+    public void createUser(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) throws SQLException {
 
-        if (!password.equals(reapetedPass)) {
-            throw new SQLException("Passwords do not match");
-        }
+
         User user = new User();
 
         user.setEmail(email);
