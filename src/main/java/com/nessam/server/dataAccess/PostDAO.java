@@ -26,26 +26,27 @@ public class PostDAO {
                 "CREATE TABLE IF NOT EXISTS posts (" +
                         "post_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                         "title VARCHAR(255) NOT NULL, " +
-                        "content TEXT NOT NULL, " +
-                        "file_path TEXT" +
-                        "dateCreated DATETIME NOT NULL, " +
-                        "author VARCHAR(255) NOT NULL, " +
-                        "likes INT NOT NULL DEFAULT 0, " +
-                        "dislikes INT NOT NULL DEFAULT 0" +
+                        "content TEXT, " +
+                        "file_path TEXT, " +
+                        "dateCreated TEXT, " +
+                        "author VARCHAR(255), " +
+                        "likes INT, " +
+                        "dislikes INT" +
                         ")"
         );
         statement.executeUpdate();
     }
 
 
+
     public void createCommentTable() throws SQLException {
         PreparedStatement statement = connection.prepareStatement(
                 "CREATE TABLE IF NOT EXISTS comments (" +
                         "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                        "content TEXT NOT NULL, " +
-                        "file_path TEXT" +
-                        "dateCreated DATETIME NOT NULL, " +
-                        "author VARCHAR(255) NOT NULL, " +
+                        "content TEXT, " +
+                        "file_path TEXT, " +
+                        "dateCreated TEXT, " +
+                        "author VARCHAR(255), " +
                         "fk_post_Id BIGINT NOT NULL, " +
                         "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id)" +
                         ")"
@@ -84,6 +85,19 @@ public class PostDAO {
             }
         }
         return posts;
+    }
+
+    public Post getPostById(long postId) throws SQLException {
+        String query = "SELECT * FROM posts WHERE post_Id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, postId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToPost(rs);
+                }
+            }
+        }
+        return null; // Return null if no post with the given ID is found
     }
 
     public List<Post> getPostsByAuthor(String author) throws SQLException {
@@ -156,10 +170,6 @@ public class PostDAO {
 
         return post;
     }
-
-
-
-
 
 
 }

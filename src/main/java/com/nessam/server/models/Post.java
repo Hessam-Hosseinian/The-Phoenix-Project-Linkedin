@@ -3,7 +3,6 @@ package com.nessam.server.models;
 import jakarta.persistence.*;
 
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class Post {
     private String content;
 
 
-    @Column(name = "file-PATH")
+    @Column(name = "file-path")
     private String filePath;
 
     @Column(name = "dateCreated")
@@ -38,8 +37,7 @@ public class Post {
     private int dislikes;
 
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "fk_post_Id", referencedColumnName = "post_Id")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
     public Post(String title, String content, String author) {
