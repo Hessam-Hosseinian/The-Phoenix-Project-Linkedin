@@ -1,10 +1,6 @@
 package com.nessam.server.dataAccess;
 
 import com.nessam.server.models.User;
-import jakarta.persistence.NoResultException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.query.Query;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -166,8 +162,7 @@ public class UserDAO {
         String sql = "SELECT email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity FROM users";
         List<User> users = new ArrayList<>();
 
-        try (PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
+        try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 User user = new User();
                 user.setEmail(resultSet.getString("email"));

@@ -18,7 +18,7 @@ public class JWTManager {
     public String createToken(Map<String, Object> payload, int expirationMinutes) {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
-        Date exp = new Date(nowMillis + expirationMinutes * 60 * 1000);
+        Date exp = new Date(nowMillis + (long) expirationMinutes * 60 * 1000);
 
         return Jwts.builder()
                 .setClaims(payload)
