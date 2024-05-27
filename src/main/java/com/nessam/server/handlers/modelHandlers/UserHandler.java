@@ -93,7 +93,24 @@ public class UserHandler implements HttpHandler {
             requestBody.close();
 
             JSONObject jsonObject = new JSONObject(body.toString());
-            Validation.checkMatchingPasswords(jsonObject.getString("password"), jsonObject.getString("reapetedPass"));
+            boolean emailMatch = Validation.isValidEmail(jsonObject.optString("email"));
+            if (!emailMatch) {
+                BetterLogger.INFO("Incorrect email format");
+                return "Incorrect email format";
+            }
+
+            boolean passwordValidation = Validation.validatePassword(jsonObject.optString("password"));
+            if (!passwordValidation) {
+                BetterLogger.INFO("Incorrect password format");
+                return "Incorrect password format";
+            }
+
+            boolean passMatch = Validation.matchingPasswords(jsonObject.getString("password"), jsonObject.getString("reapetedPass"));
+            if (!passMatch) {
+                BetterLogger.INFO("Passwords do not match");
+                return "Passwords do not match";
+            }
+
             userController.createUser(
                     jsonObject.getString("email"),
                     jsonObject.getString("password"),
@@ -132,7 +149,15 @@ public class UserHandler implements HttpHandler {
             }
             requestBody.close();
 
+
             JSONObject jsonObject = new JSONObject(body.toString());
+
+            boolean passwordValidation = Validation.validatePassword(jsonObject.optString("password"));
+            if (!passwordValidation) {
+                BetterLogger.INFO("Incorrect password format");
+                return "Incorrect password format";
+            }
+
             userController.createUser(
                     jsonObject.getString("email"),
                     jsonObject.getString("password"),
