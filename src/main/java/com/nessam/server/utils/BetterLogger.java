@@ -1,7 +1,7 @@
 package com.nessam.server.utils;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class BetterLogger {
 
@@ -21,54 +21,36 @@ public class BetterLogger {
     public static final String UNDERLINE = "\u001B[4m";
 
     public enum LogLevel {
-        DEBUG,
-        INFO,
-        WARNING,
-        ERROR,
-        CRITICAL
+        DEBUG, INFO, WARNING, ERROR, CRITICAL
     }
 
-    private static boolean includeTimestamp;
-    private static boolean useStyles;
 
     public BetterLogger() {
-        this.includeTimestamp = true;
-        this.useStyles = true;
+
     }
 
     private static void log(LogLevel level, String message) {
-        String color;
-        switch (level) {
-            case DEBUG:
-                color = CYAN;
-                break;
-            case INFO:
-                color = GREEN;
-                break;
-            case WARNING:
-                color = YELLOW;
-                break;
-            case ERROR:
-                color = RED;
-                break;
-            case CRITICAL:
-                color = BOLD + RED;
-                break;
-            default:
-                color = RESET;
-        }
+        String color = switch (level) {
+            case DEBUG -> CYAN;
+            case INFO -> GREEN;
+            case WARNING -> YELLOW;
+            case ERROR -> RED;
+            case CRITICAL -> BOLD + RED;
+            default -> RESET;
+        };
 
-        String timestamp = "";
-        if (includeTimestamp) {
-            timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ";
-        }
+        String formattedDateTime = "";
 
-        String style = useStyles ? BOLD : "";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        formattedDateTime = LocalDateTime.now().format(formatter);
+
+
+        String style = "";
+
 
         String[] classname = Thread.currentThread().getStackTrace()[3].getClassName().split("\\.");
 
-        System.out.println(color + style + timestamp + "[" + level + "] " + RESET + classname[classname.length - 1] + " " +
-                Thread.currentThread().getStackTrace()[3].getMethodName() + color + ": " + message + RESET);
+        System.out.println(color + style + formattedDateTime + " [" + level + "] " + RESET + classname[classname.length - 1] + " " + Thread.currentThread().getStackTrace()[3].getMethodName() + color + ": " + message + RESET);
     }
 
     public static void DEBUG(String message) {
