@@ -24,6 +24,7 @@ public class UserHandler implements HttpHandler {
             BetterLogger.ERROR("Error initializing UserController: " + e.toString());
             e.printStackTrace();
         }
+
     }
 
     @Override

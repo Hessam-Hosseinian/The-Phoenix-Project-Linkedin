@@ -18,6 +18,7 @@ public class Validation {
         return matcher.matches();
     }
 
+
     public static boolean validatePassword(String password) {
         Matcher matcher = passPattern.matcher(password);
         return matcher.matches();
