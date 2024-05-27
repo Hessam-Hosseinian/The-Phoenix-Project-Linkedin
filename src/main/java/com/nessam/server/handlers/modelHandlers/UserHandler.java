@@ -184,6 +184,7 @@ public class UserHandler implements HttpHandler {
         }
     }
 
+
     private String handleDeleteRequest(String[] splittedPath) {
         if (splittedPath.length == 2) {
             userController.deleteUsers();
