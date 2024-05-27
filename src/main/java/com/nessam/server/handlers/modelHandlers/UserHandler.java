@@ -3,6 +3,7 @@ package com.nessam.server.handlers.modelHandlers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nessam.server.controllers.UserController;
 import com.nessam.server.utils.BetterLogger;
+import com.nessam.server.utils.Validation;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.json.JSONObject;
@@ -92,7 +93,7 @@ public class UserHandler implements HttpHandler {
             requestBody.close();
 
             JSONObject jsonObject = new JSONObject(body.toString());
-            checkMatchingPasswords(jsonObject.getString("password"), jsonObject.getString("reapetedPass"));
+            Validation.checkMatchingPasswords(jsonObject.getString("password"), jsonObject.getString("reapetedPass"));
             userController.createUser(
                     jsonObject.getString("email"),
                     jsonObject.getString("password"),
@@ -118,11 +119,7 @@ public class UserHandler implements HttpHandler {
         }
     }
 
-    private void checkMatchingPasswords(String password, String reapetedPass) throws SQLException{
-        if (!password.equals(reapetedPass)) {
-            throw new SQLException("Passwords do not match");
-        }
-    }
+
 
     private String handlePutRequest(HttpExchange exchange) {
         try {

@@ -1,6 +1,7 @@
 package com.nessam.server.handlers.modelHandlers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.nessam.server.controllers.CommentController;
 import com.nessam.server.controllers.PostController;
 import com.nessam.server.utils.BetterLogger;
 import com.nessam.server.utils.JWTManager;
@@ -15,10 +16,12 @@ import java.util.Map;
 public class PostHandler implements HttpHandler {
 
     private final PostController postController;
+    private final CommentController commentController;
     private final JWTManager jwtManager;
 
     public PostHandler() throws SQLException {
         this.postController = new PostController();
+        this.commentController = new CommentController();
         this.jwtManager = new JWTManager();
     }
 
@@ -51,7 +54,11 @@ public class PostHandler implements HttpHandler {
                             response = handleGetRequest(splittedPath);
                             break;
                         case "POST":
-                            response = handlePostRequest(splittedPath, exchange);
+                            if (splittedPath.length == 6 && "comment".equals(splittedPath[5])) {
+                                response = handleCommentPostRequest(splittedPath, exchange);
+                            } else {
+                                response = handlePostRequest(splittedPath, exchange);
+                            }
                             break;
                         case "PUT":
                             response = handlePutRequest(splittedPath, exchange);
@@ -115,8 +122,7 @@ public class PostHandler implements HttpHandler {
         return "WRONG URL";
     }
 
-    private String handlePostRequest(String[] splittedPath, HttpExchange exchange) throws
-            SQLException {
+    private String handlePostRequest(String[] splittedPath, HttpExchange exchange) throws SQLException {
         if (splittedPath.length != 5) {
             BetterLogger.WARNING("Invalid request format for POST.");
             return "Invalid request format";
@@ -130,8 +136,35 @@ public class PostHandler implements HttpHandler {
         return "Done!";
     }
 
-    private String handlePutRequest(String[] splittedPath, HttpExchange exchange) throws
-            SQLException, IOException {
+    private String handleCommentPostRequest(String[] splittedPath, HttpExchange exchange) throws SQLException, IOException {
+        if (splittedPath.length != 6) {
+            BetterLogger.WARNING("Invalid request format for adding comment.");
+            return "Invalid request format";
+        }
+
+
+        String postIdStr = splittedPath[2];
+        String author = splittedPath[3];
+        String content = splittedPath[4];
+
+        try {
+            long postId = Long.parseLong(postIdStr);
+
+
+            commentController.createComment(content, "", author, postId);
+
+
+            BetterLogger.INFO("Successfully added comment by: " + author + " -> Post ID: " + postId);
+
+
+            return "Comment added!";
+        } catch (NumberFormatException e) {
+            BetterLogger.WARNING("Invalid post ID format.");
+            return "Invalid post ID format";
+        }
+    }
+
+    private String handlePutRequest(String[] splittedPath, HttpExchange exchange) throws SQLException, IOException {
         if (splittedPath.length != 5) {
             BetterLogger.WARNING("Invalid request format for PUT.");
             return "Invalid request format";

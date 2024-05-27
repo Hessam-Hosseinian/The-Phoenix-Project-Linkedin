@@ -1,5 +1,6 @@
 package com.nessam.server.dataAccess;
 
+import com.fasterxml.jackson.core.JsonToken;
 import com.nessam.server.models.Comment;
 import com.nessam.server.models.Post;
 
@@ -13,32 +14,36 @@ public class CommentDAO {
 
     public CommentDAO() throws SQLException {
         connection = DatabaseConnectionManager.getConnection();
-//        createCommentTable();
+        createCommentTable();
     }
 
-    private void createCommentTable() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS comments (" +
-                        "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                        "content TEXT NOT NULL, " +
-                        "file_path TEXT, " +
-                        "dateCreated TEXT , " +
-                        "author VARCHAR(255) , " +
-                        "fk_post_Id BIGINT NOT NULL, " +
-                        "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id)" +
-                        ")"
-        );
+    public void createCommentTable() throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS comments (" + "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "content TEXT, " + "file_path TEXT, " + "dateCreated TEXT, " + "author VARCHAR(255), " + "fk_post_Id BIGINT NOT NULL, " + "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id))");
         statement.executeUpdate();
     }
 
+
+
+
     public void saveComment(Comment comment) throws SQLException {
-        String query = "INSERT INTO comments (content, file_path, dateCreated, author, fk_post_Id) VALUES (?, ?, ?, ?, ?)";
+
+
+        String query = "INSERT INTO comments (content,file_path, dateCreated, author, fk_post_Id) VALUES (?, ?, ?, ?, ?)";
+
+
         try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
+
             statement.setString(1, comment.getContent());
             statement.setString(2, comment.getFilePath());
             statement.setString(3, comment.getDateCreated());
             statement.setString(4, comment.getAuthor());
+
+
             statement.setLong(5, comment.getPost().getId());
+
+
+
             statement.executeUpdate();
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -47,36 +52,27 @@ public class CommentDAO {
                 }
             }
         }
+
     }
 
     public List<Comment> getCommentsByPostId(long postId) throws SQLException {
         List<Comment> comments = new ArrayList<>();
         String query = "SELECT * FROM comments WHERE fk_post_Id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, postId);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    comments.add(mapResultSetToComment(resultSet));
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, postId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    comments.add(mapResultSetToComment(rs));
                 }
             }
         }
         return comments;
     }
 
-    public void deleteCommentsByPostId(long postId) throws SQLException {
-        String query = "DELETE FROM comments WHERE fk_post_Id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, postId);
-            statement.executeUpdate();
-        }
-    }
-
-
     private Comment mapResultSetToComment(ResultSet resultSet) throws SQLException {
         Comment comment = new Comment();
         comment.setId(resultSet.getLong("comment_Id"));
         comment.setContent(resultSet.getString("content"));
-        comment.setFilePath(resultSet.getString("file_path"));
         comment.setDateCreated(resultSet.getString("dateCreated"));
         comment.setAuthor(resultSet.getString("author"));
 

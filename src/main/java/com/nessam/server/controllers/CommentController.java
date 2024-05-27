@@ -29,13 +29,14 @@ public class CommentController {
             throw new SQLException("Post not found");
         }
 
+
         Comment comment = new Comment();
         comment.setContent(content);
         comment.setFilePath(filePath);
         comment.setAuthor(author);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         comment.setDateCreated(formatter.format(new Date()));
-        comment.setPost(post);
+
 
         commentDAO.saveComment(comment);
     }
@@ -45,7 +46,7 @@ public class CommentController {
         return objectMapper.writeValueAsString(comments);
     }
 
-    public void deleteCommentsByPostId(long postId) throws SQLException {
-        commentDAO.deleteCommentsByPostId(postId);
-    }
+//    public void deleteCommentsByPostId(long postId) throws SQLException {
+//        commentDAO.deleteCommentsByPostId(postId);
+//    }
 }

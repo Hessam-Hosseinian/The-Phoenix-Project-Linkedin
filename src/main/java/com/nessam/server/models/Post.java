@@ -3,6 +3,7 @@ package com.nessam.server.models;
 import jakarta.persistence.*;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -57,6 +58,14 @@ public class Post {
 
     public Long getId() {
         return id;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public void setId(Long id) {

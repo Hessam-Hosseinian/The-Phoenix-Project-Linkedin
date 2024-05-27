@@ -2,8 +2,6 @@ package com.nessam.server.models;
 
 import jakarta.persistence.*;
 
-import java.util.Collection;
-
 @Entity
 @Table(name = "comments")
 public class Comment {
@@ -68,7 +66,9 @@ public class Comment {
     }
 
     public Post getPost() {
+
         return post;
+
     }
 
     public void setPost(Post post) {

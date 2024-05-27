@@ -2,6 +2,7 @@ package com.nessam.server.handlers.httpHandlers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nessam.server.controllers.UserController;
+import com.nessam.server.utils.BetterLogger;
 import com.nessam.server.utils.JWTManager;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -15,8 +16,8 @@ import java.util.Map;
 
 public class RequestHandler implements HttpHandler {
 
-    private UserController userController;
-    private JWTManager jwtManager;
+    private final UserController userController;
+    private final JWTManager jwtManager;
 
     public RequestHandler() throws SQLException {
         this.userController = new UserController();
@@ -24,16 +25,13 @@ public class RequestHandler implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange) {
         String method = exchange.getRequestMethod();
         String[] splittedPath = exchange.getRequestURI().getPath().split("/");
-        switch (method) {
-            case "GET":
-                handleGetRequest(splittedPath, exchange);
-                break;
-            default:
-                sendResponse(exchange, "Method not allowed", 405);
-                break;
+        if (method.equals("GET")) {
+            handleGetRequest(splittedPath, exchange);
+        } else {
+            sendResponse(exchange, "Method not allowed", 405);
         }
     }
 
@@ -74,7 +72,7 @@ public class RequestHandler implements HttpHandler {
                 sendResponse(exchange, "Logged in successfully", 200);
             }
         } catch (SQLException | JsonProcessingException e) {
-            e.printStackTrace();
+            BetterLogger.ERROR(e.getMessage());
             sendResponse(exchange, "Internal server error", 500);
         }
     }
@@ -86,7 +84,7 @@ public class RequestHandler implements HttpHandler {
                 os.write(response.getBytes());
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            BetterLogger.ERROR(e.getMessage());
         }
     }
 }

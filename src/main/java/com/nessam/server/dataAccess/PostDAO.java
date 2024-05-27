@@ -1,8 +1,6 @@
 package com.nessam.server.dataAccess;
 
-import com.nessam.server.models.Comment;
 import com.nessam.server.models.Post;
-import com.nessam.server.models.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -22,38 +20,15 @@ public class PostDAO {
 
 
     public void createPostTable() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS posts (" +
-                        "post_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                        "title VARCHAR(255) NOT NULL, " +
-                        "content TEXT, " +
-                        "file_path TEXT, " +
-                        "dateCreated TEXT, " +
-                        "author VARCHAR(255), " +
-                        "likes INT, " +
-                        "dislikes INT" +
-                        ")"
-        );
+        PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS posts (" + "post_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "title VARCHAR(255) NOT NULL, " + "content TEXT, " + "file_path TEXT, " + "dateCreated TEXT, " + "author VARCHAR(255), " + "likes INT, " + "dislikes INT" + ")");
         statement.executeUpdate();
     }
-
 
 
     public void createCommentTable() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS comments (" +
-                        "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                        "content TEXT, " +
-                        "file_path TEXT, " +
-                        "dateCreated TEXT, " +
-                        "author VARCHAR(255), " +
-                        "fk_post_Id BIGINT NOT NULL, " +
-                        "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id)" +
-                        ")"
-        );
+        PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS comments (" + "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "content TEXT, " + "file_path TEXT, " + "dateCreated TEXT, " + "author VARCHAR(255), " + "fk_post_Id BIGINT NOT NULL, " + "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id)" + ")");
         statement.executeUpdate();
     }
-
 
 
     public void savePost(Post post) throws SQLException {

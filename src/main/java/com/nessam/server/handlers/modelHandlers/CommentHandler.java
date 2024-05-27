@@ -117,7 +117,7 @@ public class CommentHandler implements HttpHandler {
         if (splittedPath.length == 3) {
             try {
                 long postId = Long.parseLong(splittedPath[2]);
-                commentController.deleteCommentsByPostId(postId);
+//                commentController.deleteCommentsByPostId(postId);
                 BetterLogger.INFO("Successfully deleted comments for post ID: " + postId);
                 return "Comments deleted!";
             } catch (NumberFormatException e) {
