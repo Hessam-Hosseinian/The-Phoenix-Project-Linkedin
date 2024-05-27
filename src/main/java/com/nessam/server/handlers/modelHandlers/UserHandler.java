@@ -128,8 +128,8 @@ public class UserHandler implements HttpHandler {
 
 
             Files.createDirectories(Paths.get("src/main/resources/assets/users/user" + jsonObject.getString("email")));
-            BetterLogger.INFO("User created successfully");
-            return "User created successfully";
+            BetterLogger.INFO("User signed-up successfully");
+            return "User signed-up successfully";
         } catch (Exception e) {
             e.printStackTrace();
             BetterLogger.ERROR("Can not create user");
@@ -175,8 +175,8 @@ public class UserHandler implements HttpHandler {
 
 
             Files.createDirectories(Paths.get("src/main/resources/assets/users/user" + jsonObject.getString("email")));
-            BetterLogger.INFO("User update successfully");
-            return "User update successfully";
+            BetterLogger.INFO("User updated successfully");
+            return "User updated successfully";
         } catch (Exception e) {
             e.printStackTrace();
             BetterLogger.ERROR("Can not update user");
@@ -194,7 +194,7 @@ public class UserHandler implements HttpHandler {
             userController.deleteUser(userEmail);
 
             if (userController.isUserExists(userEmail)) {
-                BetterLogger.INFO("One user deleted successfully");
+                BetterLogger.INFO("User deleted successfully");
                 return "User deleted successfully";
             } else {
                 BetterLogger.ERROR("There is no user with this Email");
