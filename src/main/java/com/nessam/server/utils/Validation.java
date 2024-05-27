@@ -34,5 +34,6 @@ public static boolean validatePassword(String password) {
 
 public static boolean validatePassword(String password, String password2) {
 
+
     return password.equals(password2);
 }
