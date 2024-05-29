@@ -7,6 +7,8 @@ public class Like {
     @Column(name = "liker")
     private String liker;
 
+
+    
     @Column(name = "liked")
     private String liked;
 
