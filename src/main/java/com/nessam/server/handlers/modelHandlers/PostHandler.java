@@ -18,6 +18,7 @@ public class PostHandler implements HttpHandler {
     private final PostController postController;
     private final CommentController commentController;
     private final JWTManager jwtManager;
+    String userEmail;
 
     public PostHandler() throws SQLException {
         this.postController = new PostController();
@@ -43,11 +44,14 @@ public class PostHandler implements HttpHandler {
         } else {
             String token = authHeader.substring(7);
             Map<String, Object> tokenData = jwtManager.decodeToken(token);
+
+
             if (tokenData == null) {
                 response = "Invalid or expired token";
                 statusCode = 401;
                 BetterLogger.WARNING("Invalid or expired token received.");
             } else {
+                setUserEmail((String) tokenData.get("email"));
                 try {
                     switch (method) {
                         case "GET":
@@ -86,7 +90,7 @@ public class PostHandler implements HttpHandler {
     }
 
     private String handleGetRequest(String[] splittedPath) throws SQLException {
-        if (splittedPath.length == 2) {
+        if (splittedPath.length == 1) {
             try {
                 String posts = postController.getPosts();
                 BetterLogger.INFO("Successfully retrieved all posts");
@@ -95,8 +99,8 @@ public class PostHandler implements HttpHandler {
                 BetterLogger.ERROR("Error fetching posts: " + e.getMessage());
                 return "Error fetching posts";
             }
-        } else if (splittedPath.length == 3) {
-            String userEmail = splittedPath[splittedPath.length - 1];
+        } else if (splittedPath.length == 2) {
+
             try {
                 String response = postController.getPostByAuthor(userEmail);
                 BetterLogger.INFO("Successfully retrieved posts for author: " + userEmail);
@@ -105,8 +109,8 @@ public class PostHandler implements HttpHandler {
                 BetterLogger.ERROR("Error fetching posts for author " + userEmail + ": " + e.getMessage());
                 return "Error fetching posts";
             }
-        } else if (splittedPath.length == 4) {
-            String userEmail = splittedPath[splittedPath.length - 2];
+        } else if (splittedPath.length == 3) {
+
             String title = splittedPath[splittedPath.length - 1];
             try {
                 String response = postController.getPostByAuthorAndTitle(userEmail, title);
@@ -123,13 +127,13 @@ public class PostHandler implements HttpHandler {
     }
 
     private String handlePostRequest(String[] splittedPath, HttpExchange exchange) throws SQLException {
-        if (splittedPath.length != 5) {
+        if (splittedPath.length != 4) {
             BetterLogger.WARNING("Invalid request format for POST.");
             return "Invalid request format";
         }
-        String author = splittedPath[2];
-        String title = splittedPath[3];
-        String content = splittedPath[4];
+        String author = userEmail;
+        String title = splittedPath[2];
+        String content = splittedPath[3];
 
         postController.createPost(title, content, author);
         BetterLogger.INFO("Successfully saved post: " + author + " -> " + title);
@@ -137,15 +141,15 @@ public class PostHandler implements HttpHandler {
     }
 
     private String handleCommentPostRequest(String[] splittedPath, HttpExchange exchange) throws SQLException, IOException {
-        if (splittedPath.length != 6) {
+        if (splittedPath.length != 5) {
             BetterLogger.WARNING("Invalid request format for adding comment.");
             return "Invalid request format";
         }
 
 
         String postIdStr = splittedPath[2];
-        String author = splittedPath[3];
-        String content = splittedPath[4];
+        String author = userEmail;
+        String content = splittedPath[3];
 
         try {
             long postId = Long.parseLong(postIdStr);
@@ -165,14 +169,14 @@ public class PostHandler implements HttpHandler {
     }
 
     private String handlePutRequest(String[] splittedPath, HttpExchange exchange) throws SQLException, IOException {
-        if (splittedPath.length != 5) {
+        if (splittedPath.length != 4) {
             BetterLogger.WARNING("Invalid request format for PUT.");
             return "Invalid request format";
         }
 
-        String author = splittedPath[2];
-        String title = splittedPath[3];
-        String newContent = splittedPath[4];
+        String author = userEmail;
+        String title = splittedPath[2];
+        String newContent = splittedPath[3];
 
         postController.updatePost(author, title, newContent);
         BetterLogger.INFO("Successfully updated post: " + author + " -> " + title);
@@ -194,5 +198,13 @@ public class PostHandler implements HttpHandler {
             BetterLogger.WARNING("Invalid request format for DELETE.");
             return "Invalid request format";
         }
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }
