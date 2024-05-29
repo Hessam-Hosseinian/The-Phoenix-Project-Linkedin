@@ -23,4 +23,30 @@ public class Json {
         return myObjectMapper.treeToValue(node, clazz);
     }
 
+    public static String jsonModify(String jsonString, String field) {
+        try {
+            // Example
+
+
+            // Create an ObjectMapper instance
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // Parse the JSON string into a JsonNode
+            JsonNode rootNode = objectMapper.readTree(jsonString);
+
+            // Extract a specific value (e.g., extract the value of "id" from the first post)
+            if (rootNode.isArray() && rootNode.size() > 0) {
+                JsonNode firstPost = rootNode.get(0);
+                String idValue = firstPost.get(field).asText();  // Adjust the field name as needed
+
+                // Print the extracted value
+                return idValue;
+            } else {
+                return "The JSON is not an array or is empty.";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "The JSON is not an array or is empty.";
+        }
+    }
 }

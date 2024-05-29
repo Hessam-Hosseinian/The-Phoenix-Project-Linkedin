@@ -49,7 +49,9 @@ public class PostController {
         Post posts = postDAO.getPostByAuthorAndTitle(email, title);
         return posts != null ? objectMapper.writeValueAsString(posts) : "No Post";
     }
-
+    public Post getPostByAuthorAndTitleAbsolut(String email, String title) throws SQLException {
+        return postDAO.getPostByAuthorAndTitle(email, title);
+    }
 
     public void updatePost(String email, String title, String content) throws SQLException {
         Post post = postDAO.getPostByAuthorAndTitle(email, title);
