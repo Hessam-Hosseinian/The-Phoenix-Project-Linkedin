@@ -32,14 +32,13 @@ public class PostDAO {
 
 
     public void savePost(Post post) throws SQLException {
-        String query = "INSERT INTO posts (title, content, dateCreated, author, likes, dislikes) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO posts (title, content, dateCreated, author, likes) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, post.getTitle());
             statement.setString(2, post.getContent());
             statement.setString(3, post.getDateCreated());
             statement.setString(4, post.getAuthor());
             statement.setInt(5, post.getLikes());
-            statement.setInt(6, post.getDislikes());
             statement.executeUpdate();
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -141,7 +140,6 @@ public class PostDAO {
         post.setDateCreated(resultSet.getString("dateCreated"));
         post.setAuthor(resultSet.getString("author"));
         post.setLikes(resultSet.getInt("likes"));
-        post.setDislikes(resultSet.getInt("dislikes"));
 
         return post;
     }

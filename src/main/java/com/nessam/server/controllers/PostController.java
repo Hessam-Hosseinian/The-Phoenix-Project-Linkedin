@@ -30,7 +30,6 @@ public class PostController {
         String dateCreated = formatter.format(new Date());
         post.setDateCreated(dateCreated);
         post.setLikes(0);
-        post.setDislikes(0);
         postDAO.savePost(post);
     }
 
@@ -78,5 +77,14 @@ public class PostController {
         }
     }
 
+    public Post getPost (String id) throws SQLException {
+        return postDAO.getPostById(Long.parseLong(id));
+    }
+
+    public String getPostById(String id) throws SQLException, JsonProcessingException {
+        Post post = getPost(id);
+        if (post == null) return null;
+        return objectMapper.writeValueAsString(post);
+    }
 
 }

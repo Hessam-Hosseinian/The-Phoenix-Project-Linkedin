@@ -152,11 +152,7 @@ public class PostHandler implements HttpHandler {
 
 
             commentController.createComment(content, "", author, postId);
-
-
             BetterLogger.INFO("Successfully added comment by: " + author + " -> Post ID: " + postId);
-
-
             return "Comment added!";
         } catch (NumberFormatException e) {
             BetterLogger.WARNING("Invalid post ID format.");

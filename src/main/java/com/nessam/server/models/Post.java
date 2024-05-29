@@ -22,6 +22,8 @@ public class Post {
     @Column(name = "content", nullable = false, length = 5000)
     private String content;
 
+    @Column(name = "likes")
+    private int likes;
 
     @Column(name = "file-path")
     private String filePath;
@@ -31,25 +33,19 @@ public class Post {
     @Column(name = "author")
     private String author;
 
-    @Column(name = "likes")
-    private int likes;
-
-    @Column(name = "dislikes")
-    private int dislikes;
 
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
-    public Post(String title, String content, String author) {
+
+    public Post(String title, String content, String author, int likes) {
         this.title = title;
         this.content = content;
         this.author = author;
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         this.dateCreated = formatter.format(new Date());
-
-        this.likes = 0;
-        this.dislikes = 0;
+        this.likes = likes;
     }
 
 
@@ -104,45 +100,20 @@ public class Post {
         this.author = author;
     }
 
-    public int getLikes() {
-        return likes;
-    }
-
-    public void setLikes(int likes) {
-        this.likes = likes;
-    }
-
-    public int getDislikes() {
-        return dislikes;
-    }
-
-    public void setDislikes(int dislikes) {
-        this.dislikes = dislikes;
-    }
-
-
-    public void likePost() {
-        this.likes++;
-    }
-
-    public void dislikePost() {
-        this.dislikes++;
-    }
-
-    public void onlikePost() {
-        this.likes--;
-    }
-
-    public void ondislikePost() {
-        this.dislikes--;
-    }
-
     public List<Comment> getComments() {
         return comments;
     }
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
     }
 }
 
