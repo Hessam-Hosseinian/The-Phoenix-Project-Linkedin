@@ -1,87 +1,73 @@
 package com.nessam.server.dataAccess;
 
 import com.nessam.server.models.Like;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LikeDAO {
-    private final Connection connection;
+    private Connection connection;
 
-    public LikeDAO() throws SQLException {
+    public LikeDAO() throws SQLException, ClassNotFoundException {
         connection = DatabaseConnectionManager.getConnection();
         createLikeTable();
     }
 
-    public void createLikeTable() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS likes (liker VARCHAR(36), likes VARCHAR(36))");
-        statement.executeUpdate();
-
-    }
-    public void insertLike(Like like) throws SQLException {
-
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO likes (liker, liked) VALUES (?, ?)");
-        statement.setString(1, like.getLiker());
-        statement.setString(2, like.getLiked());
-        statement.executeUpdate();
-    }
-
-    public void deleteLike(Like like) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("DELETE FROM likes WHERE liker = ? AND liked = ?");
-        statement.setString(1, like.getLiker());
-        statement.setString(2, like.getLiked());
-        statement.executeUpdate();
+    public void createLikeTable() {
+        String sql = "CREATE TABLE IF NOT EXISTS likes (" +
+                "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
+                "post_id BIGINT NOT NULL," +
+                "liker VARCHAR(255) NOT NULL," +
+                "FOREIGN KEY (post_id) REFERENCES posts(id)" +
+                ")";
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(sql);
+            System.out.println("Table 'likes' created successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Failed to create table 'likes'.");
+        }
     }
 
-    public void deleteAllLikes() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("DELETE FROM likes");
-        statement.executeUpdate();
-    }
-
-    public List<Like> getLikes(String liker) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM likes WHERE liker = ?");
-        statement.setString(1, liker);
-        ResultSet resultSet = statement.executeQuery();
+    public List<Like> getAllLikes(Long postId) {
         List<Like> likes = new ArrayList<>();
-        while (resultSet.next()) {
-            Like like = new Like(resultSet.getString("liker"), resultSet.getString("liked"));
-            likes.add(like);
+        String sql = "SELECT id, post_id, liker FROM likes WHERE post_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, postId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Like like = new Like();
+                like.setId(resultSet.getLong("id"));
+                like.getPost().setId(resultSet.getLong("post_id"));
+                like.setLiker(resultSet.getString("liker"));
+                likes.add(like);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return likes;
     }
 
-    public List<Like> getLikers (String liker) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM likes WHERE liker = ?");
-        statement.setString(1, liker);
-        ResultSet resultSet = statement.executeQuery();
-        List<Like> likes = new ArrayList<>();
-        while (resultSet.next()) {
-            Like like = new Like(resultSet.getString("liker"), resultSet.getString("liked"));
-            likes.add(like);
+    public void insertLike(Like like) {
+        String sql = "INSERT INTO likes (post_id, liker) VALUES (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, like.getPost().getId());
+            statement.setString(2, like.getLiker());
+            int affectedRows = statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return likes;
     }
 
-    public List<Like> getAllLikes() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM likes");
-        ResultSet resultSet = statement.executeQuery();
-        List<Like> likes = new ArrayList<>();
-        while (resultSet.next()) {
-            Like like = new Like(resultSet.getString("liker"), resultSet.getString("liked"));
-            likes.add(like);
+    public void deleteLike(Long likeId) {
+        String sql = "DELETE FROM likes WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, likeId);
+            int affectedRows = statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return likes;
     }
 
-    public boolean isLiked(String liker, String liked) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM likes WHERE liker = ? AND liked = ?");
-        statement.setString(1, liker);
-        statement.setString(2, liked);
-        ResultSet resultSet = statement.executeQuery();
-        return resultSet.next();
-    }
+
 }

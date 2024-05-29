@@ -1,48 +1,58 @@
 package com.nessam.server.models;
 
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 
-
+@Entity
+@Table(name = "likes")
 public class Like {
-    @Column(name = "liker")
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String liker;
 
+    @ManyToOne
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
-    
-    @Column(name = "liked")
-    private String liked;
-
-    public Like () {
-
+    public Like() {
     }
 
-
-    public Like(String liker, String liked) {
+    public Like(Post post, String liker) {
+        this.post = post;
         this.liker = liker;
-        this.liked = liked;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Post getPost() {
+        return post;
     }
 
     public String getLiker() {
         return liker;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
     public void setLiker(String liker) {
         this.liker = liker;
-    }
-
-    public String getLiked() {
-        return liked;
-    }
-
-    public void setLiked(String liked) {
-        this.liked = liked;
     }
 
     @Override
     public String toString() {
         return "Like{" +
-                "liker='" + liker + '\'' +
-                ", liked='" + liked + '\'' +
+                "id=" + id +
+                ", post=" + post +
+                ", liker='" + liker + '\'' +
                 '}';
     }
 

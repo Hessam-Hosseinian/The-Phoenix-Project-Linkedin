@@ -8,7 +8,6 @@ import com.nessam.server.utils.BetterLogger;
 import com.nessam.server.utils.JWTManager;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
@@ -53,7 +52,7 @@ public class LikeHandler implements HttpHandler {
                         response = handleGetRequest(splittedPath);
                         break;
                     case "POST":
-                            response = handlePostRequest(splittedPath);
+                        response = handlePostRequest(splittedPath);
                         break;
                     case "DELETE":
                         response = handleDeleteRequest(splittedPath);
@@ -143,14 +142,8 @@ public class LikeHandler implements HttpHandler {
                 if (!userController.isUserExists(splittedPath[2]) || postController.getPostById(splittedPath[3]) == null) {
                     return "user doesn't exist";
                 } else {
-                    try {
-                        likeController.deleteLike(splittedPath[2], splittedPath[3]);
-                        BetterLogger.INFO("your specified like deleted successfully" +
-                                "");
-                    } catch (SQLException e) {
-                        BetterLogger.ERROR("Error: " + e.getMessage());
-                        return "an error occurred";
-                    }
+                    likeController.deleteLike(Long.valueOf(splittedPath[2]));
+                    BetterLogger.INFO("your specified like deleted successfully" + "");
                     return "Success!";
                 }
             } catch (SQLException | JsonProcessingException e) {

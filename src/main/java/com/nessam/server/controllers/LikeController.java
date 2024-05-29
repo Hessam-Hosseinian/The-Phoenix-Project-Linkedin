@@ -15,7 +15,7 @@ public class LikeController {
     private final ObjectMapper objectMapper;
 
 
-    public LikeController() throws SQLException {
+    public LikeController() throws SQLException, ClassNotFoundException {
         likeDAO = new LikeDAO();
         objectMapper = new ObjectMapper();
     }
@@ -25,32 +25,24 @@ public class LikeController {
 
     }
 
-    public void saveLike(String liker, String liked) throws  SQLException {
-        Like like = new Like(liker, liked);
+    public void saveLike(Long postId, String liker) {
+        Like like = new Like();
+        like.getPost().setId(postId);
+        like.setLiker(liker);
         likeDAO.insertLike(like);
     }
 
-    public void deleteLike(String liker, String liked) throws SQLException {
-        Like like = new Like(liker, liked);
-        likeDAO.deleteLike(like);
+    public void deleteLike(Long likeId) {
+        likeDAO.deleteLike(likeId);
     }
 
-    public void deleteAllLikes() throws SQLException {
-        likeDAO.deleteAllLikes();
-    }
-
-    public String getLikes(String liker) throws SQLException, JsonProcessingException {
-        List<Like> likes = likeDAO.getLikes(liker);
-        return objectMapper.writeValueAsString(likes);
-    }
-
-    public String getLikers(String liker) throws SQLException, JsonProcessingException {
-        List<Like> likes = likeDAO.getAllLikes();
-        return objectMapper.writeValueAsString(likes);
-    }
-
-    public String getAllLikes() throws SQLException, JsonProcessingException {
-        List<Like> likes = likeDAO.getAllLikes();
-        return objectMapper.writeValueAsString(likes);
+    public String getAllLikes(Long postId) {
+        try {
+            List<Like> likes = likeDAO.getAllLikes(postId);  // Passing postId to DAO
+            return objectMapper.writeValueAsString(likes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to convert likes to JSON";
+        }
     }
 }
