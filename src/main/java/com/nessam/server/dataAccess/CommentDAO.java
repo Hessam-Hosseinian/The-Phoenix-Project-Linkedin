@@ -26,26 +26,14 @@ public class CommentDAO {
 
 
     public void saveComment(Comment comment) throws SQLException {
-
-
         String query = "INSERT INTO comments (content,file_path, dateCreated, author, fk_post_Id) VALUES (?, ?, ?, ?, ?)";
-
-
         try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-
-
             statement.setString(1, comment.getContent());
             statement.setString(2, comment.getFilePath());
             statement.setString(3, comment.getDateCreated());
             statement.setString(4, comment.getAuthor());
-
-
             statement.setLong(5, comment.getPost().getId());
-
-
-
             statement.executeUpdate();
-
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     comment.setId(generatedKeys.getLong(1));

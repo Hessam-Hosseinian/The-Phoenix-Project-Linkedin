@@ -1,7 +1,7 @@
 package com.nessam.server.models;
 
 import jakarta.persistence.*;
-
+import com.nessam.server.models.Like;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -15,37 +15,34 @@ public class Post {
     @Column(name = "post_Id")
     private Long id;
 
-
     @Column(name = "title", nullable = false)
     private String title;
 
     @Column(name = "content", nullable = false, length = 5000)
     private String content;
 
-    @Column(name = "likes")
-    private int likes;
-
     @Column(name = "file-path")
     private String filePath;
 
     @Column(name = "dateCreated")
     private String dateCreated;
+
     @Column(name = "author")
     private String author;
-
 
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes;
 
-    public Post(String title, String content, String author, int likes) {
+    public Post(String title, String content, String author) {
         this.title = title;
         this.content = content;
         this.author = author;
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         this.dateCreated = formatter.format(new Date());
-        this.likes = likes;
     }
 
 
@@ -108,12 +105,5 @@ public class Post {
         this.comments = comments;
     }
 
-    public int getLikes() {
-        return likes;
-    }
-
-    public void setLikes(int likes) {
-        this.likes = likes;
-    }
 }
 

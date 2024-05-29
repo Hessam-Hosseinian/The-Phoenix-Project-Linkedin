@@ -8,6 +8,7 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @Column(name = "content")
     private String content;
 
@@ -16,6 +17,7 @@ public class Comment {
 
     @Column(name = "author")
     private String author;
+
     @Column(name = "dateCreated")
     private String dateCreated;
 
@@ -23,8 +25,6 @@ public class Comment {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-
-    // Getters and Setters
     public long getId() {
         return id;
     }
@@ -66,9 +66,7 @@ public class Comment {
     }
 
     public Post getPost() {
-
         return post;
-
     }
 
     public void setPost(Post post) {
