@@ -23,7 +23,6 @@ public class LikeDAO {
 
     }
     public void insertLike(Like like) throws SQLException {
-
         PreparedStatement statement = connection.prepareStatement("INSERT INTO likes (liker, liked) VALUES (?, ?)");
         statement.setString(1, like.getLiker());
         statement.setString(2, like.getLiked());
