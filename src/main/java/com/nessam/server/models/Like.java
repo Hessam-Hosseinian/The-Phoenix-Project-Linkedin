@@ -14,6 +14,7 @@ public class Like {
 
     }
 
+
     public Like(String liker, String liked) {
         this.liker = liker;
         this.liked = liked;

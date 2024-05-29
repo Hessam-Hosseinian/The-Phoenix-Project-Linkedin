@@ -34,6 +34,7 @@ public class LikeController {
         likeDAO.deleteLike(like);
     }
 
+    
     public void deleteAllLikes() throws SQLException {
         likeDAO.deleteAllLikes();
     }
