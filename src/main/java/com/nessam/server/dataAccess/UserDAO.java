@@ -29,6 +29,7 @@ public class UserDAO {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getEmail());
             statement.setString(2, user.getPassword());
+
             statement.setString(3, user.getFirstName());
             statement.setString(4, user.getLastName());
             statement.setString(5, user.getAdditionalName());
@@ -126,7 +127,7 @@ public class UserDAO {
     }
 
     public User getUserByEmail(String email, String password) throws SQLException {
-        String sql = "SELECT email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity FROM users WHERE email = ? AND password =?";
+        String sql = "SELECT Id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity FROM users WHERE email = ? AND password =?";
         User user = null;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -136,6 +137,7 @@ public class UserDAO {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     user = new User();
+                    user.setId(resultSet.getLong("Id"));
                     user.setEmail(resultSet.getString("email"));
                     user.setPassword(resultSet.getString("password"));
                     user.setFirstName(resultSet.getString("first_name"));
@@ -159,12 +161,13 @@ public class UserDAO {
 
 
     public List<User> getAllUsers() throws SQLException {
-        String sql = "SELECT email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity FROM users";
+        String sql = "SELECT Id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity FROM users";
         List<User> users = new ArrayList<>();
 
         try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 User user = new User();
+                user.setId(resultSet.getLong("Id"));
                 user.setEmail(resultSet.getString("email"));
                 user.setPassword(resultSet.getString("password"));
                 user.setFirstName(resultSet.getString("first_name"));

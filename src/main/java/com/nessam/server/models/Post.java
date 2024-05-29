@@ -65,15 +65,7 @@ public class Post {
         this.id = id;
     }
 
-    public void addComment(Comment comment) {
-        comments.add(comment);
-        comment.setPost(this);
-    }
 
-    public void removeComment(Comment comment) {
-        comments.remove(comment);
-        comment.setPost(null);
-    }
 
     public String getFilePath() {
         return filePath;
@@ -148,12 +140,6 @@ public class Post {
         this.dislikes--;
     }
 
-    public List<Comment> getComments() {
-        return comments;
-    }
 
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
 }
 

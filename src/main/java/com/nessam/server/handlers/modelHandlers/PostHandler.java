@@ -1,7 +1,6 @@
 package com.nessam.server.handlers.modelHandlers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.nessam.server.controllers.CommentController;
 import com.nessam.server.controllers.PostController;
 import com.nessam.server.utils.BetterLogger;
 import com.nessam.server.utils.JWTManager;
@@ -16,13 +15,13 @@ import java.util.Map;
 public class PostHandler implements HttpHandler {
 
     private final PostController postController;
-    private final CommentController commentController;
+
     private final JWTManager jwtManager;
     String userEmail;
 
     public PostHandler() throws SQLException {
         this.postController = new PostController();
-        this.commentController = new CommentController();
+
         this.jwtManager = new JWTManager();
     }
 
@@ -57,15 +56,12 @@ public class PostHandler implements HttpHandler {
                         case "GET":
                             response = handleGetRequest(splittedPath);
                             break;
-                        case "POST":
-                            if (splittedPath.length == 6 && "comment".equals(splittedPath[5])) {
-                                response = handleCommentPostRequest(splittedPath, exchange);
-                            } else {
-                                response = handlePostRequest(splittedPath, exchange);
-                            }
-                            break;
+                        case "POST": {
+                            response = handlePostRequest(exchange);
+                        }
+                        break;
                         case "PUT":
-                            response = handlePutRequest(splittedPath, exchange);
+                            response = handlePutRequest(exchange);
                             break;
                         case "DELETE":
                             response = handleDeleteRequest(splittedPath);
@@ -90,7 +86,7 @@ public class PostHandler implements HttpHandler {
     }
 
     private String handleGetRequest(String[] splittedPath) throws SQLException {
-        if (splittedPath.length == 1) {
+        if (splittedPath.length == 2) {
             try {
                 String posts = postController.getPosts();
                 BetterLogger.INFO("Successfully retrieved all posts");
@@ -99,25 +95,26 @@ public class PostHandler implements HttpHandler {
                 BetterLogger.ERROR("Error fetching posts: " + e.getMessage());
                 return "Error fetching posts";
             }
-        } else if (splittedPath.length == 2) {
-
+        } else if (splittedPath.length == 3) {
+            String tmpUserEmail = splittedPath[splittedPath.length - 1];
             try {
-                String response = postController.getPostByAuthor(userEmail);
-                BetterLogger.INFO("Successfully retrieved posts for author: " + userEmail);
+                String response = postController.getPostByAuthor(tmpUserEmail);
+                BetterLogger.INFO("Successfully retrieved posts for author: " + tmpUserEmail);
                 return response != null ? response : "No Post";
             } catch (SQLException | JsonProcessingException e) {
-                BetterLogger.ERROR("Error fetching posts for author " + userEmail + ": " + e.getMessage());
+                BetterLogger.ERROR("Error fetching posts for author " + tmpUserEmail + ": " + e.getMessage());
                 return "Error fetching posts";
             }
-        } else if (splittedPath.length == 3) {
+        } else if (splittedPath.length == 4) {
 
             String title = splittedPath[splittedPath.length - 1];
+            String tmpUserEmail = splittedPath[splittedPath.length - 2];
             try {
-                String response = postController.getPostByAuthorAndTitle(userEmail, title);
-                BetterLogger.INFO("Successfully retrieved post for author: " + userEmail + ", title: " + title);
+                String response = postController.getPostByAuthorAndTitle(tmpUserEmail, title);
+                BetterLogger.INFO("Successfully retrieved post for author: " + tmpUserEmail + ", title: " + title);
                 return response != null ? response : "No Post";
             } catch (SQLException | JsonProcessingException e) {
-                BetterLogger.ERROR("Error fetching post for author " + userEmail + ", title " + title + ": " + e.getMessage());
+                BetterLogger.ERROR("Error fetching post for author " + tmpUserEmail + ", title " + title + ": " + e.getMessage());
                 return "Error fetching post";
             }
         }
@@ -126,7 +123,7 @@ public class PostHandler implements HttpHandler {
         return "WRONG URL";
     }
 
-    private String handlePostRequest(String[] splittedPath, HttpExchange exchange) throws SQLException, IOException {
+    private String handlePostRequest(HttpExchange exchange) throws SQLException, IOException {
         InputStream requestBody = exchange.getRequestBody();
         BufferedReader reader = new BufferedReader(new InputStreamReader(requestBody));
         StringBuilder body = new StringBuilder();
@@ -143,55 +140,45 @@ public class PostHandler implements HttpHandler {
         String title = jsonObject.optString("title", null);
         String content = jsonObject.optString("content", null);
 
-        postController.createPost(title, content, author);
-        BetterLogger.INFO("Successfully saved post: " + author + " -> " + title);
-        return "Done!";
+        if (postController.getPostByAuthorAndTitle(userEmail, title).equals("No Post")) {
+            postController.createPost(title, content, author);
+            BetterLogger.INFO("Successfully saved post: " + author + " -> " + title);
+            return "Done!";
+        } else {
+            BetterLogger.WARNING("Post not saved: " + author + " -> " + title);
+            return "This post is already saved use another title!";
+        }
+
     }
 
-    private String handleCommentPostRequest(String[] splittedPath, HttpExchange exchange) throws SQLException, IOException {
-        if (splittedPath.length != 5) {
-            BetterLogger.WARNING("Invalid request format for adding comment.");
-            return "Invalid request format";
+
+    private String handlePutRequest(HttpExchange exchange) throws SQLException, IOException {
+        InputStream requestBody = exchange.getRequestBody();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(requestBody));
+        StringBuilder body = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            body.append(line);
         }
+        requestBody.close();
 
-
-        String postIdStr = splittedPath[2];
-        String author = userEmail;
-        String content = splittedPath[3];
-
-        try {
-            long postId = Long.parseLong(postIdStr);
-
-
-            commentController.createComment(content, "", author, postId);
-
-
-            BetterLogger.INFO("Successfully added comment by: " + author + " -> Post ID: " + postId);
-
-
-            return "Comment added!";
-        } catch (NumberFormatException e) {
-            BetterLogger.WARNING("Invalid post ID format.");
-            return "Invalid post ID format";
-        }
-    }
-
-    private String handlePutRequest(String[] splittedPath, HttpExchange exchange) throws SQLException, IOException {
-        if (splittedPath.length != 4) {
-            BetterLogger.WARNING("Invalid request format for PUT.");
-            return "Invalid request format";
-        }
+        JSONObject jsonObject = new JSONObject(body.toString());
 
         String author = userEmail;
-        String title = splittedPath[2];
-        String newContent = splittedPath[3];
+        String title = jsonObject.optString("title", null);
+        String newContent = jsonObject.optString("content", null);
 
+        if (postController.getPostByAuthorAndTitle(userEmail, title).equals("No Post")) {
+            BetterLogger.WARNING("Post not found for author: " + author + " -> " + title);
+            return "Post not found!";
+        }
         postController.updatePost(author, title, newContent);
         BetterLogger.INFO("Successfully updated post: " + author + " -> " + title);
         return "Post updated!";
     }
 
     private String handleDeleteRequest(String[] splittedPath) throws SQLException {
+
         if (splittedPath.length == 2) {
             postController.deletePosts();
             BetterLogger.INFO("Successfully deleted all posts");
