@@ -39,7 +39,7 @@ public class Server {
             server.createContext("/follows", new FollowHandler());
             server.createContext("/message", new MessageHandler());
             server.createContext("/post", new PostHandler());
-//            server.createContext("/comment", new CommentHandler());
+            server.createContext("/comment", new CommentHandler());
 
             server.setExecutor(null);
             server.start();
