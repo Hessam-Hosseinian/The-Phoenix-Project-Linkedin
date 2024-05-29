@@ -14,6 +14,7 @@ public class LikeController {
     private final LikeDAO likeDAO;
     private final ObjectMapper objectMapper;
 
+
     public LikeController() throws SQLException {
         likeDAO = new LikeDAO();
         objectMapper = new ObjectMapper();
