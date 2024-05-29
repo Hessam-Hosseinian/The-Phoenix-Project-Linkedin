@@ -19,6 +19,7 @@ public class CommentHandler implements HttpHandler {
     private final CommentController commentController;
     private final PostController postController;
     private final JWTManager jwtManager;
+    private String userEmail;
 
     public CommentHandler() throws SQLException {
         this.commentController = new CommentController();
@@ -48,6 +49,7 @@ public class CommentHandler implements HttpHandler {
                 statusCode = 401;
                 BetterLogger.WARNING("Invalid or expired token received.");
             } else {
+                userEmail = (String) tokenData.get("email");
                 try {
                     switch (method) {
                         case "GET":
@@ -102,16 +104,16 @@ public class CommentHandler implements HttpHandler {
         }
         String email = splittedPath[2];
         String title = splittedPath[3];
-        String author = splittedPath[4];
+        String author = userEmail;
         String content = splittedPath[5];
         String filePath = ""; // Assuming no file path provided
 
         try {
-            System.out.println(postController.getPostByAuthorAndTitle(email, title)); ;
+            Post post = postController.getPostByAuthorAndTitleAbsolut(email, title);
 
-//            commentController.createComment(content, filePath, author, post);
-//
-//            BetterLogger.INFO("Successfully saved comment: " + author + " -> Post ID: " + post.getId());
+
+            commentController.createComment(content, filePath, author, post);
+            BetterLogger.INFO("Successfully saved comment: " + author + " -> Post ID: " + post.getId());
             return "Done!";
         } catch (NumberFormatException e) {
             BetterLogger.WARNING("Invalid post ID format.");

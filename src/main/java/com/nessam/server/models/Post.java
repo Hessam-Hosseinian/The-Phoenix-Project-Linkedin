@@ -2,9 +2,7 @@ package com.nessam.server.models;
 
 import jakarta.persistence.*;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -15,19 +13,18 @@ public class Post {
     @Column(name = "post_Id")
     private Long id;
 
-
     @Column(name = "title", nullable = false)
     private String title;
 
     @Column(name = "content", nullable = false, length = 5000)
     private String content;
 
-
     @Column(name = "file-path")
     private String filePath;
 
     @Column(name = "dateCreated")
     private String dateCreated;
+
     @Column(name = "author")
     private String author;
 
@@ -37,22 +34,22 @@ public class Post {
     @Column(name = "dislikes")
     private int dislikes;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Comment> comments;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments ;
+    // Constructors, getters, and setters
 
+    public Post(String title, String content, String filePath, String dateCreated, String author) {
 
-    public Post(String title, String content, String author) {
         this.title = title;
         this.content = content;
+        this.filePath = filePath;
+        this.dateCreated = dateCreated;
         this.author = author;
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-        this.dateCreated = formatter.format(new Date());
-
         this.likes = 0;
         this.dislikes = 0;
+        this.comments = new ArrayList<>();
     }
-
 
     public Post() {
     }
@@ -63,16 +60,6 @@ public class Post {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
     }
 
     public String getTitle() {
@@ -89,6 +76,14 @@ public class Post {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public String getDateCreated() {
@@ -122,23 +117,7 @@ public class Post {
     public void setDislikes(int dislikes) {
         this.dislikes = dislikes;
     }
-
-
-    public void likePost() {
-        this.likes++;
-    }
-
-    public void dislikePost() {
-        this.dislikes++;
-    }
-
-    public void onlikePost() {
-        this.likes--;
-    }
-
-    public void ondislikePost() {
-        this.dislikes--;
-    }
+    // Other methods
 
     public List<Comment> getComments() {
         return comments;
@@ -148,4 +127,3 @@ public class Post {
         this.comments = comments;
     }
 }
-
