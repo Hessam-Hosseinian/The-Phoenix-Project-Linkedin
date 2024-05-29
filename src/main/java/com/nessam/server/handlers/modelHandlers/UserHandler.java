@@ -3,6 +3,7 @@ package com.nessam.server.handlers.modelHandlers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nessam.server.controllers.UserController;
 import com.nessam.server.utils.BetterLogger;
+import com.nessam.server.utils.JWTManager;
 import com.nessam.server.utils.Validation;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -12,45 +13,74 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.Map;
 
 public class UserHandler implements HttpHandler {
 
+    private final JWTManager jwtManager;
+    String userEmail;
     private UserController userController;
 
+
     public UserHandler() {
+        jwtManager = new JWTManager();
         try {
             userController = new UserController();
         } catch (SQLException e) {
-            BetterLogger.ERROR("Error initializing UserController: " + e.toString());
-            e.printStackTrace();
+            BetterLogger.ERROR("Error initializing UserController: " + e);
+
         }
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
-
         String method = exchange.getRequestMethod();
         String path = exchange.getRequestURI().getPath();
-        String response = "";
-
         String[] splittedPath = path.split("/");
-        switch (method) {
-            case "GET":
-                response = handleGetRequest(splittedPath);
-                break;
-            case "POST":
-                response = handlePostRequest(exchange);
-                break;
-            case "PUT":
-                response = handlePutRequest(exchange);
-                break;
-            case "DELETE":
-                response = handleDeleteRequest(splittedPath);
-                break;
-            default:
-                response = "Method not allowed";
-                break;
+        String response = "This is the response follows";
+        int statusCode = 200;
+
+        // Extract and verify token
+        String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response = "Unauthorized";
+            statusCode = 401;
+
+            BetterLogger.WARNING("Unauthorized access detected.");
+        } else {
+            String token = authHeader.substring(7);
+            Map<String, Object> tokenData = jwtManager.decodeToken(token);
+
+
+            if (tokenData == null) {
+                response = "Invalid or expired token";
+                statusCode = 401;
+                BetterLogger.WARNING("Invalid or expired token received.");
+            } else {
+                setUserEmail((String) tokenData.get("email"));
+                try {
+                    switch (method) {
+                        case "GET":
+                            response = handleGetRequest(splittedPath);
+                            break;
+                        case "POST":
+                            response = handlePostRequest(exchange);
+                            break;
+                        case "PUT":
+                            response = handlePutRequest(exchange);
+                            break;
+                        case "DELETE":
+                            response = handleDeleteRequest(splittedPath);
+                            break;
+                        default:
+                            response = "Method not allowed";
+                            break;
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
 
         exchange.sendResponseHeaders(200, response.getBytes().length);
@@ -69,9 +99,9 @@ public class UserHandler implements HttpHandler {
                 return "Error fetching users";
             }
         } else {
-            String userEmail = splittedPath[splittedPath.length - 1];
+            String tmpUserEmail = splittedPath[splittedPath.length - 1];
             try {
-                String response = userController.getUserById(userEmail);
+                String response = userController.getUserById(tmpUserEmail);
                 BetterLogger.INFO("User received");
                 return response != null ? response : "No User";
             } catch (SQLException | JsonProcessingException e) {
@@ -105,25 +135,16 @@ public class UserHandler implements HttpHandler {
                 return "Incorrect password format";
             }
 
-            boolean passMatch = Validation.matchingPasswords(jsonObject.getString("password"), jsonObject.getString("reapetedPass"));
+            boolean passMatch = Validation.matchingPasswords(jsonObject.getString("password"), jsonObject.getString("repeatedPass"));
             if (!passMatch) {
                 BetterLogger.INFO("Passwords do not match");
                 return "Passwords do not match";
             }
-
-            userController.createUser(
-                    jsonObject.getString("email"),
-                    jsonObject.getString("password"),
-                    jsonObject.getString("firstName"),
-                    jsonObject.getString("lastName"),
-                    jsonObject.getString("additionalName"),
-                    jsonObject.getString("profilePicture"),
-                    jsonObject.getString("backgroundPicture"),
-                    jsonObject.getString("title"),
-                    jsonObject.getString("location"),
-                    jsonObject.getString("profession"),
-                    jsonObject.getString("seekingOpportunity")
-            );
+            if (userController.isUserExists(jsonObject.getString("email"))) {
+                BetterLogger.WARNING("User created unsuccessfully");
+                return "This email has already been taken\n" + "Use another email Or login";
+            }
+            userController.createUser(jsonObject.getString("email"), jsonObject.getString("password"), jsonObject.getString("firstName"), jsonObject.getString("lastName"), jsonObject.getString("additionalName"), jsonObject.getString("profilePicture"), jsonObject.getString("backgroundPicture"), jsonObject.getString("title"), jsonObject.getString("location"), jsonObject.getString("profession"), jsonObject.getString("seekingOpportunity"));
 
 
             Files.createDirectories(Paths.get("src/main/resources/assets/users/user" + jsonObject.getString("email")));
@@ -135,7 +156,6 @@ public class UserHandler implements HttpHandler {
             return "Error creating user";
         }
     }
-
 
 
     private String handlePutRequest(HttpExchange exchange) {
@@ -152,33 +172,25 @@ public class UserHandler implements HttpHandler {
 
             JSONObject jsonObject = new JSONObject(body.toString());
 
-            boolean passwordValidation = Validation.validatePassword(jsonObject.optString("password"));
+            boolean passwordValidation = Validation.validatePassword(jsonObject.optString("newPassword"));
             if (!passwordValidation) {
                 BetterLogger.INFO("Incorrect password format");
                 return "Incorrect password format";
             }
+            boolean passMatch = Validation.matchingPasswords(jsonObject.getString("newPassword"), jsonObject.getString("repeatedPass"));
+            if (!passMatch) {
+                BetterLogger.INFO("Passwords do not match");
+                return "Passwords do not match";
+            }
 
-            userController.createUser(
-                    jsonObject.getString("email"),
-                    jsonObject.getString("password"),
-                    jsonObject.getString("firstName"),
-                    jsonObject.getString("lastName"),
-                    jsonObject.getString("additionalName"),
-                    jsonObject.getString("profilePicture"),
-                    jsonObject.getString("backgroundPicture"),
-                    jsonObject.getString("title"),
-                    jsonObject.getString("location"),
-                    jsonObject.getString("profession"),
-                    jsonObject.getString("seekingOpportunity")
-            );
+            userController.createUser(userEmail, jsonObject.getString("newPassword"), jsonObject.getString("firstName"), jsonObject.getString("lastName"), jsonObject.getString("additionalName"), jsonObject.getString("profilePicture"), jsonObject.getString("backgroundPicture"), jsonObject.getString("title"), jsonObject.getString("location"), jsonObject.getString("profession"), jsonObject.getString("seekingOpportunity"));
 
 
-            Files.createDirectories(Paths.get("src/main/resources/assets/users/user" + jsonObject.getString("email")));
             BetterLogger.INFO("User update successfully");
             return "User update successfully";
         } catch (Exception e) {
-            e.printStackTrace();
-            BetterLogger.ERROR("Can not update user");
+
+            BetterLogger.ERROR(e.getMessage());
             return "Error update user";
         }
     }
@@ -200,5 +212,13 @@ public class UserHandler implements HttpHandler {
                 return "User deleted unsuccessfully";
             }
         }
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }
