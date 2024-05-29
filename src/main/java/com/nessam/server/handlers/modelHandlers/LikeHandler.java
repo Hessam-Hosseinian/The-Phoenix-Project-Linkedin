@@ -120,6 +120,7 @@ public class LikeHandler implements HttpHandler {
             }
             return "Success!";
         }
+
     }
 
     public String handleDeleteRequest(String[] splittedPath) {
@@ -143,7 +144,8 @@ public class LikeHandler implements HttpHandler {
                 } else {
                     try {
                         likeController.deleteLike(splittedPath[2], splittedPath[3]);
-                        BetterLogger.INFO("your specified like deleted successfully");
+                        BetterLogger.INFO("your specified like deleted successfully" +
+                                "");
                     } catch (SQLException e) {
                         BetterLogger.ERROR("Error: " + e.getMessage());
                         return "an error occurred";

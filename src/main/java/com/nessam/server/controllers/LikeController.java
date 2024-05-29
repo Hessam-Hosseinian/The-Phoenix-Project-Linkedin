@@ -21,6 +21,7 @@ public class LikeController {
 
     public void createLikeTable() throws SQLException {
         likeDAO.createLikeTable();
+
     }
 
     public void saveLike(String liker, String liked) throws  SQLException {

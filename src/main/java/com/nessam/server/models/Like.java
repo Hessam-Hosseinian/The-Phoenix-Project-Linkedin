@@ -2,6 +2,7 @@ package com.nessam.server.models;
 
 import jakarta.persistence.Column;
 
+
 public class Like {
     @Column(name = "liker")
     private String liker;

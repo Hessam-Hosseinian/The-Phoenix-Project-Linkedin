@@ -20,6 +20,7 @@ public class LikeDAO {
     public void createLikeTable() throws SQLException {
         PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS likes (liker VARCHAR(36), likes VARCHAR(36))");
         statement.executeUpdate();
+
     }
     public void insertLike(Like like) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("INSERT INTO likes (liker, liked) VALUES (?, ?)");
