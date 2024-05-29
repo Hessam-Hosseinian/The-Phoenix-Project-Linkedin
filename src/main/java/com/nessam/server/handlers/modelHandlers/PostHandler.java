@@ -7,9 +7,9 @@ import com.nessam.server.utils.BetterLogger;
 import com.nessam.server.utils.JWTManager;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -126,14 +126,22 @@ public class PostHandler implements HttpHandler {
         return "WRONG URL";
     }
 
-    private String handlePostRequest(String[] splittedPath, HttpExchange exchange) throws SQLException {
-        if (splittedPath.length != 4) {
-            BetterLogger.WARNING("Invalid request format for POST.");
-            return "Invalid request format";
+    private String handlePostRequest(String[] splittedPath, HttpExchange exchange) throws SQLException, IOException {
+        InputStream requestBody = exchange.getRequestBody();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(requestBody));
+        StringBuilder body = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            body.append(line);
         }
+        requestBody.close();
+
+        JSONObject jsonObject = new JSONObject(body.toString());
+
+
         String author = userEmail;
-        String title = splittedPath[2];
-        String content = splittedPath[3];
+        String title = jsonObject.optString("title", null);
+        String content = jsonObject.optString("content", null);
 
         postController.createPost(title, content, author);
         BetterLogger.INFO("Successfully saved post: " + author + " -> " + title);
