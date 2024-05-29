@@ -19,8 +19,7 @@ public class Comment {
     @Column(name = "dateCreated")
     private String dateCreated;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Post post;
 
     // Getters and Setters
@@ -65,13 +64,10 @@ public class Comment {
     }
 
     public Post getPost() {
-
         return post;
-
     }
 
     public void setPost(Post post) {
         this.post = post;
     }
-
 }

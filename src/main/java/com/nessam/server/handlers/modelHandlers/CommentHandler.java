@@ -2,6 +2,8 @@ package com.nessam.server.handlers.modelHandlers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nessam.server.controllers.CommentController;
+import com.nessam.server.controllers.PostController;
+import com.nessam.server.models.Post;
 import com.nessam.server.utils.BetterLogger;
 import com.nessam.server.utils.JWTManager;
 import com.sun.net.httpserver.HttpExchange;
@@ -15,10 +17,12 @@ import java.util.Map;
 public class CommentHandler implements HttpHandler {
 
     private final CommentController commentController;
+    private final PostController postController;
     private final JWTManager jwtManager;
 
     public CommentHandler() throws SQLException {
         this.commentController = new CommentController();
+        this.postController = new PostController();
         this.jwtManager = new JWTManager();
     }
 
@@ -35,7 +39,6 @@ public class CommentHandler implements HttpHandler {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response = "Unauthorized";
             statusCode = 401;
-
             BetterLogger.WARNING("Unauthorized access detected.");
         } else {
             String token = authHeader.substring(7);
@@ -93,19 +96,22 @@ public class CommentHandler implements HttpHandler {
     }
 
     private String handlePostRequest(String[] splittedPath, HttpExchange exchange) throws SQLException, IOException {
-        if (splittedPath.length != 5) {
+        if (splittedPath.length != 6) {
             BetterLogger.WARNING("Invalid request format for POST.");
             return "Invalid request format";
         }
-        String postIdStr = splittedPath[2];
-        String author = splittedPath[3];
-        String content = splittedPath[4];
+        String email = splittedPath[2];
+        String title = splittedPath[3];
+        String author = splittedPath[4];
+        String content = splittedPath[5];
         String filePath = ""; // Assuming no file path provided
 
         try {
-            long postId = Long.parseLong(postIdStr);
-            commentController.createComment(content, filePath, author, postId);
-            BetterLogger.INFO("Successfully saved comment: " + author + " -> Post ID: " + postId);
+            System.out.println(postController.getPostByAuthorAndTitle(email, title)); ;
+
+//            commentController.createComment(content, filePath, author, post);
+//
+//            BetterLogger.INFO("Successfully saved comment: " + author + " -> Post ID: " + post.getId());
             return "Done!";
         } catch (NumberFormatException e) {
             BetterLogger.WARNING("Invalid post ID format.");
@@ -117,7 +123,7 @@ public class CommentHandler implements HttpHandler {
         if (splittedPath.length == 3) {
             try {
                 long postId = Long.parseLong(splittedPath[2]);
-//                commentController.deleteCommentsByPostId(postId);
+                commentController.deleteCommentsByPostId(postId);
                 BetterLogger.INFO("Successfully deleted comments for post ID: " + postId);
                 return "Comments deleted!";
             } catch (NumberFormatException e) {
