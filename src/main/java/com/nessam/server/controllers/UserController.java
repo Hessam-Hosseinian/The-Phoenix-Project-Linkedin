@@ -20,7 +20,6 @@ public class UserController {
 
     public void createUser(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) throws SQLException {
 
-
         User user = new User();
 
         user.setEmail(email);
@@ -82,5 +81,13 @@ public class UserController {
         }
     }
 
+    public List<String> search(String keyword) {
+        try {
+            return userDAO.searchByName(keyword);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 }

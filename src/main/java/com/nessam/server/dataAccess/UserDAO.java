@@ -190,5 +190,19 @@ public class UserDAO {
         return users;
     }
 
-
+    public List<String> searchByName(String keyword) throws SQLException {
+        List<String> results = new ArrayList<>();
+        String sql = "SELECT first_name, last_name FROM users WHERE first_name LIKE ? OR last_name LIKE ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, "%" + keyword + "%");
+            statement.setString(2, "%" + keyword + "%");
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    String name = resultSet.getString("first_name") + " " + resultSet.getString("last_name");
+                    results.add(name);
+                }
+            }
+        }
+        return results;
+    }
 }

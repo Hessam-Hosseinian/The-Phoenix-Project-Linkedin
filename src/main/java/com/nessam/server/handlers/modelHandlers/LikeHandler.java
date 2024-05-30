@@ -76,7 +76,7 @@ public class LikeHandler implements HttpHandler {
         }
     }
 
-    // POST ip:port/All-Likes/postId
+    // GET ip:port/All-Likes/postId
     public String handleGetRequest(String[] splittedPath) throws IOException, SQLException {
         if (splittedPath.length != 3) {
             return "you idiot!";
@@ -106,7 +106,7 @@ public class LikeHandler implements HttpHandler {
 
     }
 
-    // POST ip:port/dislike/liker-email/postId
+    // DELETE ip:port/dislike/liker-email/postId
     public String handleDeleteRequest(String[] splittedPath) {
         if (splittedPath.length != 4) {
             return "you idiot!";
