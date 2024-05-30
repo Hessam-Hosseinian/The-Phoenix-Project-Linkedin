@@ -59,15 +59,25 @@ public class LikeDAO {
         }
     }
 
-    public void deleteLike(Long likeId) {
-        String sql = "DELETE FROM likes WHERE id = ?";
+    public void deleteLike(String likerEmail, Long postId) {
+        String sql = "DELETE FROM likes WHERE liker_email = ? AND post_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, likeId);
+            statement.setString(1, likerEmail); // Set the email of the user who liked
+            statement.setLong(2, postId); // Set the post ID of the liked post
             int affectedRows = statement.executeUpdate();
+            if (affectedRows > 0) {
+                System.out.println("Like deleted successfully for user with email: " + likerEmail + " and post ID: " + postId);
+            } else {
+                System.out.println("No like found for user with email: " + likerEmail + " and post ID: " + postId);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("Failed to delete like for user with email: " + likerEmail + " and post ID: " + postId);
         }
     }
+
+
+
 
 
 }

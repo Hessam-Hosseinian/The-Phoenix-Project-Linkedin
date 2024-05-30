@@ -29,7 +29,6 @@ public class PostController {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         String dateCreated = formatter.format(new Date());
         post.setDateCreated(dateCreated);
-        post.setLikes(0);
         postDAO.savePost(post);
     }
 
@@ -68,6 +67,7 @@ public class PostController {
             throw new RuntimeException(e);
         }
     }
+
 
     public void deletePostByAuthorAndTitle(String author, String title) {
         try {

@@ -14,7 +14,6 @@ public class LikeController {
     private final LikeDAO likeDAO;
     private final ObjectMapper objectMapper;
 
-
     public LikeController() throws SQLException, ClassNotFoundException {
         likeDAO = new LikeDAO();
         objectMapper = new ObjectMapper();
@@ -32,8 +31,8 @@ public class LikeController {
         likeDAO.insertLike(like);
     }
 
-    public void deleteLike(Long likeId) {
-        likeDAO.deleteLike(likeId);
+    public void deleteLike(String likerId, Long postId) {
+        likeDAO.deleteLike(likerId, postId);
     }
 
     public String getAllLikes(Long postId) {

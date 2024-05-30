@@ -39,6 +39,7 @@ public class Like {
         this.id = id;
     }
 
+
     public void setPost(Post post) {
         this.post = post;
     }

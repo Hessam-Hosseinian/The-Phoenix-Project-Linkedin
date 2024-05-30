@@ -37,6 +37,7 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
 
+
     public Post(String title, String content, String author) {
         this.title = title;
         this.content = content;
