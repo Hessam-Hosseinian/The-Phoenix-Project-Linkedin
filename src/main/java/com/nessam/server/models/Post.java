@@ -1,8 +1,10 @@
 package com.nessam.server.models;
 
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
+import com.nessam.server.models.Like;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -28,34 +30,36 @@ public class Post {
     @Column(name = "author")
     private String author;
 
-    @Column(name = "likes")
-    private int likes;
 
-    @Column(name = "dislikes")
-    private int dislikes;
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
-    // Constructors, getters, and setters
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes;
 
-    public Post(String title, String content, String filePath, String dateCreated, String author) {
 
+    public Post(String title, String content, String author) {
         this.title = title;
         this.content = content;
-        this.filePath = filePath;
-        this.dateCreated = dateCreated;
         this.author = author;
-        this.likes = 0;
-        this.dislikes = 0;
-        this.comments = new ArrayList<>();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        this.dateCreated = formatter.format(new Date());
     }
+
 
     public Post() {
     }
 
     public Long getId() {
         return id;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public void setId(Long id) {
@@ -78,14 +82,6 @@ public class Post {
         this.content = content;
     }
 
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
     public String getDateCreated() {
         return dateCreated;
     }
@@ -102,23 +98,6 @@ public class Post {
         this.author = author;
     }
 
-    public int getLikes() {
-        return likes;
-    }
-
-    public void setLikes(int likes) {
-        this.likes = likes;
-    }
-
-    public int getDislikes() {
-        return dislikes;
-    }
-
-    public void setDislikes(int dislikes) {
-        this.dislikes = dislikes;
-    }
-    // Other methods
-
     public List<Comment> getComments() {
         return comments;
     }
@@ -126,4 +105,6 @@ public class Post {
     public void setComments(List<Comment> comments) {
         this.comments = comments;
     }
+
 }
+

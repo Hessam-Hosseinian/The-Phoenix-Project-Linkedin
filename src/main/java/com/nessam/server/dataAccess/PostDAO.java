@@ -34,8 +34,6 @@ public class PostDAO {
             statement.setString(2, post.getContent());
             statement.setString(3, post.getDateCreated());
             statement.setString(4, post.getAuthor());
-            statement.setInt(5, post.getLikes());
-            statement.setInt(6, post.getDislikes());
             statement.executeUpdate();
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -153,7 +151,6 @@ public class PostDAO {
         comment.setDateCreated(resultSet.getString("dateCreated"));
         comment.setAuthor(resultSet.getString("author"));
         comment.setFilePath(resultSet.getString("file_path"));
-        // Assuming you set the post manually where needed
         return comment;
     }
 
@@ -164,8 +161,6 @@ public class PostDAO {
         post.setContent(resultSet.getString("content"));
         post.setDateCreated(resultSet.getString("dateCreated"));
         post.setAuthor(resultSet.getString("author"));
-        post.setLikes(resultSet.getInt("likes"));
-        post.setDislikes(resultSet.getInt("dislikes"));
         return post;
     }
 }

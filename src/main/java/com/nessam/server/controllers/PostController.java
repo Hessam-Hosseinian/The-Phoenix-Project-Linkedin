@@ -3,7 +3,9 @@ package com.nessam.server.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nessam.server.dataAccess.PostDAO;
+import com.nessam.server.models.Comment;
 import com.nessam.server.models.Post;
+import com.nessam.server.models.User;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -27,8 +29,6 @@ public class PostController {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         String dateCreated = formatter.format(new Date());
         post.setDateCreated(dateCreated);
-        post.setLikes(0);
-        post.setDislikes(0);
         postDAO.savePost(post);
     }
 
@@ -47,9 +47,7 @@ public class PostController {
         Post posts = postDAO.getPostByAuthorAndTitle(email, title);
         return posts != null ? objectMapper.writeValueAsString(posts) : "No Post";
     }
-    public Post getPostByAuthorAndTitleAbsolut(String email, String title) throws SQLException {
-        return postDAO.getPostByAuthorAndTitle(email, title);
-    }
+
 
     public void updatePost(String email, String title, String content) throws SQLException {
         Post post = postDAO.getPostByAuthorAndTitle(email, title);
@@ -70,6 +68,7 @@ public class PostController {
         }
     }
 
+
     public void deletePostByAuthorAndTitle(String author, String title) {
         try {
             postDAO.deletePostByAuthorAndTitle(author, title);
@@ -78,5 +77,14 @@ public class PostController {
         }
     }
 
+    public Post getPost (String id) throws SQLException {
+        return postDAO.getPostById(Long.parseLong(id));
+    }
+
+    public String getPostById(String id) throws SQLException, JsonProcessingException {
+        Post post = getPost(id);
+        if (post == null) return null;
+        return objectMapper.writeValueAsString(post);
+    }
 
 }
