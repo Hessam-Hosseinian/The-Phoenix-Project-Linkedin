@@ -16,10 +16,10 @@ import java.util.Map;
 
 public class FollowHandler implements HttpHandler {
 
-    private FollowController followController;
-    private UserController userController;
+    private final FollowController followController;
+    private final UserController userController;
     private BlockController blockController;
-    private JWTManager jwtManager;
+    private final JWTManager jwtManager;
 
     public FollowHandler() throws SQLException {
         this.followController = new FollowController();

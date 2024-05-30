@@ -3,9 +3,7 @@ package com.nessam.server.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nessam.server.dataAccess.PostDAO;
-import com.nessam.server.models.Comment;
 import com.nessam.server.models.Post;
-import com.nessam.server.models.User;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;

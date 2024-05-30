@@ -22,8 +22,7 @@ public class MessageController {
     public String getMessages(String u1, String u2) throws SQLException, JsonProcessingException {
         ArrayList<Message> messages = messageDAO.getMessages(u1, u2);
         ObjectMapper objectMapper = new ObjectMapper();
-        String response = objectMapper.writeValueAsString(messages);
-        return response;
+        return objectMapper.writeValueAsString(messages);
     }
 
     public void deleteMessage(String id) throws SQLException {
