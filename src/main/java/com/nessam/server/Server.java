@@ -40,7 +40,7 @@ public class Server {
             server.createContext("/message", new MessageHandler());
             server.createContext("/post", new PostHandler());
 //            server.createContext("/comment", new CommentHandler());
-
+            server.createContext("/like", new LikeHandler());
             server.setExecutor(null);
             server.start();
 
@@ -48,6 +48,8 @@ public class Server {
         } catch (IOException | SQLException e) {
             BetterLogger.ERROR(e.getMessage());
 
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
     }

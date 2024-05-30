@@ -21,11 +21,11 @@ public class LikeHandler implements HttpHandler {
     private final PostController postController;
     private final JWTManager jwtManager;
 
-    public LikeHandler(LikeController likeController, UserController userController, PostController postController, JWTManager jwtManager) {
-        this.likeController = likeController;
-        this.userController = userController;
-        this.postController = postController;
-        this.jwtManager = jwtManager;
+    public LikeHandler() throws SQLException, ClassNotFoundException {
+        this.likeController = new LikeController();
+        this.userController = new UserController();
+        this.postController = new PostController();
+        this.jwtManager = new JWTManager();
     }
 
     @Override
@@ -49,7 +49,11 @@ public class LikeHandler implements HttpHandler {
             } else {
                 switch (method) {
                     case "GET":
-                        response = handleGetRequest(splittedPath);
+                        try {
+                            response = handleGetRequest(splittedPath);
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
                         break;
                     case "POST":
                         response = handlePostRequest(splittedPath);
@@ -71,39 +75,22 @@ public class LikeHandler implements HttpHandler {
         }
     }
 
-    public String handleGetRequest(String[] splittedPath) throws IOException {
-        if (splittedPath.length ==  2) {
-            try {
-                BetterLogger.INFO("Successfully retrieved all likes");
-                return likeController.getAllLikes();
-            } catch (SQLException | JsonProcessingException e) {
-                BetterLogger.ERROR("Error: " + e.getMessage());
-                return "an error occurred";
-            }
-        } else {
-            if (splittedPath.length == 4 && splittedPath[2].equals("likers")) {
-                try {
-                    BetterLogger.INFO("Successfully retrieved all likers");
-                    return likeController.getLikes(splittedPath[3]);
-                } catch (SQLException e) {
-                    BetterLogger.ERROR("Error: " + e.getMessage());
-                    return "an error occurred";
-                }
-            } else if (splittedPath.length == 4 && splittedPath[2].equals("likes")) {
-                try {
-                    BetterLogger.INFO("Successfully retrieved all likes");
-                    return likeController.getLikes(splittedPath[3]);
-                } catch (SQLException e) {
-                    BetterLogger.ERROR("Error: " + e.getMessage());
-                    return "an error occurred";
-                }
-            }
-            else {
-                return "WRONG URL";
-            }
+    // POST ip:port/All-Likes/postId
+    public String handleGetRequest(String[] splittedPath) throws IOException, SQLException {
+        if (splittedPath.length != 3) {
+            return "you idiot!";
         }
+        else if (postController.getPostById(splittedPath[2]) == null) {
+            return "there is no post with this id";
+        }
+        else {
+            BetterLogger.INFO("All Likes below: ");
+            likeController.getAllLikes(Long.valueOf(splittedPath[2]));
+        }
+        return "successfully all likes shown";
     }
 
+    // POST ip:port/like/liker-email/postId
     public String handlePostRequest(String[] splittedPath) {
         if (splittedPath.length != 4) {
             return "you idiot!";
@@ -111,46 +98,24 @@ public class LikeHandler implements HttpHandler {
         else if (!userController.isUserExists(splittedPath[2])) {
             return "user doesn't exist";
         } else {
-            try {
-                likeController.saveLike(splittedPath[2], splittedPath[3]);
-                BetterLogger.INFO("new like added");
-            } catch (SQLException e) {
-                BetterLogger.ERROR("Error: " + e.getMessage());
-                return "an error occurred";
-            }
+            likeController.saveLike(Long.valueOf(splittedPath[2]), splittedPath[3]);
+            BetterLogger.INFO("new like added");
             return "Success!";
         }
 
     }
 
+    // POST ip:port/dislike/liker-email/postId
     public String handleDeleteRequest(String[] splittedPath) {
         if (splittedPath.length != 4) {
-            if (splittedPath.length == 2) {
-                try {
-                    likeController.deleteAllLikes();
-                    BetterLogger.INFO("All likes deleted");
-                } catch (SQLException e) {
-                    BetterLogger.ERROR("Error: " + e.getMessage());
-                    return "an error occurred";
-                }
-                return "Success!";
-            } else {
-                return "you idiot!";
-            }
-        } else {
-            try {
-                if (!userController.isUserExists(splittedPath[2]) || postController.getPostById(splittedPath[3]) == null) {
-                    return "user doesn't exist";
-                } else {
-                    likeController.deleteLike(Long.valueOf(splittedPath[2]));
-                    BetterLogger.INFO("your specified like deleted successfully" + "");
-                    return "Success!";
-                }
-            } catch (SQLException | JsonProcessingException e) {
-                BetterLogger.ERROR("Error: " + e.getMessage());
-                return "an error occurred";
-            }
+            return "you idiot!";
         }
+        else if (!userController.isUserExists(splittedPath[2])) {
+            return "user doesn't exist";
+        } else {
+            likeController.deleteLike(splittedPath[2], Long.valueOf(splittedPath[3]));
+        }
+        return "you disliked this post";
     }
 
 }
