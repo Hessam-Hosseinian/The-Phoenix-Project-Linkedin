@@ -68,6 +68,7 @@ public class PostController {
         }
     }
 
+
     public void deletePostByAuthorAndTitle(String author, String title) {
         try {
             postDAO.deletePostByAuthorAndTitle(author, title);

@@ -38,7 +38,6 @@ public class PostDAO {
             statement.setString(2, post.getContent());
             statement.setString(3, post.getDateCreated());
             statement.setString(4, post.getAuthor());
-            statement.setInt(5, post.getLikes());
             statement.executeUpdate();
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -131,7 +130,6 @@ public class PostDAO {
         }
     }
 
-
     private Post mapResultSetToPost(ResultSet resultSet) throws SQLException {
         Post post = new Post();
         post.setId(resultSet.getLong("post_Id"));
@@ -139,8 +137,6 @@ public class PostDAO {
         post.setContent(resultSet.getString("content"));
         post.setDateCreated(resultSet.getString("dateCreated"));
         post.setAuthor(resultSet.getString("author"));
-        post.setLikes(resultSet.getInt("likes"));
-
         return post;
     }
 

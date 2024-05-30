@@ -28,6 +28,7 @@ public class LikeHandler implements HttpHandler {
         this.jwtManager = new JWTManager();
     }
 
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
