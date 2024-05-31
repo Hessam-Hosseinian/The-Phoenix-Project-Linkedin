@@ -12,20 +12,24 @@ public class HashtagController {
         hashtagDAO = new HashtagDAO();
     }
 
-    public void addHashtag(String id, String tweet) throws SQLException {
-        hashtagDAO.saveHashtag(id, tweet);
+    public void addHashtag(String id, String post) throws SQLException {
+        hashtagDAO.saveHashtag(id, post);
     }
 
     public void deleteAll() throws SQLException {
         hashtagDAO.deleteAll();
     }
 
+    public void deleteOne (String id) throws SQLException {
+        hashtagDAO.deleteOne(id);
+    }
+
     public String GetHashtag(String id) throws SQLException {
-        ArrayList<String> tweets = hashtagDAO.getHashtag(id);
+        ArrayList<String> posts = hashtagDAO.getHashtag(id);
         StringBuilder response = new StringBuilder();
-        for (int i = 0; i < tweets.size(); i++) {
+        for (int i = 0; i < posts.size(); i++) {
             if (i > 0) response.append(',');
-            response.append(tweets.get(i));
+            response.append(posts.get(i));
         }
         return response.toString();
     }

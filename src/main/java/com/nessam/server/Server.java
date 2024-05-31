@@ -48,7 +48,6 @@ public class Server {
 
         } catch (IOException | SQLException e) {
             BetterLogger.ERROR(e.getMessage());
-
         }
 
     }

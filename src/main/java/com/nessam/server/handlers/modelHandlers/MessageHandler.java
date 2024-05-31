@@ -26,8 +26,8 @@ public class MessageHandler implements HttpHandler {
         String method = exchange.getRequestMethod();
         String path = exchange.getRequestURI().getPath();
         String[] splittedPath = path.split("/");
-        String response = "This is the response likes";
-        int statusCode = 202;
+        String response = "This is the response messages";
+        int statusCode = 200;
 
         String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -37,7 +37,7 @@ public class MessageHandler implements HttpHandler {
             Map<String, Object> tokenData = jwtManager.decodeToken(token);
             if (tokenData == null) {
                 response = "Invalid or expired token";
-                statusCode = 402;
+                statusCode = 401;
                 BetterLogger.WARNING("Invalid or expired token received.");
             } else {
                 switch (method) {
@@ -48,12 +48,16 @@ public class MessageHandler implements HttpHandler {
                         response = handlePostRequest(splittedPath, exchange);
                         break;
                     case "DELETE":
-                        response = handleDeleteRequest(splittedPath);
+                        try {
+                            response = handleDeleteRequest(splittedPath);
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
                         break;
                     default:
                         BetterLogger.ERROR("Unsupported HTTP method: " + method);
                         response = "Method not supported";
-                        statusCode = 406;
+                        statusCode = 405;
                 }
             }
 

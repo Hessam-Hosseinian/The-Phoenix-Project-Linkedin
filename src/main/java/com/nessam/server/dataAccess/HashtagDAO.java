@@ -5,24 +5,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class HashtagDAO {
+
     private final Connection connection;
+
     public HashtagDAO() throws SQLException {
         connection = DatabaseConnectionManager.getConnection();
         createHashtagTable();
     }
+
     public void Drop() throws SQLException {
         PreparedStatement statement = connection.prepareStatement("DROP TABLE tags");
         statement.executeUpdate();
     }
+
     public void createHashtagTable() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS tags (id VARCHAR(280) , tweet VARCHAR(36), PRIMARY KEY (id, tweet))");
+        PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS tags (id VARCHAR(280) , post VARCHAR(36), PRIMARY KEY (id, post))");
         statement.executeUpdate();
     }
 
-    public void saveHashtag(String id, String tweet) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO tags (id, tweet) VALUES (?, ?)");
+    public void saveHashtag(String id, String post) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO tags (id, post) VALUES (?, ?)");
         statement.setString(1, id);
-        statement.setString(2, tweet);
+        statement.setString(2, post);
         statement.executeUpdate();
     }
 
@@ -35,15 +39,15 @@ public class HashtagDAO {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM tags WHERE id = ?");
         statement.setString(1, id);
         ResultSet resultSet = statement.executeQuery();
-        ArrayList<String> tweets = new ArrayList<>();
+        ArrayList<String> posts = new ArrayList<>();
         while (resultSet.next()) {
-            tweets.add(resultSet.getString("tweet"));
+            posts.add(resultSet.getString("post"));
         }
-        return tweets;
+        return posts;
     }
 
     public ArrayList<String> getTags(String id) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT id FROM tags WHERE tweet = ?");
+        PreparedStatement statement = connection.prepareStatement("SELECT id FROM tags WHERE post = ?");
         statement.setString(1, id);
         ResultSet resultSet = statement.executeQuery();
         ArrayList<String> tags = new ArrayList<>();
@@ -52,4 +56,11 @@ public class HashtagDAO {
         }
         return tags;
     }
+
+    public void deleteOne(String id) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("DELETE FROM tags WHERE id = ?");
+        statement.setString(1, id);
+        statement.executeUpdate();
+    }
+
 }

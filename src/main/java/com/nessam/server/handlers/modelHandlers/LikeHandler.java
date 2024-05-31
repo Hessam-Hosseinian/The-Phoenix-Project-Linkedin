@@ -1,6 +1,5 @@
 package com.nessam.server.handlers.modelHandlers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nessam.server.controllers.LikeController;
 import com.nessam.server.controllers.PostController;
 import com.nessam.server.controllers.UserController;
@@ -35,7 +34,7 @@ public class LikeHandler implements HttpHandler {
         String path = exchange.getRequestURI().getPath();
         String[] splittedPath = path.split("/");
         String response = "This is the response likes";
-        int statusCode = 202;
+        int statusCode = 200;
 
         String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -45,7 +44,7 @@ public class LikeHandler implements HttpHandler {
             Map<String, Object> tokenData = jwtManager.decodeToken(token);
             if (tokenData == null) {
                 response = "Invalid or expired token";
-                statusCode = 402;
+                statusCode = 403;
                 BetterLogger.WARNING("Invalid or expired token received.");
             } else {
                 switch (method) {
@@ -65,7 +64,7 @@ public class LikeHandler implements HttpHandler {
                     default:
                         BetterLogger.ERROR("Unsupported HTTP method: " + method);
                         response = "Method not supported";
-                        statusCode = 406;
+                        statusCode = 405;
                 }
             }
 

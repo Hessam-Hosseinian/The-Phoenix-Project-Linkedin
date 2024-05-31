@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LikeDAO {
-    private Connection connection;
+    private final Connection connection;
 
     public LikeDAO() throws SQLException, ClassNotFoundException {
         connection = DatabaseConnectionManager.getConnection();
