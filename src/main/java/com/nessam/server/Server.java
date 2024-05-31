@@ -40,7 +40,8 @@ public class Server {
             server.createContext("/message", new MessageHandler());
             server.createContext("/post", new PostHandler());
             server.createContext("/comment", new CommentHandler());
-
+            server.createContext("/search", new SearchHandler());
+            server.createContext("/hashtag", new HashtagHandler());
             server.setExecutor(null);
             server.start();
 

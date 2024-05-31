@@ -74,7 +74,6 @@ public class UserController {
 
     public void deleteUser(String identifier) {
         try {
-
             userDAO.deleteUserByEmail(identifier);
         } catch (SQLException e) {
             throw new RuntimeException(e);

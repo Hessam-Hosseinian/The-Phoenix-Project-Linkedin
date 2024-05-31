@@ -48,6 +48,7 @@ public class SearchHandler implements HttpHandler {
                             throw new RuntimeException(e);
                         }
                         break;
+
                     default:
                         BetterLogger.ERROR("Unsupported HTTP method: " + method);
                         response = "Method not supported";
