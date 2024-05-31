@@ -15,13 +15,11 @@ import java.util.Map;
 public class PostHandler implements HttpHandler {
 
     private final PostController postController;
-
     private final JWTManager jwtManager;
     String userEmail;
 
     public PostHandler() throws SQLException {
         this.postController = new PostController();
-
         this.jwtManager = new JWTManager();
     }
 

@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class MessageController {
+
     private final MessageDAO messageDAO;
+    private final ObjectMapper objectMapper;
 
     public MessageController() throws SQLException {
         messageDAO = new MessageDAO();
+        objectMapper = new ObjectMapper();
     }
 
     public void addMessage(String id, String sender, String receiver, String text) throws SQLException {
@@ -21,7 +24,6 @@ public class MessageController {
 
     public String getMessages(String u1, String u2) throws SQLException, JsonProcessingException {
         ArrayList<Message> messages = messageDAO.getMessages(u1, u2);
-        ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(messages);
     }
 
@@ -33,11 +35,10 @@ public class MessageController {
         messageDAO.deleteAll();
     }
 
-    public String getNotify(String receiver, int cnt) throws SQLException, JsonProcessingException {
-        ArrayList<Message> messages = messageDAO.getNotify(receiver);
+    public String getMessagesInDirect(String receiver, int cnt) throws SQLException, JsonProcessingException {
+        ArrayList<Message> messages = messageDAO.getMessagesInDirect(receiver);
 //		Collections.sort(messages);
         cnt = Integer.min(cnt, messages.size());
-        ObjectMapper objectMapper = new ObjectMapper();
         String response = objectMapper.writeValueAsString(messages.subList(messages.size() - cnt, messages.size()));
         return response;
     }

@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MessageDAO {
+    
     private final Connection connection;
 
     public MessageDAO() throws SQLException {
@@ -16,36 +17,38 @@ public class MessageDAO {
     }
 
     public void createMessageTable() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS messages (id VARCHAR(60) PRIMARY KEY, sender VARCHAR(36), receiver VARCHAR(36), text VARCHAR(300), createdat bigint)");
-        preparedStatement.executeUpdate();
+        PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS messages (id VARCHAR(60) PRIMARY KEY, sender VARCHAR(36), receiver VARCHAR(36), text VARCHAR(300), createdat bigint)");
+        statement.executeUpdate();
     }
 
     public void saveMessage(Message message) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO messages (id, sender, receiver, text, createdat) VALUES (?, ?, ?, ?, ?)");
-        preparedStatement.setString(1, message.getId());
-        preparedStatement.setString(2, message.getSender());
-        preparedStatement.setString(3, message.getReceiver());
-        preparedStatement.setString(4, message.getText());
-        preparedStatement.setLong(5, message.getCreatedAt());
-        preparedStatement.executeUpdate();
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO messages (id, sender, receiver, text, createdat) VALUES (?, ?, ?, ?, ?)");
+        statement.setString(1, message.getId());
+        statement.setString(2, message.getSender());
+        statement.setString(3, message.getReceiver());
+        statement.setString(4, message.getText());
+        statement.setLong(5, message.getCreatedAt());
+        statement.executeUpdate();
     }
 
     public void deleteMessage(String id) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM messages WHERE id = ?");
-        preparedStatement.setString(1, id);
-        preparedStatement.executeUpdate();
+        PreparedStatement statement = connection.prepareStatement("DELETE FROM messages WHERE id = ?");
+        statement.setString(1, id);
+        statement.executeUpdate();
     }
 
     public void deleteAll() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM messages");
-        preparedStatement.executeUpdate();
+        PreparedStatement statement = connection.prepareStatement("DELETE FROM messages");
+        statement.executeUpdate();
     }
 
     public ArrayList<Message> getMessages(String u1, String u2) throws SQLException {
         ArrayList<Message> messages = new ArrayList<>();
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM messages WHERE (sender = ? AND receiver = ?) or (sender = ? AND receiver = ?)");
-        statement.setString(1, u1); statement.setString(2, u2);
-        statement.setString(3, u2); statement.setString(4, u1);
+        statement.setString(1, u1);
+        statement.setString(2, u2);
+        statement.setString(3, u2);
+        statement.setString(4, u1);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()) {
             Message message = new Message();
@@ -59,7 +62,7 @@ public class MessageDAO {
         return messages;
     }
 
-    public ArrayList<Message> getNotify(String receiver) throws SQLException {
+    public ArrayList<Message> getMessagesInDirect(String receiver) throws SQLException {
         ArrayList<Message> messages = new ArrayList<>();
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM messages WHERE receiver = ?");
         statement.setString(1, receiver);

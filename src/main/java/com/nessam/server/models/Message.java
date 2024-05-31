@@ -1,22 +1,24 @@
 package com.nessam.server.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
+
 import java.sql.Date;
 
 public class Message implements Comparable {
-    @JsonProperty("id")
+    @Column(name = "message-id")
     private String id;
 
-    @JsonProperty("sender")
+    @Column(name = "sender")
     private String sender;
 
-    @JsonProperty("receiver")
+    @Column(name = "receiver")
     private String receiver;
 
-    @JsonProperty("text")
+    @Column(name = "text")
     private String text;
 
-    @JsonProperty("createdAt")
+    @Column(name = "createdat")
     private long createdAt;
 
     public Message () {

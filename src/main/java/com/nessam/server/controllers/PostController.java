@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 public class PostController {
+
     private final PostDAO postDAO;
     private final ObjectMapper objectMapper;
 
