@@ -3,9 +3,7 @@ package com.nessam.server.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nessam.server.dataAccess.PostDAO;
-import com.nessam.server.models.Comment;
 import com.nessam.server.models.Post;
-import com.nessam.server.models.User;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -49,6 +47,12 @@ public class PostController {
         return posts != null ? objectMapper.writeValueAsString(posts) : "No Post";
     }
 
+    public Post getPostByAuthorAndTitleAbsolut(String email, String title) throws SQLException, JsonProcessingException {
+        Post post = postDAO.getPostByAuthorAndTitle(email, title);
+//        return posts != null ? objectMapper.writeValueAsString(posts) : "No Post";
+        return post;
+    }
+
 
     public void updatePost(String email, String title, String content) throws SQLException {
         Post post = postDAO.getPostByAuthorAndTitle(email, title);
@@ -78,7 +82,7 @@ public class PostController {
         }
     }
 
-    public Post getPost (String id) throws SQLException {
+    public Post getPost(String id) throws SQLException {
         return postDAO.getPostById(Long.parseLong(id));
     }
 

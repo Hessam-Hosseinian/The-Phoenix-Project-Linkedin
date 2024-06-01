@@ -181,9 +181,7 @@ public class PostDAO {
         post.setTitle(resultSet.getString("title"));
         post.setContent(resultSet.getString("content"));
         post.setDateCreated(resultSet.getString("dateCreated"));
-        post.setAuthor(resultSet.getString("author"));
-        post.setLikes(resultSet.getInt("likes"));
-        post.setDislikes(resultSet.getInt("dislikes"));
+        post.setAuthor(resultSet.getString("author")); 
         return post;
     }
 }

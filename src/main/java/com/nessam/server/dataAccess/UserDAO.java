@@ -20,23 +20,23 @@ public class UserDAO {
 
     private void createUserTable() throws SQLException {
         String userTableSql = """
-            CREATE TABLE IF NOT EXISTS users (
-                id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                email VARCHAR(50) NOT NULL,
-                password VARCHAR(255) NOT NULL,
-                first_name VARCHAR(20),
-                last_name VARCHAR(40),
-                additional_name VARCHAR(40),
-                profile_picture VARCHAR(255),
-                background_picture VARCHAR(255),
-                title VARCHAR(220),
-                location VARCHAR(255),
-                profession VARCHAR(255),
-                seeking_opportunity VARCHAR(255),
-                information_id BIGINT
+                    CREATE TABLE IF NOT EXISTS users (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        email VARCHAR(50) NOT NULL,
+                        password VARCHAR(255) NOT NULL,
+                        first_name VARCHAR(20),
+                        last_name VARCHAR(40),
+                        additional_name VARCHAR(40),
+                        profile_picture VARCHAR(255),
+                        background_picture VARCHAR(255),
+                        title VARCHAR(220),
+                        location VARCHAR(255),
+                        profession VARCHAR(255),
+                        seeking_opportunity VARCHAR(255),
+                        information_id BIGINT
 
-            )
-        """;
+                    )
+                """;
 
         try (PreparedStatement statement = connection.prepareStatement(userTableSql)) {
             statement.executeUpdate();
@@ -45,21 +45,21 @@ public class UserDAO {
 
     private void createInformationTable() throws SQLException {
         String informationTableSql = """
-            CREATE TABLE IF NOT EXISTS information (
-                id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                profile_link VARCHAR(40),
-                email VARCHAR(40),
-                phone_number VARCHAR(40),
-                phone_type INT,
-                address VARCHAR(220),
-                birth_month DATE,
-                birth_day DATE,
-                birth_privacy_policy INT,
-                instant_contact_method VARCHAR(40),
-                user_id BIGINT,
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-            )
-        """;
+                    CREATE TABLE IF NOT EXISTS information (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        profile_link VARCHAR(40),
+                        email VARCHAR(40),
+                        phone_number VARCHAR(40),
+                        phone_type INT,
+                        address VARCHAR(220),
+                        birth_month DATE,
+                        birth_day DATE,
+                        birth_privacy_policy INT,
+                        instant_contact_method VARCHAR(40),
+                        user_id BIGINT,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                """;
 
         try (PreparedStatement statement = connection.prepareStatement(informationTableSql)) {
             statement.executeUpdate();
@@ -74,9 +74,9 @@ public class UserDAO {
 
     public void saveUser(User user) throws SQLException {
         String userSql = """
-            INSERT INTO users (email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
+                    INSERT INTO users (email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
 
         try (PreparedStatement userStmt = connection.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS)) {
             connection.setAutoCommit(false);
@@ -111,9 +111,9 @@ public class UserDAO {
 
     private void saveContactInformation(Information contactInfo) throws SQLException {
         String contactSql = """
-            INSERT INTO contact_information (profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
+                    INSERT INTO contact_information (profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
 
         try (PreparedStatement contactStmt = connection.prepareStatement(contactSql, Statement.RETURN_GENERATED_KEYS)) {
             contactStmt.setString(1, contactInfo.getProfileLink());
@@ -151,8 +151,8 @@ public class UserDAO {
 
     public void updateUser(User user) throws SQLException {
         String sql = """
-            UPDATE users SET password = ?, first_name = ?, last_name = ?, additional_name = ?, profile_picture = ?, background_picture = ?, title = ?, location = ?, profession = ?, seeking_opportunity = ?, information_id = ? WHERE email = ?
-        """;
+                    UPDATE users SET password = ?, first_name = ?, last_name = ?, additional_name = ?, profile_picture = ?, background_picture = ?, title = ?, location = ?, profession = ?, seeking_opportunity = ?, information_id = ? WHERE email = ?
+                """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getPassword());
@@ -174,9 +174,9 @@ public class UserDAO {
 
     public User getUserByEmail(String email) throws SQLException {
         String sql = """
-            SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id
-            FROM users WHERE email = ?
-        """;
+                    SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id
+                    FROM users WHERE email = ?
+                """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
@@ -195,9 +195,9 @@ public class UserDAO {
 
     public User getUserByEmailAndPassword(String email, String password) throws SQLException {
         String sql = """
-            SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id
-            FROM users WHERE email = ? AND password = ?
-        """;
+                    SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id
+                    FROM users WHERE email = ? AND password = ?
+                """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
@@ -217,9 +217,9 @@ public class UserDAO {
 
     public List<User> getAllUsers() throws SQLException {
         String sql = """
-            SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id
-            FROM users
-        """;
+                    SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id
+                    FROM users
+                """;
 
         List<User> users = new ArrayList<>();
 
@@ -233,6 +233,8 @@ public class UserDAO {
 
         return users;
     }
+
+
 
     private User mapResultSetToUser(ResultSet resultSet) throws SQLException {
         User user = new User();
@@ -257,9 +259,9 @@ public class UserDAO {
         }
 
         String sql = """
-            SELECT id, profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method
-            FROM contact_information WHERE id = ?
-        """;
+                    SELECT id, profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method
+                    FROM contact_information WHERE id = ?
+                """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
