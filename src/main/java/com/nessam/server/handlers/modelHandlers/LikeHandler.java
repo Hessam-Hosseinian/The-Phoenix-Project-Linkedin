@@ -14,20 +14,17 @@ import java.util.Map;
 
 public class LikeHandler implements HttpHandler {
 
-
-    private final LikeController likeController;
     private final UserController userController;
     private final PostController postController;
+    private final LikeController likeController;
     private final JWTManager jwtManager;
 
-    public LikeHandler() throws SQLException, ClassNotFoundException {
-        this.likeController = new LikeController();
+    public LikeHandler() throws SQLException {
         this.userController = new UserController();
         this.postController = new PostController();
+        this.likeController = new LikeController();
         this.jwtManager = new JWTManager();
     }
-
-
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -76,9 +73,9 @@ public class LikeHandler implements HttpHandler {
         }
     }
 
-    // GET ip:port/All-Likes/postId
+    // GET ip:port/like/All-Likes/postId
     public String handleGetRequest(String[] splittedPath) throws IOException, SQLException {
-        if (splittedPath.length != 3) {
+        if (splittedPath.length != 4) {
             return "you idiot!";
         }
         else if (postController.getPostById(splittedPath[2]) == null) {
@@ -91,33 +88,32 @@ public class LikeHandler implements HttpHandler {
         return "successfully all likes shown";
     }
 
-    // POST ip:port/like/liker-email/postId
+    // POST ip:port/like/set/liker-email/postId
     public String handlePostRequest(String[] splittedPath) {
-        if (splittedPath.length != 4) {
+        if (splittedPath.length != 5) {
             return "you idiot!";
         }
-        else if (!userController.isUserExists(splittedPath[2])) {
+        else if (!userController.isUserExists(splittedPath[3])) {
             return "user doesn't exist";
         } else {
-            likeController.saveLike(Long.valueOf(splittedPath[2]), splittedPath[3]);
+            likeController.saveLike(Long.valueOf(splittedPath[3]), splittedPath[4]);
             BetterLogger.INFO("new like added");
             return "Success!";
         }
 
     }
 
-    // DELETE ip:port/dislike/liker-email/postId
+    // DELETE ip:port/like/dislike/liker-email/postId
     public String handleDeleteRequest(String[] splittedPath) {
-        if (splittedPath.length != 4) {
+        if (splittedPath.length != 5) {
             return "you idiot!";
         }
-        else if (!userController.isUserExists(splittedPath[2])) {
+        else if (!userController.isUserExists(splittedPath[3])) {
             return "user doesn't exist";
         } else {
-            likeController.deleteLike(splittedPath[2], Long.valueOf(splittedPath[3]));
+            likeController.deleteLike(splittedPath[3], Long.valueOf(splittedPath[4]));
         }
         return "you disliked this post";
     }
 
 }
-//this is a test comment

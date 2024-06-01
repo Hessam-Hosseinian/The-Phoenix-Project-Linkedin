@@ -4,6 +4,7 @@ import com.nessam.server.config.Configuration;
 import com.nessam.server.config.ConfigurationManager;
 import com.nessam.server.handlers.httpHandlers.RequestHandler;
 import com.nessam.server.handlers.modelHandlers.*;
+import com.nessam.server.handlers.modelHandlers.LikeHandler;
 import com.nessam.server.utils.BetterLogger;
 import com.sun.net.httpserver.HttpServer;
 
@@ -35,13 +36,18 @@ public class Server {
             server.createContext("/users", new UserHandler());
 
 //            server.createContext("/education", new EducationHandler());
+
             server.createContext("/req", new RequestHandler());
             server.createContext("/follows", new FollowHandler());
             server.createContext("/message", new MessageHandler());
             server.createContext("/post", new PostHandler());
+            System.out.println(3);
+            server.createContext("/like", new LikeHandler());
             server.createContext("/comment", new CommentHandler());
             server.createContext("/search", new SearchHandler());
             server.createContext("/hashtag", new HashtagHandler());
+
+
             server.setExecutor(null);
             server.start();
 
@@ -50,6 +56,4 @@ public class Server {
         }
 
     }
-    //this is a test comment
 }
-//this is a test comment

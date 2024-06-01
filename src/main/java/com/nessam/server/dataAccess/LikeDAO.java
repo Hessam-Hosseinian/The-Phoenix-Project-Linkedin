@@ -6,14 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LikeDAO {
+
     private final Connection connection;
 
-    public LikeDAO() throws SQLException, ClassNotFoundException {
-        connection = DatabaseConnectionManager.getConnection();
+    public LikeDAO() throws SQLException {
+        this.connection = DatabaseConnectionManager.getConnection();
         createLikeTable();
     }
 
-    public void createLikeTable() {
+    public void createLikeTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS likes (" +
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
                 "post_id BIGINT NOT NULL," +
@@ -78,6 +79,6 @@ public class LikeDAO {
 
 
 
-//this is a test comment
+
 
 }

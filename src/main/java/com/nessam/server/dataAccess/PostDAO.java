@@ -2,6 +2,7 @@ package com.nessam.server.dataAccess;
 
 import com.nessam.server.models.Comment;
 import com.nessam.server.models.Post;
+import com.nessam.server.models.Like;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ public class PostDAO {
         connection = DatabaseConnectionManager.getConnection();
         createPostTable();
         createCommentTable();
+        createLikeTable();
     }
 
     public void createPostTable() throws SQLException {
@@ -25,9 +27,7 @@ public class PostDAO {
                         "content TEXT, " +
                         "file_path TEXT, " +
                         "dateCreated TEXT, " +
-                        "author VARCHAR(255), " +
-                        "likes INT, " +
-                        "dislikes INT)"
+                        "author VARCHAR(255))"
         );
         statement.executeUpdate();
     }
@@ -46,15 +46,26 @@ public class PostDAO {
         statement.executeUpdate();
     }
 
+    public void createLikeTable() throws SQLException {
+        String sql = "CREATE TABLE IF NOT EXISTS likes (" +
+                "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
+                "post_id BIGINT NOT NULL," +
+                "liker VARCHAR(255) NOT NULL," +
+                "FOREIGN KEY posts(post_id) REFERENCES id ON DELETE CASCADE" +
+                ")";
+        // shayad lazem bashe DELETE CASCADE ro pak koni
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.executeUpdate();
+    }
+
+
     public void savePost(Post post) throws SQLException {
-        String query = "INSERT INTO posts (title, content, dateCreated, author, likes, dislikes) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO posts (title, content, dateCreated, author) VALUES (?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, post.getTitle());
             statement.setString(2, post.getContent());
             statement.setString(3, post.getDateCreated());
             statement.setString(4, post.getAuthor());
-//            statement.setInt(5, post.getLikes());
-//            statement.setInt(6, post.getDislikes());
             statement.executeUpdate();
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -152,7 +163,6 @@ public class PostDAO {
     }
 
     private List<Comment> getCommentsByPostId(long postId) throws SQLException {
-
         List<Comment> comments = new ArrayList<>();
         String query = "SELECT * FROM comments WHERE fk_post_Id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {

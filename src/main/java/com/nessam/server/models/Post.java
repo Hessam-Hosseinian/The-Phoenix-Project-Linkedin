@@ -1,9 +1,8 @@
 package com.nessam.server.models;
 
 import jakarta.persistence.*;
-import com.nessam.server.models.Like;
+
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
