@@ -43,46 +43,46 @@ public class UserHandler implements HttpHandler {
         int statusCode = 200;
 
         // Extract and verify token
-        String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response = "Unauthorized";
-            statusCode = 401;
-
-            BetterLogger.WARNING("Unauthorized access detected.");
-        } else {
-            String token = authHeader.substring(7);
-            Map<String, Object> tokenData = jwtManager.decodeToken(token);
-
-
-            if (tokenData == null) {
-                response = "Invalid or expired token";
-                statusCode = 401;
-                BetterLogger.WARNING("Invalid or expired token received.");
-            } else {
-                setUserEmail((String) tokenData.get("email"));
-                try {
-                    switch (method) {
-                        case "GET":
-                            response = handleGetRequest(splittedPath);
-                            break;
-                        case "POST":
-                            response = handlePostRequest(exchange);
-                            break;
-                        case "PUT":
-                            response = handlePutRequest(exchange);
-                            break;
-                        case "DELETE":
-                            response = handleDeleteRequest(splittedPath);
-                            break;
-                        default:
-                            response = "Method not allowed";
-                            break;
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+//        String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+//        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+//            response = "Unauthorized";
+//            statusCode = 401;
+//
+//            BetterLogger.WARNING("Unauthorized access detected.");
+//        } else {
+//            String token = authHeader.substring(7);
+//            Map<String, Object> tokenData = jwtManager.decodeToken(token);
+//
+//
+//            if (tokenData == null) {
+//                response = "Invalid or expired token";
+//                statusCode = 401;
+//                BetterLogger.WARNING("Invalid or expired token received.");
+//            } else {
+//                setUserEmail((String) tokenData.get("email"));
+        try {
+            switch (method) {
+                case "GET":
+                    response = handleGetRequest(splittedPath);
+                    break;
+                case "POST":
+                    response = handlePostRequest(exchange);
+                    break;
+                case "PUT":
+                    response = handlePutRequest(exchange);
+                    break;
+                case "DELETE":
+                    response = handleDeleteRequest(splittedPath);
+                    break;
+                default:
+                    response = "Method not allowed";
+                    break;
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+//            }
+//        }
 
         exchange.sendResponseHeaders(200, response.getBytes().length);
         OutputStream os = exchange.getResponseBody();

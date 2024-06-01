@@ -1,19 +1,16 @@
 package com.nessam.server.models;
 
 import jakarta.persistence.*;
+
 import java.sql.Date;
 
 @Entity
 @Table(name = "contact_information")
-public class ContactInformation {
+public class Information {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
 
     @Column(name = "profile_link", length = 40)
     private String profileLink;
@@ -42,11 +39,14 @@ public class ContactInformation {
     @Column(name = "instant_contact_method", length = 40)
     private String instantContactMethod;
 
-    public ContactInformation() {
+    @OneToOne(mappedBy = "contactInformation")
+    private User user;
+
+    // Constructors, getters, and setters
+    public Information() {
     }
 
-    public ContactInformation(User user, String profileLink, String email, String phoneNumber, int phoneType, String address, Date birthMonth, Date birthDay, int birthPrivacyPolicy, String instantContactMethod) {
-        this.user = user;
+    public Information(String profileLink, String email, String phoneNumber, int phoneType, String address, Date birthMonth, Date birthDay, int birthPrivacyPolicy, String instantContactMethod) {
         this.profileLink = profileLink;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -56,9 +56,10 @@ public class ContactInformation {
         this.birthDay = birthDay;
         this.birthPrivacyPolicy = birthPrivacyPolicy;
         this.instantContactMethod = instantContactMethod;
-    }
 
-    // Getters and setters...
+    }
+    // Getters and setters
+    // ...
 
     public Long getId() {
         return id;
@@ -66,14 +67,6 @@ public class ContactInformation {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public String getProfileLink() {
@@ -146,5 +139,13 @@ public class ContactInformation {
 
     public void setInstantContactMethod(String instantContactMethod) {
         this.instantContactMethod = instantContactMethod;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

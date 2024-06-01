@@ -18,12 +18,31 @@ public class PostDAO {
     }
 
     public void createPostTable() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS posts (" + "post_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "title VARCHAR(255) NOT NULL, " + "content TEXT, " + "file_path TEXT, " + "dateCreated TEXT, " + "author VARCHAR(255), " + "likes INT, " + "dislikes INT)");
+        PreparedStatement statement = connection.prepareStatement(
+                "CREATE TABLE IF NOT EXISTS posts (" +
+                        "post_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+                        "title VARCHAR(255) NOT NULL, " +
+                        "content TEXT, " +
+                        "file_path TEXT, " +
+                        "dateCreated TEXT, " +
+                        "author VARCHAR(255), " +
+                        "likes INT, " +
+                        "dislikes INT)"
+        );
         statement.executeUpdate();
     }
 
     public void createCommentTable() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS comments (" + "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "content TEXT, " + "file_path TEXT, " + "dateCreated TEXT, " + "author VARCHAR(255), " + "fk_post_Id BIGINT NOT NULL, " + "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id))");
+        PreparedStatement statement = connection.prepareStatement(
+                "CREATE TABLE IF NOT EXISTS comments (" +
+                        "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+                        "content TEXT, " +
+                        "file_path TEXT, " +
+                        "dateCreated TEXT, " +
+                        "author VARCHAR(255), " +
+                        "fk_post_Id BIGINT NOT NULL, " +
+                        "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id) ON DELETE CASCADE)"
+        );
         statement.executeUpdate();
     }
 
@@ -34,6 +53,8 @@ public class PostDAO {
             statement.setString(2, post.getContent());
             statement.setString(3, post.getDateCreated());
             statement.setString(4, post.getAuthor());
+//            statement.setInt(5, post.getLikes());
+//            statement.setInt(6, post.getDislikes());
             statement.executeUpdate();
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -161,6 +182,8 @@ public class PostDAO {
         post.setContent(resultSet.getString("content"));
         post.setDateCreated(resultSet.getString("dateCreated"));
         post.setAuthor(resultSet.getString("author"));
+        post.setLikes(resultSet.getInt("likes"));
+        post.setDislikes(resultSet.getInt("dislikes"));
         return post;
     }
 }

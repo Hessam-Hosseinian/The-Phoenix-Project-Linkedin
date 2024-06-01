@@ -1,11 +1,6 @@
 package com.nessam.server.models;
 
-//import jakarta.persistence.*;
-
 import jakarta.persistence.*;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -20,8 +15,6 @@ public class User {
 
     @Column(name = "password", nullable = false)
     private String password;
-
-
 
     @Column(name = "first_name", length = 20)
     private String firstName;
@@ -50,27 +43,12 @@ public class User {
     @Column(name = "seeking_opportunity")
     private String seekingOpportunity;
 
-//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<Education> educationRecords = new HashSet<>();
-//
-//    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-//    private ContactInformation contactInformation ;
-//
-//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<Post> posts = new HashSet<>();
-//
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = "user_likes_post",
-//            joinColumns = @JoinColumn(name = "user_id"),
-//            inverseJoinColumns = @JoinColumn(name = "post_id")
-//    )
-//    private Set<Post> likedPosts = new HashSet<>();
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "information_id", referencedColumnName = "id")
+    private Information information;
 
     // Constructors, getters, and setters
-
-    public User() {
-    }
+    public User() {}
 
     public User(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) {
         this.email = email;
@@ -84,6 +62,7 @@ public class User {
         this.location = location;
         this.profession = profession;
         this.seekingOpportunity = seekingOpportunity;
+        information = new Information();
     }
 
     public Long getId() {
@@ -182,6 +161,13 @@ public class User {
         this.seekingOpportunity = seekingOpportunity;
     }
 
+    public Information getContactInformation() {
+        return information;
+    }
 
-
+    public void setContactInformation(Information information) {
+        this.information = information;
+    }
+    // Getters and setters
+    // ...
 }

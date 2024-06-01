@@ -60,7 +60,7 @@ public class UserController {
     }
 
     public String getUserByEmailAndPass(String email, String pass) throws SQLException, JsonProcessingException {
-        User user = userDAO.getUserByEmail(email, pass);
+        User user = userDAO.getUserByEmailAndPassword(email, pass);
         return user != null ? objectMapper.writeValueAsString(user) : "No User";
     }
 
@@ -80,13 +80,13 @@ public class UserController {
         }
     }
 
-    public List<String> search(String keyword) {
-        try {
-            return userDAO.searchByName(keyword);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+//    public List<String> search(String keyword) {
+//        try {
+//            return userDAO.searchByName(keyword);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 
 }

@@ -31,6 +31,7 @@ public class Post {
     private String author;
 
 
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 

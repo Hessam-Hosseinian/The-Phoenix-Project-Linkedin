@@ -98,18 +98,23 @@ public class CommentHandler implements HttpHandler {
     }
 
     private String handlePostRequest(String[] splittedPath, HttpExchange exchange) throws SQLException, IOException {
-        if (splittedPath.length != 6) {
+        if (splittedPath.length != 5) {
             BetterLogger.WARNING("Invalid request format for POST.");
             return "Invalid request format";
         }
         String email = splittedPath[2];
+
         String title = splittedPath[3];
+
         String author = userEmail;
-        String content = splittedPath[5];
+
+        String content = splittedPath[4];
+
         String filePath = ""; // Assuming no file path provided
 
         try {
             Post post = postController.getPostByAuthorAndTitleAbsolut(email, title);
+            System.out.println(post);
 
 
             commentController.createComment(content, filePath, author, post);
