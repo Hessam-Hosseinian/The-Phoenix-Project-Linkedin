@@ -185,4 +185,5 @@ public class PostDAO {
         post.setAuthor(resultSet.getString("author")); 
         return post;
     }
+    //this is a test comment
 }
