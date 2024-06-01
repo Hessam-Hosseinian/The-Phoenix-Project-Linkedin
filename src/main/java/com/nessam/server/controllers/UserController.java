@@ -80,13 +80,13 @@ public class UserController {
         }
     }
 
-//    public List<String> search(String keyword) {
-//        try {
-//            return userDAO.searchByName(keyword);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
+    public List<String> search(String keyword) {
+        try {
+            return userDAO.searchByName(keyword);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 }
