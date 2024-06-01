@@ -152,6 +152,7 @@ public class PostDAO {
     }
 
     private List<Comment> getCommentsByPostId(long postId) throws SQLException {
+
         List<Comment> comments = new ArrayList<>();
         String query = "SELECT * FROM comments WHERE fk_post_Id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {

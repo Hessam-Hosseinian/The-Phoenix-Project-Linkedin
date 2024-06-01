@@ -74,6 +74,7 @@ public class HashtagHandler implements HttpHandler {
             }
         }
 
+
         exchange.sendResponseHeaders(statusCode, response.getBytes().length);
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(response.getBytes());

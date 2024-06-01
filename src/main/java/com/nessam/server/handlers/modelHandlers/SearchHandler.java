@@ -62,6 +62,7 @@ public class SearchHandler implements HttpHandler {
         }
     }
 
+
     // GET ip:port/searcherEmail/search/keyword
     public String handleGetRequest(String[] splittedPath) throws IOException, SQLException {
        if (splittedPath.length != 4) {

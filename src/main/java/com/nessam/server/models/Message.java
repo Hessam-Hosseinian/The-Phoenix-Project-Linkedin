@@ -25,6 +25,7 @@ public class Message implements Comparable {
 
     }
 
+
     public Message(String id, String sender, String receiver, String text, long createdAt) {
         this.id = id;
         this.sender = sender;
