@@ -78,4 +78,5 @@ public class MessageDAO {
         }
         return messages;
     }
+    //this is a test comment
 }
