@@ -71,7 +71,7 @@ public class SearchHandler implements HttpHandler {
            return "user doesn't exist";
        }
        else {
-            userController.search(splittedPath[3]);
+//            userController.search(splittedPath[3]);
        }
        return "the search results shown";
     }
