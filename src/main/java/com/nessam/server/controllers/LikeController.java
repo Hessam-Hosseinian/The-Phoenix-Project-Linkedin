@@ -17,11 +17,6 @@ public class LikeController {
         objectMapper = new ObjectMapper();
     }
 
-    public void createLikeTable() throws SQLException {
-        likeDAO.createLikeTable();
-
-    }
-
     public void saveLike(Long postId, String liker) throws SQLException {
         Like like = new Like();
         like.getPost().setId(postId);
@@ -35,7 +30,7 @@ public class LikeController {
 
     public void getAllLikes(Long postId) {
         try {
-            List<Like> likes = likeDAO.getAllLikes(postId);  // Passing postId to DAO
+            List<Like> likes = likeDAO.getAllLikes(postId);
             objectMapper.writeValueAsString(likes);
         } catch (Exception e) {
             e.printStackTrace();

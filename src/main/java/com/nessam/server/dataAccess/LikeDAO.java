@@ -1,5 +1,6 @@
 package com.nessam.server.dataAccess;
 
+import com.nessam.server.models.Comment;
 import com.nessam.server.models.Like;
 import java.sql.*;
 import java.util.ArrayList;
@@ -27,19 +28,28 @@ public class LikeDAO {
 
     public List<Like> getAllLikes(Long postId) {
         List<Like> likes = new ArrayList<>();
-        String sql = "SELECT liker FROM likes WHERE post_id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        String query = "SELECT liker FROM comments WHERE fk_post_Id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, postId);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                Like like = new Like();
-                like.setLiker(resultSet.getString("liker"));
-                likes.add(like);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    likes.add(mapResultSetToLike(resultSet));
+                }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return likes;
+    }
+
+    private Like mapResultSetToLike(ResultSet resultSet) throws SQLException {
+        Like like = new Like();
+        like.setId(resultSet.getLong("id"));
+        like.setLiker(resultSet.getString("liker"));
+        PostDAO postDAO = new PostDAO();
+        like.setPost(postDAO.getPostById(resultSet.getLong("fk_post_Id")));
+
+        return like;
     }
 
     public void insertLike(Like like) throws SQLException {

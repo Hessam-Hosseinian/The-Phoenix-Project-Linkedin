@@ -120,7 +120,6 @@ public class CommentDAO {
         comment.setFilePath(resultSet.getString("file_path"));
         comment.setDateCreated(resultSet.getString("dateCreated"));
         comment.setAuthor(resultSet.getString("author"));
-        // Assuming you have a method to get Post by Id in PostDAO
         PostDAO postDAO = new PostDAO();
         comment.setPost(postDAO.getPostById(resultSet.getLong("fk_post_Id")));
 
