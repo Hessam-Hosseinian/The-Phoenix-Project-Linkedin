@@ -109,7 +109,7 @@ public class MessageHandler implements HttpHandler {
 
 
     private String handleDeleteRequest(String[] splittedPath) throws SQLException {
-        // DELETE ip:port/delete/messageId
+        // DELETE ip:port/delete/messageContent
         if (splittedPath.length == 3) {
             try {
                 messageController.deleteMessage(splittedPath[2]);

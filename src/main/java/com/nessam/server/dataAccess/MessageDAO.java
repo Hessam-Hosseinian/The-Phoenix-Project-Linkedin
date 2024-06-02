@@ -31,9 +31,9 @@ public class MessageDAO {
         statement.executeUpdate();
     }
 
-    public void deleteMessage(String id) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("DELETE FROM messages WHERE id = ?");
-        statement.setString(1, id);
+    public void deleteMessage(String text) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("DELETE FROM messages WHERE text = ?");
+        statement.setString(1, text);
         statement.executeUpdate();
     }
 

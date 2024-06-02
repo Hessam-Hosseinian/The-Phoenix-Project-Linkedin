@@ -41,12 +41,10 @@ public class Server {
             server.createContext("/follows", new FollowHandler());
             server.createContext("/message", new MessageHandler());
             server.createContext("/post", new PostHandler());
-            System.out.println(3);
             server.createContext("/like", new LikeHandler());
             server.createContext("/comment", new CommentHandler());
             server.createContext("/search", new SearchHandler());
             server.createContext("/hashtag", new HashtagHandler());
-
 
             server.setExecutor(null);
             server.start();
@@ -57,3 +55,7 @@ public class Server {
 
     }
 }
+
+// like
+// search changes
+// search for post

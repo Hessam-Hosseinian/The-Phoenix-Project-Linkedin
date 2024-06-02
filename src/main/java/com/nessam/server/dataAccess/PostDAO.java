@@ -195,5 +195,19 @@ public class PostDAO {
         post.setAuthor(resultSet.getString("author")); 
         return post;
     }
-    //this is a test comment
+
+    public List<String> searchInPosts(String keyword) throws SQLException {
+        List<String> results = new ArrayList<>();
+        String sql = "SELECT content FROM posts WHERE content LIKE ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, "%" + keyword + "%");
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    String name = resultSet.getString("title") + " " + resultSet.getString("content");
+                    results.add(name);
+                }
+            }
+        }
+        return results;
+    }
 }

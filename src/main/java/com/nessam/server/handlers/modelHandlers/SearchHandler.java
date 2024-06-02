@@ -1,5 +1,6 @@
 package com.nessam.server.handlers.modelHandlers;
 
+import com.nessam.server.controllers.PostController;
 import com.nessam.server.controllers.UserController;
 import com.nessam.server.utils.BetterLogger;
 import com.nessam.server.utils.JWTManager;
@@ -13,10 +14,12 @@ import java.util.Map;
 
 public class SearchHandler implements HttpHandler {
     private final UserController userController;
+    private final PostController postController;
     private final JWTManager jwtManager;
 
     public SearchHandler() throws SQLException {
         this.userController = new UserController();
+        this.postController = new PostController();
         this.jwtManager = new JWTManager();
     }
 
@@ -63,18 +66,19 @@ public class SearchHandler implements HttpHandler {
     }
 
 
-    // GET ip:port/searcherEmail/search/keyword
-    public String handleGetRequest(String[] splittedPath) throws IOException, SQLException {
-       if (splittedPath.length != 4) {
+    // GET ip:port/searchUser/keyword
+    // GET ip:port/searchPost/keyword
+    public String handleGetRequest(String[] splittedPath) throws SQLException {
+       if (splittedPath.length != 3) {
            return "you idiot!";
        }
-       else if (!userController.isUserExists(splittedPath[1])) {
-           return "user doesn't exist";
+       else if (splittedPath[1].equals("searchUser")) {
+           userController.searchUser(splittedPath[2]);
        }
-       else {
-//            userController.search(splittedPath[3]);
+       else if (splittedPath[1].equals("searchPost")) {
+           postController.searchPost(splittedPath[2]);
        }
        return "the search results shown";
     }
+
 }
-//this is a test comment

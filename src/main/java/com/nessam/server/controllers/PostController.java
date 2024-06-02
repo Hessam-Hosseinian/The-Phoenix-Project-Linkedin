@@ -91,5 +91,8 @@ public class PostController {
         if (post == null) return null;
         return objectMapper.writeValueAsString(post);
     }
-//this is a test comment
+
+    public List<String> searchPost(String keyword) throws SQLException {
+        return postDAO.searchInPosts(keyword);
+    }
 }

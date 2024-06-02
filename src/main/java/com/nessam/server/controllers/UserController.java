@@ -80,7 +80,7 @@ public class UserController {
         }
     }
 
-    public List<String> search(String keyword) {
+    public List<String> searchUser(String keyword) {
         try {
             return userDAO.searchByName(keyword);
         } catch (SQLException e) {
@@ -88,5 +88,5 @@ public class UserController {
             return null;
         }
     }
-//this is a test comment
+
 }
