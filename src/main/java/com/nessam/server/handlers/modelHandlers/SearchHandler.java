@@ -65,7 +65,6 @@ public class SearchHandler implements HttpHandler {
         }
     }
 
-
     // GET ip:port/searchUser/keyword
     // GET ip:port/searchPost/keyword
     public String handleGetRequest(String[] splittedPath) throws SQLException {

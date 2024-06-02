@@ -22,15 +22,15 @@ public class LikeController {
 
     }
 
-    public void saveLike(Long postId, String liker) {
+    public void saveLike(Long postId, String liker) throws SQLException {
         Like like = new Like();
         like.getPost().setId(postId);
         like.setLiker(liker);
         likeDAO.insertLike(like);
     }
 
-    public void deleteLike(String likerId, Long postId) {
-        likeDAO.deleteLike(likerId, postId);
+    public void deleteLike(Long postId) {
+        likeDAO.deleteLike(postId);
     }
 
     public void getAllLikes(Long postId) {

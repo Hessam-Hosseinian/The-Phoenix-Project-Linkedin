@@ -11,8 +11,7 @@ public class Like {
     private Long id;
     private String liker;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Post post;
 
     public Like() {

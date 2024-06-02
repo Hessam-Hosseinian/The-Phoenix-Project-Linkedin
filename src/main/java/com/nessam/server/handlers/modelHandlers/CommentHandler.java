@@ -116,7 +116,6 @@ public class CommentHandler implements HttpHandler {
             Post post = postController.getPostByAuthorAndTitleAbsolut(email, title);
             System.out.println(post);
 
-
             commentController.createComment(content, filePath, author, post);
             BetterLogger.INFO("Successfully saved comment: " + author + " -> Post ID: " + post.getId());
             return "Done!";

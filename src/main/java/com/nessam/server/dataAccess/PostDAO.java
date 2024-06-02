@@ -49,11 +49,10 @@ public class PostDAO {
     public void createLikeTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS likes (" +
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
-                "post_id BIGINT NOT NULL," +
                 "liker VARCHAR(255) NOT NULL," +
-                "FOREIGN KEY posts(post_id) REFERENCES id ON DELETE CASCADE" +
+                "fk_post_Id BIGINT NOT NULL, " +
+                "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id)" +
                 ")";
-        // shayad lazem bashe DELETE CASCADE ro pak koni
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.executeUpdate();
     }

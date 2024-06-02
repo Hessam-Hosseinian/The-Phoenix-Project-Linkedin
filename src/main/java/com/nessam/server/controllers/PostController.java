@@ -33,7 +33,6 @@ public class PostController {
 
     public String getPosts() throws SQLException, JsonProcessingException {
         List<Post> posts = postDAO.getAllPosts();
-
         return objectMapper.writeValueAsString(posts);
     }
 

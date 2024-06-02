@@ -133,7 +133,6 @@ public class PostHandler implements HttpHandler {
 
         JSONObject jsonObject = new JSONObject(body.toString());
 
-
         String author = userEmail;
         String title = jsonObject.optString("title", null);
         String content = jsonObject.optString("content", null);

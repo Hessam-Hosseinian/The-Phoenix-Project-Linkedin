@@ -18,6 +18,15 @@ public class LikeHandler implements HttpHandler {
     private final PostController postController;
     private final LikeController likeController;
     private final JWTManager jwtManager;
+    private String userEmail;
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
 
     public LikeHandler() throws SQLException {
         this.userController = new UserController();
@@ -54,7 +63,11 @@ public class LikeHandler implements HttpHandler {
                         }
                         break;
                     case "POST":
-                        response = handlePostRequest(splittedPath);
+                        try {
+                            response = handlePostRequest(splittedPath);
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
                         break;
                     case "DELETE":
                         response = handleDeleteRequest(splittedPath);
@@ -78,40 +91,33 @@ public class LikeHandler implements HttpHandler {
         if (splittedPath.length != 4) {
             return "you idiot!";
         }
-        else if (postController.getPostById(splittedPath[2]) == null) {
+        else if (postController.getPostById(splittedPath[3]) == null) {
             return "there is no post with this id";
         }
         else {
             BetterLogger.INFO("All Likes below: ");
-            likeController.getAllLikes(Long.valueOf(splittedPath[2]));
+            likeController.getAllLikes(Long.valueOf(splittedPath[3]));
         }
         return "successfully all likes shown";
     }
 
-    // POST ip:port/like/set/liker-email/postId
-    public String handlePostRequest(String[] splittedPath) {
-        if (splittedPath.length != 5) {
+    // POST ip:port/like/set/postId
+    public String handlePostRequest(String[] splittedPath) throws SQLException {
+        if (splittedPath.length != 4) {
             return "you idiot!";
-        }
-        else if (!userController.isUserExists(splittedPath[3])) {
-            return "user doesn't exist";
         } else {
-            likeController.saveLike(Long.valueOf(splittedPath[3]), splittedPath[4]);
-            BetterLogger.INFO("new like added");
-            return "Success!";
+            likeController.saveLike(Long.valueOf(splittedPath[3]), userEmail);
+            return "success";
         }
 
     }
 
-    // DELETE ip:port/like/dislike/liker-email/postId
+    // DELETE ip:port/like/dislike/postId
     public String handleDeleteRequest(String[] splittedPath) {
-        if (splittedPath.length != 5) {
+        if (splittedPath.length != 4) {
             return "you idiot!";
-        }
-        else if (!userController.isUserExists(splittedPath[3])) {
-            return "user doesn't exist";
         } else {
-            likeController.deleteLike(splittedPath[3], Long.valueOf(splittedPath[4]));
+            likeController.deleteLike(Long.valueOf(splittedPath[3]));
         }
         return "you disliked this post";
     }

@@ -8,6 +8,7 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @Column(name = "content")
     private String content;
 
@@ -16,13 +17,14 @@ public class Comment {
 
     @Column(name = "author")
     private String author;
+
     @Column(name = "dateCreated")
     private String dateCreated;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Post post;
 
-    // Getters and Setters
+
     public long getId() {
         return id;
     }
