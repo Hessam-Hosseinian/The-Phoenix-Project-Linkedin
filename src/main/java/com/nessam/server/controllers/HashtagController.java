@@ -4,6 +4,7 @@ package com.nessam.server.controllers;
 import com.nessam.server.dataAccess.HashtagDAO;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class HashtagController {
     private final HashtagDAO hashtagDAO;
@@ -12,26 +13,27 @@ public class HashtagController {
         hashtagDAO = new HashtagDAO();
     }
 
-    public void addHashtag(String id, String post) throws SQLException {
-        hashtagDAO.saveHashtag(id, post);
+    public void addHashtag(Long id, String post) throws SQLException {
+        hashtagDAO.addHashtag(id, post);
     }
 
-    public void deleteAll() throws SQLException {
-        hashtagDAO.deleteAll();
+    public String deleteHashtag(Long postId, String hashtag) throws SQLException {
+        hashtagDAO.deleteHashtag(postId, hashtag);
+        return "tag deleted successfully";
     }
 
-    public void deleteOne (String id) throws SQLException {
-        hashtagDAO.deleteOne(id);
-    }
-
-    public String GetHashtag(String id) throws SQLException {
-        ArrayList<String> posts = hashtagDAO.getHashtag(id);
+    public String searchHashtag(String hashtag) throws SQLException {
+        List<String> posts = hashtagDAO.searchHashtags(hashtag);
         StringBuilder response = new StringBuilder();
         for (int i = 0; i < posts.size(); i++) {
-            if (i > 0) response.append(',');
+            response.append('#');
             response.append(posts.get(i));
+            response.append('\n');
         }
         return response.toString();
     }
-    //this is a test comment
+
+    public boolean tagExists (Long postId, String tagName) throws SQLException {
+        return hashtagDAO.tagExists(postId, tagName);
+    }
 }

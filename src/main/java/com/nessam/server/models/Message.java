@@ -3,7 +3,8 @@ package com.nessam.server.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 
-import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Message implements Comparable {
     @Column(name = "message-id")
@@ -19,7 +20,7 @@ public class Message implements Comparable {
     private String text;
 
     @Column(name = "createdat")
-    private long createdAt;
+    private String createdAt;
 
     public Message () {
 
@@ -28,10 +29,11 @@ public class Message implements Comparable {
 
     public Message(String id, String sender, String receiver, String text, long createdAt) {
         this.id = id;
-        this.sender = sender;
         this.receiver = receiver;
+        this.sender = sender;
         this.text = text;
-        this.createdAt = createdAt;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        this.createdAt = formatter.format(new Date());
     }
 
     public Message(String id, String sender, String receiver, String text) {
@@ -39,7 +41,8 @@ public class Message implements Comparable {
         this.sender = sender;
         this.receiver = receiver;
         this.text = text;
-        this.createdAt = System.currentTimeMillis();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        this.createdAt = formatter.format(new Date());
     }
 
     public Message(String sender, String receiver, String text) {
@@ -47,7 +50,8 @@ public class Message implements Comparable {
         this.sender = sender;
         this.receiver = receiver;
         this.text = text;
-        this.createdAt = System.currentTimeMillis();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        this.createdAt = formatter.format(new Date());
     }
 
     public String getId() {
@@ -82,11 +86,11 @@ public class Message implements Comparable {
         this.text = text;
     }
 
-    public long getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(long createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -94,7 +98,6 @@ public class Message implements Comparable {
     public String toString() {
         return "Message{" +
                 "id='" + id + '\'' +
-                ", sender='" + sender + '\'' +
                 ", receiver='" + receiver + '\'' +
                 ", text='" + text + '\'' +
                 ", createdAt=" + createdAt +
@@ -108,9 +111,8 @@ public class Message implements Comparable {
 
         Message message = (Message) o;
 
-        if (createdAt != message.createdAt) return false;
+        if (!createdAt.equals(message.createdAt)) return false;
         if (!id.equals(message.id)) return false;
-        if (!sender.equals(message.sender)) return false;
         if (!receiver.equals(message.receiver)) return false;
         return text.equals(message.text);
     }
@@ -118,16 +120,14 @@ public class Message implements Comparable {
     @Override
     public int hashCode() {
         int result = id.hashCode();
-        result = 31 * result + sender.hashCode();
         result = 31 * result + receiver.hashCode();
         result = 31 * result + text.hashCode();
-        result = 31 * result + (int) (createdAt ^ (createdAt >>> 32));
+        result = 31 * result + (int) (Integer.parseInt(createdAt) ^ (Integer.parseInt(createdAt)));
         return result;
     }
 
     @Override
     public int compareTo(Object o) {
-        return (int)(((Message)o).createdAt - createdAt);
+        return (int)(Integer.parseInt(((Message)o).createdAt) -  Integer.parseInt(createdAt));
     }
 }
-//this is a test comment

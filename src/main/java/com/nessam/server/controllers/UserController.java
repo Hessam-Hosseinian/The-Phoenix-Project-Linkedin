@@ -80,13 +80,9 @@ public class UserController {
         }
     }
 
-    public List<String> searchUser(String keyword) {
-        try {
-            return userDAO.searchByName(keyword);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
+    public String searchUser(String keyword) throws SQLException, JsonProcessingException {
+        List<User> users = userDAO.searchByName(keyword);
+        return objectMapper.writeValueAsString(users);
+    }
 }

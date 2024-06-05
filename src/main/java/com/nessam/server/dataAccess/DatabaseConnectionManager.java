@@ -9,8 +9,9 @@ import java.sql.SQLException;
 
 public class DatabaseConnectionManager {
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/hessardatabase";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "nessar";
+    private static final String USERNAME = "hessam";
+    private static final String PASSWORD = "13831101";
+    //
     private static Connection connection;
 
     private DatabaseConnectionManager() {
@@ -30,5 +31,5 @@ public class DatabaseConnectionManager {
 
         return connection;
     }
-//this is a test comment
+
 }

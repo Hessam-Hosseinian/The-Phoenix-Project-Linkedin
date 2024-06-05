@@ -82,6 +82,7 @@ public class PostDAO {
             while (resultSet.next()) {
                 Post post = mapResultSetToPost(resultSet);
                 post.setComments(getCommentsByPostId(post.getId()));
+                post.setLikes(getLikesByPostId(post.getId()));
                 posts.add(post);
             }
         }
@@ -96,11 +97,13 @@ public class PostDAO {
                 if (rs.next()) {
                     Post post = mapResultSetToPost(rs);
                     post.setComments(getCommentsByPostId(postId));
+                    post.setLikes(getLikesByPostId(postId));
                     return post;
                 }
             }
         }
-        return null; // Return null if no post with the given ID is found
+        return null;
+
     }
 
     public List<Post> getPostsByAuthor(String author) throws SQLException {
@@ -112,6 +115,7 @@ public class PostDAO {
                 while (rs.next()) {
                     Post post = mapResultSetToPost(rs);
                     post.setComments(getCommentsByPostId(post.getId()));
+                    post.setLikes(getLikesByPostId(post.getId()));
                     posts.add(post);
                 }
             }
@@ -128,6 +132,7 @@ public class PostDAO {
                 if (rs.next()) {
                     Post post = mapResultSetToPost(rs);
                     post.setComments(getCommentsByPostId(post.getId()));
+                    post.setLikes(getLikesByPostId(post.getId()));
                     return post;
                 }
             }
@@ -175,6 +180,20 @@ public class PostDAO {
         return comments;
     }
 
+    private List<Like> getLikesByPostId(long postId) throws SQLException {
+        List<Like> likes = new ArrayList<>();
+        String query = "SELECT * FROM likes WHERE fk_post_Id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, postId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    likes.add(mapResultSetToLike(rs));
+                }
+            }
+        }
+        return likes;
+    }
+
     private Comment mapResultSetToComment(ResultSet resultSet) throws SQLException {
         Comment comment = new Comment();
         comment.setId(resultSet.getLong("comment_Id"));
@@ -185,25 +204,32 @@ public class PostDAO {
         return comment;
     }
 
+    private Like mapResultSetToLike(ResultSet resultSet) throws SQLException {
+        Like like = new Like();
+        like.setId(resultSet.getLong("id"));
+        like.setLiker(resultSet.getString("liker"));
+        return like;
+    }
+
     private Post mapResultSetToPost(ResultSet resultSet) throws SQLException {
         Post post = new Post();
         post.setId(resultSet.getLong("post_Id"));
         post.setTitle(resultSet.getString("title"));
         post.setContent(resultSet.getString("content"));
         post.setDateCreated(resultSet.getString("dateCreated"));
-        post.setAuthor(resultSet.getString("author")); 
+        post.setAuthor(resultSet.getString("author"));
         return post;
     }
 
-    public List<String> searchInPosts(String keyword) throws SQLException {
-        List<String> results = new ArrayList<>();
-        String sql = "SELECT content FROM posts WHERE content LIKE ?";
+
+    public List<Post> searchInPosts(String keyword) throws SQLException {
+        List<Post> results = new ArrayList<>();
+        String sql = "SELECT post_Id, title, content, dateCreated, author FROM posts WHERE content LIKE ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, "%" + keyword + "%");
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    String name = resultSet.getString("title") + " " + resultSet.getString("content");
-                    results.add(name);
+                    results.add(mapResultSetToPost(resultSet));
                 }
             }
         }

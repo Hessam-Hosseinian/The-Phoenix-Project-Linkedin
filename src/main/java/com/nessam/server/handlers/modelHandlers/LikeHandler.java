@@ -1,8 +1,10 @@
 package com.nessam.server.handlers.modelHandlers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nessam.server.controllers.LikeController;
 import com.nessam.server.controllers.PostController;
 import com.nessam.server.controllers.UserController;
+import com.nessam.server.models.Post;
 import com.nessam.server.utils.BetterLogger;
 import com.nessam.server.utils.JWTManager;
 import com.sun.net.httpserver.HttpExchange;
@@ -68,7 +70,7 @@ public class LikeHandler implements HttpHandler {
                         } catch (SQLException e) {
                             throw new RuntimeException(e);
                         }
-                        break;
+//                        break;
                     case "DELETE":
                         response = handleDeleteRequest(splittedPath);
                         break;
@@ -101,13 +103,21 @@ public class LikeHandler implements HttpHandler {
         return "successfully all likes shown";
     }
 
-    // POST ip:port/like/set/postId
+
+    // POST ip:port/like/emailOfPost/postTitle
     public String handlePostRequest(String[] splittedPath) throws SQLException {
         if (splittedPath.length != 4) {
             return "you idiot!";
-        } else {
-            likeController.saveLike(Long.valueOf(splittedPath[3]), userEmail);
-            return "success";
+        }
+        try {
+            Post post = postController.getPostByAuthorAndTitleAbsolut(splittedPath[2], splittedPath[3]);
+            System.out.println(post);
+            likeController.saveLike(userEmail, post);
+            BetterLogger.INFO("Successfully saved like: " + userEmail + " -> Post ID: " + post.getId());
+            return "Done!";
+        } catch (NumberFormatException | JsonProcessingException e) {
+            BetterLogger.WARNING("Invalid post ID format.");
+            return "Invalid post ID format";
         }
 
     }

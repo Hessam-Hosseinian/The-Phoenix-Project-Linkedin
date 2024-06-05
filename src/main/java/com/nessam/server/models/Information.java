@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.sql.Date;
 
 @Entity
-@Table(name = "contact_information")
+@Table(name = "information")
 public class Information {
 
     @Id
@@ -149,4 +149,3 @@ public class Information {
         this.user = user;
     }
 }
-//this is a test comment

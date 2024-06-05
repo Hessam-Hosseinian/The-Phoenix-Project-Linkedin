@@ -1,8 +1,11 @@
 package com.nessam.server.dataAccess;
 
+import com.nessam.server.models.Post;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class HashtagDAO {
 
@@ -19,48 +22,63 @@ public class HashtagDAO {
     }
 
     public void createHashtagTable() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS tags (id VARCHAR(280) , post VARCHAR(36), PRIMARY KEY (id, post))");
+        String sql = "CREATE TABLE IF NOT EXISTS hashtags (" +
+                "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
+                "post_id BIGINT NOT NULL," +
+                "hashtag VARCHAR(255) NOT NULL," +
+                "FOREIGN KEY (post_id) REFERENCES posts(post_Id)" +
+                ")";
+        PreparedStatement statement = connection.prepareStatement(sql);
         statement.executeUpdate();
     }
 
-    public void saveHashtag(String id, String post) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO tags (id, post) VALUES (?, ?)");
-        statement.setString(1, id);
-        statement.setString(2, post);
-        statement.executeUpdate();
-    }
 
-    public void deleteAll() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("DELETE FROM tags");
-        statement.executeUpdate();
-    }
-
-    public ArrayList<String> getHashtag(String id) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM tags WHERE id = ?");
-        statement.setString(1, id);
-        ResultSet resultSet = statement.executeQuery();
-        ArrayList<String> posts = new ArrayList<>();
-        while (resultSet.next()) {
-            posts.add(resultSet.getString("post"));
+    public boolean tagExists (Long postId, String tagName) throws SQLException {
+        String query = "SELECT * FROM hashtags WHERE post_Id = ? AND hashtag = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, postId);
+            stmt.setString(2, tagName);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return true;
+                }
+            }
         }
-        return posts;
+        return false;
     }
-
-    public ArrayList<String> getTags(String id) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT id FROM tags WHERE post = ?");
-        statement.setString(1, id);
-        ResultSet resultSet = statement.executeQuery();
-        ArrayList<String> tags = new ArrayList<>();
-        while (resultSet.next()) {
-            tags.add(resultSet.getString("id"));
+    public void addHashtag(Long postId, String hashtag) throws SQLException {
+        String sql = "INSERT INTO hashtags (post_id, hashtag) VALUES (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, postId);
+            statement.setString(2, hashtag);
+            statement.executeUpdate();
         }
-        return tags;
     }
 
-    public void deleteOne(String id) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("DELETE FROM tags WHERE id = ?");
-        statement.setString(1, id);
-        statement.executeUpdate();
+    public String deleteHashtag(Long postId, String hashtag) throws SQLException {
+        String sql = "DELETE FROM hashtags WHERE hashtag = ? AND post_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, hashtag);
+            statement.setLong(2, postId);
+            statement.executeUpdate();
+        }
+        return "hashtag deleted";
     }
-//this is a test comment
+
+
+    public List<String> searchHashtags(String keyword) throws SQLException {
+        List<String> hashtags = new ArrayList<>();
+        String sql = "SELECT hashtag FROM hashtags WHERE hashtag LIKE ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, "%" + keyword + "%");
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    hashtags.add(resultSet.getString("hashtag"));
+                }
+            }
+        }
+        return hashtags;
+    }
+
+
 }

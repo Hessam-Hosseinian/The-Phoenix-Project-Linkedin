@@ -87,5 +87,4 @@ public class RequestHandler implements HttpHandler {
             BetterLogger.ERROR(e.getMessage());
         }
     }
-    //this is a test comment
 }

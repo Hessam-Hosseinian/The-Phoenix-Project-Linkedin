@@ -54,5 +54,4 @@ public class BlockController {
     public boolean isBlocking(String blockerId, String blockedId) throws SQLException {
         return blockDAO.isBlocking(blockerId, blockedId);
     }
-    //this is a test comment
 }

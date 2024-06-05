@@ -33,6 +33,7 @@ public class PostController {
 
     public String getPosts() throws SQLException, JsonProcessingException {
         List<Post> posts = postDAO.getAllPosts();
+
         return objectMapper.writeValueAsString(posts);
     }
 
@@ -91,7 +92,8 @@ public class PostController {
         return objectMapper.writeValueAsString(post);
     }
 
-    public List<String> searchPost(String keyword) throws SQLException {
-        return postDAO.searchInPosts(keyword);
+    public String searchPost(String keyword) throws SQLException, JsonProcessingException {
+        List<Post> posts = postDAO.searchInPosts(keyword);
+        return objectMapper.writeValueAsString(posts);
     }
 }

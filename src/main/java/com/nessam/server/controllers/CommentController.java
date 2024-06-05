@@ -41,5 +41,4 @@ public class CommentController {
     public void deleteCommentsByPostId(long postId) throws SQLException {
         commentDAO.deleteCommentsByPostId(postId);
     }
-
 }

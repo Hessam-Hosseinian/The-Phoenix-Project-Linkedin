@@ -174,4 +174,3 @@ public class CurrentJobPosition {
         this.notifyChanges = notifyChanges;
     }
 }
-//this is a test comment

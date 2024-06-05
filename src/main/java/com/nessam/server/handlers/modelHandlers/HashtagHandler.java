@@ -17,16 +17,23 @@ import java.util.Map;
 public class HashtagHandler implements HttpHandler {
 
     private final HashtagController hashtagController;
-    private final UserController userController;
     private final PostController postController;
     private final JWTManager jwtManager;
+    private String userEmail;
 
     public HashtagHandler() throws SQLException {
         this.hashtagController = new HashtagController();
-        this.userController = new UserController();
         this.postController = new PostController();
         this.jwtManager = new JWTManager();
         BetterLogger.INFO("HashtagHandler initialized successfully.");
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 
     @Override
@@ -34,22 +41,24 @@ public class HashtagHandler implements HttpHandler {
         String method = exchange.getRequestMethod();
         String path = exchange.getRequestURI().getPath();
         String[] splittedPath = path.split("/");
-        String response = "This is the response hashtags";
+        String response = "This is the response follows";
         int statusCode = 200;
 
+        // Extract and verify token
         String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response = "Unauthorized";
             statusCode = 401;
-            response = "Unauthorized access";
-            BetterLogger.WARNING("Unauthorized access attempt detected.");
+            BetterLogger.WARNING("Unauthorized access detected.");
         } else {
             String token = authHeader.substring(7);
             Map<String, Object> tokenData = jwtManager.decodeToken(token);
             if (tokenData == null) {
                 response = "Invalid or expired token";
-                statusCode = 403;
-                BetterLogger.WARNING("Token validation failed for token: " + token);
+                statusCode = 401;
+                BetterLogger.WARNING("Invalid or expired token received.");
             } else {
+                userEmail = (String) tokenData.get("email");
                 try {
                     switch (method) {
                         case "GET":
@@ -62,32 +71,31 @@ public class HashtagHandler implements HttpHandler {
                             response = handleDeleteRequest(splittedPath);
                             break;
                         default:
-                            response = "HTTP method not supported";
-                            statusCode = 405;
                             BetterLogger.ERROR("Unsupported HTTP method: " + method);
+                            response = "Method not supported";
+                            statusCode = 405;
                     }
-                } catch (Exception e) {
+                } catch (SQLException e) {
+                    BetterLogger.ERROR("SQLException occurred: " + e.getMessage());
                     response = "Internal Server Error";
                     statusCode = 500;
-                    BetterLogger.ERROR("Exception occurred: " + e.getMessage());
                 }
             }
-        }
 
-
-        exchange.sendResponseHeaders(statusCode, response.getBytes().length);
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(response.getBytes());
-            BetterLogger.INFO("Response sent: " + response);
+            exchange.sendResponseHeaders(statusCode, response.getBytes().length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(response.getBytes());
+            }
         }
     }
 
+    // GET ip:port/hashtag/#tagWord
     private String handleGetRequest(String[] splittedPath) {
         if (splittedPath.length != 3) {
             return "Incorrect URL format.";
         }
         try {
-            String result = hashtagController.GetHashtag(splittedPath[2]);
+            String result = hashtagController.searchHashtag(splittedPath[2]);
             BetterLogger.INFO("Fetched posts for hashtag: " + splittedPath[2]);
             return result;
         } catch (SQLException e) {
@@ -96,36 +104,34 @@ public class HashtagHandler implements HttpHandler {
         }
     }
 
-    private String handlePostRequest(String[] splittedPath) {
+    // POST ip:port/hashtag/postId/#tagWord
+    private String handlePostRequest(String[] splittedPath) throws SQLException, JsonProcessingException {
         if (splittedPath.length != 4) {
+            System.out.println(splittedPath.length);
             return "Incorrect URL format.";
         }
-        try {
-            if (postController.getPostById(splittedPath[3]) == null) {
-                return "No post found with ID: " + splittedPath[3];
+        else {
+            if (postController.getPostById(splittedPath[2]) == null) {
+                return "No post found with ID: " + splittedPath[2];
             } else {
-                hashtagController.addHashtag(splittedPath[2], splittedPath[3]);
-                BetterLogger.INFO("Hashtag added: " + splittedPath[2] + " to post " + splittedPath[3]);
+                hashtagController.addHashtag(Long.valueOf(splittedPath[2]), splittedPath[3]);
+                BetterLogger.INFO("Hashtag added: " + splittedPath[3] + " to post " + splittedPath[2]);
                 return "Hashtag added successfully.";
             }
-        } catch (SQLException | JsonProcessingException e) {
-            BetterLogger.ERROR("Error adding hashtag to post");
-            throw new RuntimeException(e);
         }
     }
 
+    // DELETE ip:port/hashtag/postId/#tagName
     private String handleDeleteRequest(String[] splittedPath) throws SQLException {
-        if (splittedPath.length == 2 && "deleteAllTags".equals(splittedPath[1])) {
-            hashtagController.deleteAll();
-            BetterLogger.INFO("All tags deleted");
-            return "All tags deleted successfully.";
-        } else if (splittedPath.length == 3) {
-            hashtagController.deleteOne(splittedPath[2]);
-            BetterLogger.INFO("Tag deleted: " + splittedPath[2]);
-            return "Tag deleted successfully.";
-        } else {
-            return "Incorrect URL format.";
+        if (splittedPath.length == 4) {
+            if (hashtagController.tagExists(Long.valueOf(splittedPath[2]), splittedPath[3])) {
+                return hashtagController.deleteHashtag(Long.valueOf(splittedPath[2]), splittedPath[3]);
+            }
+            else {
+                return "No tag exists matching this postId";
+            }
+        } else  {
+            return "Wrong URL format";
         }
     }
 }
-//this is a test comment

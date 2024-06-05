@@ -73,4 +73,3 @@ public class BetterLogger {
         log(LogLevel.CRITICAL, message);
     }
 }
-//this is a test comment

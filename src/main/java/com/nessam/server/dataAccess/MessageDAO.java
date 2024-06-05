@@ -27,13 +27,13 @@ public class MessageDAO {
         statement.setString(2, message.getSender());
         statement.setString(3, message.getReceiver());
         statement.setString(4, message.getText());
-        statement.setLong(5, message.getCreatedAt());
+        statement.setString(5, message.getCreatedAt());
         statement.executeUpdate();
     }
 
-    public void deleteMessage(String text) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("DELETE FROM messages WHERE text = ?");
-        statement.setString(1, text);
+    public void deleteMessage(String id) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("DELETE FROM messages WHERE id = ?");
+        statement.setString(1, id);
         statement.executeUpdate();
     }
 
@@ -44,11 +44,9 @@ public class MessageDAO {
 
     public ArrayList<Message> getMessages(String u1, String u2) throws SQLException {
         ArrayList<Message> messages = new ArrayList<>();
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM messages WHERE (sender = ? AND receiver = ?) or (sender = ? AND receiver = ?)");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM messages WHERE (sender = ? AND receiver = ?)");
         statement.setString(1, u1);
         statement.setString(2, u2);
-        statement.setString(3, u2);
-        statement.setString(4, u1);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()) {
             Message message = new Message();
@@ -56,7 +54,7 @@ public class MessageDAO {
             message.setSender(resultSet.getString("sender"));
             message.setReceiver(resultSet.getString("receiver"));
             message.setText(resultSet.getString("text"));
-            message.setCreatedAt(resultSet.getLong("createdat"));
+            message.setCreatedAt(resultSet.getString("createdat"));
             messages.add(message);
         }
         return messages;
@@ -73,10 +71,9 @@ public class MessageDAO {
             message.setSender(resultSet.getString("sender"));
             message.setReceiver(resultSet.getString("receiver"));
             message.setText(resultSet.getString("text"));
-            message.setCreatedAt(resultSet.getLong("createdat"));
+            message.setCreatedAt(resultSet.getString("createdat"));
             messages.add(message);
         }
         return messages;
     }
-    //this is a test comment
 }

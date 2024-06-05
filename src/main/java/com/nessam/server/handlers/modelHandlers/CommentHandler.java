@@ -97,6 +97,7 @@ public class CommentHandler implements HttpHandler {
         return "WRONG URL";
     }
 
+    // POST ip:port/comment/emailOfPost/postTitle/commentContent
     private String handlePostRequest(String[] splittedPath, HttpExchange exchange) throws SQLException, IOException {
         if (splittedPath.length != 5) {
             BetterLogger.WARNING("Invalid request format for POST.");
@@ -141,5 +142,4 @@ public class CommentHandler implements HttpHandler {
             return "Invalid request format";
         }
     }
-    //this is a test comment
 }

@@ -1,5 +1,6 @@
 package com.nessam.server.handlers.modelHandlers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nessam.server.controllers.PostController;
 import com.nessam.server.controllers.UserController;
 import com.nessam.server.utils.BetterLogger;
@@ -65,19 +66,22 @@ public class SearchHandler implements HttpHandler {
         }
     }
 
-    // GET ip:port/searchUser/keyword
-    // GET ip:port/searchPost/keyword
-    public String handleGetRequest(String[] splittedPath) throws SQLException {
-       if (splittedPath.length != 3) {
-           return "you idiot!";
-       }
-       else if (splittedPath[1].equals("searchUser")) {
-           userController.searchUser(splittedPath[2]);
-       }
-       else if (splittedPath[1].equals("searchPost")) {
-           postController.searchPost(splittedPath[2]);
-       }
-       return "the search results shown";
-    }
 
+    // GET ip:port/search/searchUser/keyword
+    // GET ip:port/search/searchPost/keyword
+    private String handleGetRequest(String[] splittedPath) throws SQLException, JsonProcessingException {
+        if (splittedPath.length != 4) {
+            BetterLogger.ERROR("Invalid URL format for search.");
+            return "Invalid URL format.";
+        }
+        else if (splittedPath[2].equals("searchUser")) {
+            BetterLogger.INFO("Searching user with keyword: " + splittedPath[3]);
+            return userController.searchUser(splittedPath[3]);
+        }
+        else if (splittedPath[2].equals("searchPost")) {
+            BetterLogger.INFO("Searching post with keyword: " + splittedPath[3]);
+            return postController.searchPost(splittedPath[3]);
+        }
+        return "No search operation executed.";
+    }
 }

@@ -64,5 +64,5 @@ public class ConfigurationManager {
         return myCurrentConfiguration;
     }
 
-//this is a test comment
+
 }

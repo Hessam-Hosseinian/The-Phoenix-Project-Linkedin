@@ -16,15 +16,7 @@ public class CommentDAO {
     }
 
     public void createCommentTable() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS comments (" +
-                "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                "content TEXT, " +
-                "file_path TEXT, " +
-                "dateCreated TEXT, " +
-                "author VARCHAR(255), " +
-                "fk_post_Id BIGINT NOT NULL, " +
-                "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id)" + ")");
+        PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS comments (" + "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "content TEXT, " + "file_path TEXT, " + "dateCreated TEXT, " + "author VARCHAR(255), " + "fk_post_Id BIGINT NOT NULL, " + "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id)" + ")");
         statement.executeUpdate();
     }
 
@@ -70,7 +62,7 @@ public class CommentDAO {
                 }
             }
         }
-        return null;
+        return null; // Return null if no comment with the given ID is found
     }
 
     public List<Comment> getCommentsByAuthor(String author) throws SQLException {
@@ -120,10 +112,10 @@ public class CommentDAO {
         comment.setFilePath(resultSet.getString("file_path"));
         comment.setDateCreated(resultSet.getString("dateCreated"));
         comment.setAuthor(resultSet.getString("author"));
+        // Assuming you have a method to get Post by Id in PostDAO
         PostDAO postDAO = new PostDAO();
         comment.setPost(postDAO.getPostById(resultSet.getLong("fk_post_Id")));
 
         return comment;
     }
-    //this is a test comment
 }

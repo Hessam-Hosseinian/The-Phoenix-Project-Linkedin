@@ -16,7 +16,7 @@ public class PostHandler implements HttpHandler {
 
     private final PostController postController;
     private final JWTManager jwtManager;
-    String userEmail;
+    private String userEmail;
 
     public PostHandler() throws SQLException {
         this.postController = new PostController();
@@ -28,10 +28,9 @@ public class PostHandler implements HttpHandler {
         String method = exchange.getRequestMethod();
         String path = exchange.getRequestURI().getPath();
         String[] splittedPath = path.split("/");
-        String response = "This is the response follows";
+        String response = "This is the response Posts";
         int statusCode = 200;
 
-        // Extract and verify token
         String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response = "Unauthorized";
@@ -48,7 +47,7 @@ public class PostHandler implements HttpHandler {
                 statusCode = 401;
                 BetterLogger.WARNING("Invalid or expired token received.");
             } else {
-                setUserEmail((String) tokenData.get("email"));
+                setUserEmail((String)tokenData.get("email"));
                 try {
                     switch (method) {
                         case "GET":
@@ -132,7 +131,6 @@ public class PostHandler implements HttpHandler {
         requestBody.close();
 
         JSONObject jsonObject = new JSONObject(body.toString());
-
         String author = userEmail;
         String title = jsonObject.optString("title", null);
         String content = jsonObject.optString("content", null);
@@ -200,4 +198,3 @@ public class PostHandler implements HttpHandler {
         this.userEmail = userEmail;
     }
 }
-//this is a test comment

@@ -54,7 +54,7 @@ CREATE TABLE current_job_positions
 );
 
 
-CREATE TABLE contact_information
+CREATE TABLE information
 (
     id                     BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id                BIGINT NOT NULL,

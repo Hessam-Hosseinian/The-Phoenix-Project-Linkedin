@@ -21,7 +21,7 @@ public class LikeDAO {
                 "liker VARCHAR(255) NOT NULL," +
                 "fk_post_Id BIGINT NOT NULL, " +
                 "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id)" +
-        ")";
+                ")";
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.executeUpdate();
     }

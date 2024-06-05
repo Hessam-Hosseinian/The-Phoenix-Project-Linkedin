@@ -42,7 +42,6 @@ public class UserHandler implements HttpHandler {
         String response = "This is the response follows";
         int statusCode = 200;
 
-        // Extract and verify token
 //        String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
 //        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 //            response = "Unauthorized";
@@ -52,14 +51,12 @@ public class UserHandler implements HttpHandler {
 //        } else {
 //            String token = authHeader.substring(7);
 //            Map<String, Object> tokenData = jwtManager.decodeToken(token);
-//
-//
+
+
 //            if (tokenData == null) {
 //                response = "Invalid or expired token";
 //                statusCode = 401;
 //                BetterLogger.WARNING("Invalid or expired token received.");
-//            } else {
-//                setUserEmail((String) tokenData.get("email"));
         try {
             switch (method) {
                 case "GET":
@@ -136,15 +133,15 @@ public class UserHandler implements HttpHandler {
                 return "Incorrect password format";
             }
 
-            boolean passMatch = Validation.matchingPasswords(jsonObject.getString("password"), jsonObject.getString("repeatedPass"));
-            if (!passMatch) {
-                BetterLogger.INFO("Passwords do not match");
-                return "Passwords do not match";
-            }
-            if (userController.isUserExists(jsonObject.getString("email"))) {
-                BetterLogger.WARNING("User created unsuccessfully");
-                return "This email has already been taken\n" + "Use another email Or login";
-            }
+//            boolean passMatch = Validation.matchingPasswords(jsonObject.getString("password"), jsonObject.getString("repeatedPass"));
+//            if (!passMatch) {
+//                BetterLogger.INFO("Passwords do not match");
+//                return "Passwords do not match";
+//            }
+//            if (userController.isUserExists(jsonObject.getString("email"))) {
+//                BetterLogger.WARNING("User created unsuccessfully");
+//                return "This email has already been taken\n" + "Use another email Or login";
+//            }
             userController.createUser(jsonObject.getString("email"), jsonObject.getString("password"), jsonObject.getString("firstName"), jsonObject.getString("lastName"), jsonObject.getString("additionalName"), jsonObject.getString("profilePicture"), jsonObject.getString("backgroundPicture"), jsonObject.getString("title"), jsonObject.getString("location"), jsonObject.getString("profession"), jsonObject.getString("seekingOpportunity"));
 
 
@@ -223,4 +220,3 @@ public class UserHandler implements HttpHandler {
         this.userEmail = userEmail;
     }
 }
-//this is a test comment

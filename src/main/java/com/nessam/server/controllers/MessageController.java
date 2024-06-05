@@ -27,8 +27,8 @@ public class MessageController {
         return objectMapper.writeValueAsString(messages);
     }
 
-    public void deleteMessage(String text) throws SQLException {
-        messageDAO.deleteMessage(text);
+    public void deleteMessage(String id) throws SQLException {
+        messageDAO.deleteMessage(id);
     }
 
     public void deleteAll() throws SQLException {
@@ -42,5 +42,4 @@ public class MessageController {
         String response = objectMapper.writeValueAsString(messages.subList(messages.size() - cnt, messages.size()));
         return response;
     }
-    //this is a test comment
 }

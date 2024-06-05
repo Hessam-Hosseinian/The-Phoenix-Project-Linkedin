@@ -41,6 +41,7 @@ public class UserDAO {
         try (PreparedStatement statement = connection.prepareStatement(userTableSql)) {
             statement.executeUpdate();
         }
+
     }
 
     private void createInformationTable() throws SQLException {
@@ -60,7 +61,6 @@ public class UserDAO {
                         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
                     )
                 """;
-
         try (PreparedStatement statement = connection.prepareStatement(informationTableSql)) {
             statement.executeUpdate();
         }
@@ -77,14 +77,11 @@ public class UserDAO {
                     INSERT INTO users (email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
-
         try (PreparedStatement userStmt = connection.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS)) {
             connection.setAutoCommit(false);
-
             if (user.getContactInformation() != null) {
                 saveContactInformation(user.getContactInformation());
             }
-
             userStmt.setString(1, user.getEmail());
             userStmt.setString(2, user.getPassword());
             userStmt.setString(3, user.getFirstName());
@@ -97,9 +94,7 @@ public class UserDAO {
             userStmt.setString(10, user.getProfession());
             userStmt.setString(11, user.getSeekingOpportunity());
             userStmt.setObject(12, user.getContactInformation() != null ? user.getContactInformation().getId() : null);
-
             userStmt.executeUpdate();
-
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
@@ -111,7 +106,7 @@ public class UserDAO {
 
     private void saveContactInformation(Information contactInfo) throws SQLException {
         String contactSql = """
-                    INSERT INTO contact_information (profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method)
+                    INSERT INTO information (profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
@@ -260,7 +255,7 @@ public class UserDAO {
 
         String sql = """
                     SELECT id, profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method
-                    FROM contact_information WHERE id = ?
+                    FROM information WHERE id = ?
                 """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -287,20 +282,20 @@ public class UserDAO {
         return null;
     }
 
-    public List<String> searchByName(String keyword) throws SQLException {
-        List<String> results = new ArrayList<>();
-        String sql = "SELECT first_name, last_name FROM users WHERE first_name LIKE ? OR last_name LIKE ?";
+
+    public List<User> searchByName(String keyword) throws SQLException {
+        List<User> results = new ArrayList<>();
+        String sql = "SELECT id, email, password, first_name, last_name, additional_name," +
+                "profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id FROM users WHERE first_name LIKE ? OR last_name LIKE ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, "%" + keyword + "%");
             statement.setString(2, "%" + keyword + "%");
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    String name = resultSet.getString("first_name") + " " + resultSet.getString("last_name");
-                    results.add(name);
+                    results.add(mapResultSetToUser(resultSet));
                 }
             }
         }
         return results;
     }
-    //this is a test comment
 }

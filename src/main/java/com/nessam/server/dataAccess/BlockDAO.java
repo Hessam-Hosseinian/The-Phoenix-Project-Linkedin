@@ -88,5 +88,4 @@ public class BlockDAO {
         boolean isBlocking = resultSet.next();
         return isBlocking;
     }
-    //this is a test comment
 }

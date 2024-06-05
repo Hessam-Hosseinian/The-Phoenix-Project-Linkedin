@@ -3,6 +3,7 @@ package com.nessam.server.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nessam.server.dataAccess.LikeDAO;
 import com.nessam.server.models.Like;
+import com.nessam.server.models.Post;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -17,10 +18,10 @@ public class LikeController {
         objectMapper = new ObjectMapper();
     }
 
-    public void saveLike(Long postId, String liker) throws SQLException {
+    public void saveLike(String likerEmail, Post post) throws SQLException {
         Like like = new Like();
-        like.getPost().setId(postId);
-        like.setLiker(liker);
+        like.setPost(post);
+        like.setLiker(likerEmail);
         likeDAO.insertLike(like);
     }
 

@@ -52,5 +52,4 @@ public class FollowController {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(follows);
     }
-    //this is a test comment
 }

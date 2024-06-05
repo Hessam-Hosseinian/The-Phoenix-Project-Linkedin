@@ -1,8 +1,9 @@
 package com.nessam.server.models;
 
 import jakarta.persistence.*;
-
+import com.nessam.server.models.Like;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -106,6 +107,12 @@ public class Post {
         this.comments = comments;
     }
 
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
+    }
 }
 
-//this is a test comment
