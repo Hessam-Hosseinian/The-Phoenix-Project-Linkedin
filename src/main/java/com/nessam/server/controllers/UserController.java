@@ -7,7 +7,6 @@ import com.nessam.server.models.User;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 public class UserController {
     private final UserDAO userDAO;
@@ -19,20 +18,7 @@ public class UserController {
     }
 
     public void createUser(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) throws SQLException {
-
-        User user = new User();
-
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setAdditionalName(additionalName);
-        user.setProfilePicture(profilePicture);
-        user.setBackgroundPicture(backgroundPicture);
-        user.setTitle(title);
-        user.setLocation(location);
-        user.setProfession(profession);
-        user.setSeekingOpportunity(seekingOpportunity);
+        User user = new User(email, password, firstName, lastName, additionalName, profilePicture, backgroundPicture, title, location, profession, seekingOpportunity);
 
         if (isUserExists(user.getEmail())) {
             userDAO.updateUser(user);
@@ -79,7 +65,6 @@ public class UserController {
             throw new RuntimeException(e);
         }
     }
-
 
     public String searchUser(String keyword) throws SQLException, JsonProcessingException {
         List<User> users = userDAO.searchByName(keyword);
