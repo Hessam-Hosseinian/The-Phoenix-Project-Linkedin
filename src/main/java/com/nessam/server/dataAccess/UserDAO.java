@@ -15,68 +15,58 @@ public class UserDAO {
         this.connection = DatabaseConnectionManager.getConnection();
         createUserTable();
         createInformationTable();
-
     }
 
     private void createUserTable() throws SQLException {
         String userTableSql = """
-                    CREATE TABLE IF NOT EXISTS users (
-                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                        email VARCHAR(50) NOT NULL,
-                        password VARCHAR(255) NOT NULL,
-                        first_name VARCHAR(20),
-                        last_name VARCHAR(40),
-                        additional_name VARCHAR(40),
-                        profile_picture VARCHAR(255),
-                        background_picture VARCHAR(255),
-                        title VARCHAR(220),
-                        location VARCHAR(255),
-                        profession VARCHAR(255),
-                        seeking_opportunity VARCHAR(255),
-                        information_id BIGINT
-
-                    )
-                """;
-
+            CREATE TABLE IF NOT EXISTS users (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                email VARCHAR(50) NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                first_name VARCHAR(20),
+                last_name VARCHAR(40),
+                additional_name VARCHAR(40),
+                profile_picture VARCHAR(255),
+                background_picture VARCHAR(255),
+                title VARCHAR(220),
+                location VARCHAR(255),
+                profession VARCHAR(255),
+                seeking_opportunity VARCHAR(255),
+                information_id BIGINT
+            )
+        """;
         try (PreparedStatement statement = connection.prepareStatement(userTableSql)) {
             statement.executeUpdate();
         }
-
     }
 
     private void createInformationTable() throws SQLException {
         String informationTableSql = """
-                    CREATE TABLE IF NOT EXISTS information (
-                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                        profile_link VARCHAR(40),
-                        email VARCHAR(40),
-                        phone_number VARCHAR(40),
-                        phone_type INT,
-                        address VARCHAR(220),
-                        birth_month DATE,
-                        birth_day DATE,
-                        birth_privacy_policy INT,
-                        instant_contact_method VARCHAR(40),
-                        user_id BIGINT,
-                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-                    )
-                """;
+            CREATE TABLE IF NOT EXISTS information (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                profile_link VARCHAR(40),
+                email VARCHAR(40),
+                phone_number VARCHAR(40),
+                phone_type INT,
+                address VARCHAR(220),
+                birth_month DATE,
+                birth_day DATE,
+                birth_privacy_policy INT,
+                instant_contact_method VARCHAR(40),
+                user_id BIGINT,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        """;
         try (PreparedStatement statement = connection.prepareStatement(informationTableSql)) {
-            statement.executeUpdate();
-        }
-    }
-
-    private void executeUpdate(String sql) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.executeUpdate();
         }
     }
 
     public void saveUser(User user) throws SQLException {
         String userSql = """
-                    INSERT INTO users (email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """;
+            INSERT INTO users (email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
         try (PreparedStatement userStmt = connection.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS)) {
             connection.setAutoCommit(false);
             if (user.getContactInformation() != null) {
@@ -106,10 +96,9 @@ public class UserDAO {
 
     private void saveContactInformation(Information contactInfo) throws SQLException {
         String contactSql = """
-                    INSERT INTO information (profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """;
-
+            INSERT INTO information (profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
         try (PreparedStatement contactStmt = connection.prepareStatement(contactSql, Statement.RETURN_GENERATED_KEYS)) {
             contactStmt.setString(1, contactInfo.getProfileLink());
             contactStmt.setString(2, contactInfo.getEmail());
@@ -122,7 +111,6 @@ public class UserDAO {
             contactStmt.setString(9, contactInfo.getInstantContactMethod());
 
             contactStmt.executeUpdate();
-
             try (ResultSet generatedKeys = contactStmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     contactInfo.setId(generatedKeys.getLong(1));
@@ -141,14 +129,50 @@ public class UserDAO {
 
     public void deleteAllUsers() throws SQLException {
         String sql = "DELETE FROM users";
-        executeUpdate(sql);
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.executeUpdate();
+        }
+    }
+
+    public User getUserByEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM users WHERE email = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, email);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next() ? buildUser(resultSet) : null;
+            }
+        }
+    }
+
+    public User getUserByEmailAndPassword(String email, String password) throws SQLException {
+        String sql = "SELECT * FROM users WHERE email = ? AND password = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, email);
+            statement.setString(2, password);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next() ? buildUser(resultSet) : null;
+            }
+        }
+    }
+
+    public List<User> getAllUsers() throws SQLException {
+        String sql = "SELECT * FROM users";
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            List<User> users = new ArrayList<>();
+            while (resultSet.next()) {
+                users.add(buildUser(resultSet));
+            }
+            return users;
+        }
     }
 
     public void updateUser(User user) throws SQLException {
         String sql = """
-                    UPDATE users SET password = ?, first_name = ?, last_name = ?, additional_name = ?, profile_picture = ?, background_picture = ?, title = ?, location = ?, profession = ?, seeking_opportunity = ?, information_id = ? WHERE email = ?
-                """;
-
+            UPDATE users SET
+                password = ?, first_name = ?, last_name = ?, additional_name = ?, profile_picture = ?, background_picture = ?, title = ?, location = ?, profession = ?, seeking_opportunity = ?
+            WHERE email = ?
+        """;
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getPassword());
             statement.setString(2, user.getFirstName());
@@ -160,78 +184,29 @@ public class UserDAO {
             statement.setString(8, user.getLocation());
             statement.setString(9, user.getProfession());
             statement.setString(10, user.getSeekingOpportunity());
-            statement.setObject(11, user.getContactInformation() != null ? user.getContactInformation().getId() : null);
-            statement.setString(12, user.getEmail());
-
+            statement.setString(11, user.getEmail());
             statement.executeUpdate();
         }
     }
 
-    public User getUserByEmail(String email) throws SQLException {
-        String sql = """
-                    SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id
-                    FROM users WHERE email = ?
-                """;
-
+    public List<User> searchByName(String keyword) throws SQLException {
+        String sql = "SELECT * FROM users WHERE first_name LIKE ? OR last_name LIKE ? OR additional_name LIKE ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, email);
-
+            String searchTerm = "%" + keyword + "%";
+            statement.setString(1, searchTerm);
+            statement.setString(2, searchTerm);
+            statement.setString(3, searchTerm);
             try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    User user = mapResultSetToUser(resultSet);
-                    user.setContactInformation(getContactInformationById(resultSet.getLong("information_id")));
-                    return user;
+                List<User> users = new ArrayList<>();
+                while (resultSet.next()) {
+                    users.add(buildUser(resultSet));
                 }
+                return users;
             }
         }
-
-        return null;
     }
 
-    public User getUserByEmailAndPassword(String email, String password) throws SQLException {
-        String sql = """
-                    SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id
-                    FROM users WHERE email = ? AND password = ?
-                """;
-
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, email);
-            statement.setString(2, password);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    User user = mapResultSetToUser(resultSet);
-                    user.setContactInformation(getContactInformationById(resultSet.getLong("information_id")));
-                    return user;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public List<User> getAllUsers() throws SQLException {
-        String sql = """
-                    SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id
-                    FROM users
-                """;
-
-        List<User> users = new ArrayList<>();
-
-        try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                User user = mapResultSetToUser(resultSet);
-                user.setContactInformation(getContactInformationById(resultSet.getLong("information_id")));
-                users.add(user);
-            }
-        }
-
-        return users;
-    }
-
-
-
-    private User mapResultSetToUser(ResultSet resultSet) throws SQLException {
+    private User buildUser(ResultSet resultSet) throws SQLException {
         User user = new User();
         user.setId(resultSet.getLong("id"));
         user.setEmail(resultSet.getString("email"));
@@ -245,57 +220,35 @@ public class UserDAO {
         user.setLocation(resultSet.getString("location"));
         user.setProfession(resultSet.getString("profession"));
         user.setSeekingOpportunity(resultSet.getString("seeking_opportunity"));
+
+        Information contactInfo = getContactInformationByUserId(resultSet.getLong("id"));
+        user.setContactInformation(contactInfo);
+
         return user;
     }
 
-    private Information getContactInformationById(Long id) throws SQLException {
-        if (id == null) {
-            return null;
-        }
-
-        String sql = """
-                    SELECT id, profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method
-                    FROM information WHERE id = ?
-                """;
-
+    private Information getContactInformationByUserId(Long userId) throws SQLException {
+        String sql = "SELECT * FROM information WHERE user_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, id);
-
+            statement.setLong(1, userId);
             try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    Information contactInfo = new Information();
-                    contactInfo.setId(resultSet.getLong("id"));
-                    contactInfo.setProfileLink(resultSet.getString("profile_link"));
-                    contactInfo.setEmail(resultSet.getString("email"));
-                    contactInfo.setPhoneNumber(resultSet.getString("phone_number"));
-                    contactInfo.setPhoneType(resultSet.getInt("phone_type"));
-                    contactInfo.setAddress(resultSet.getString("address"));
-                    contactInfo.setBirthMonth(resultSet.getDate("birth_month"));
-                    contactInfo.setBirthDay(resultSet.getDate("birth_day"));
-                    contactInfo.setBirthPrivacyPolicy(resultSet.getInt("birth_privacy_policy"));
-                    contactInfo.setInstantContactMethod(resultSet.getString("instant_contact_method"));
-                    return contactInfo;
-                }
+                return resultSet.next() ? buildContactInformation(resultSet) : null;
             }
         }
-
-        return null;
     }
 
-
-    public List<User> searchByName(String keyword) throws SQLException {
-        List<User> results = new ArrayList<>();
-        String sql = "SELECT id, email, password, first_name, last_name, additional_name," +
-                "profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id FROM users WHERE first_name LIKE ? OR last_name LIKE ?";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, "%" + keyword + "%");
-            statement.setString(2, "%" + keyword + "%");
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    results.add(mapResultSetToUser(resultSet));
-                }
-            }
-        }
-        return results;
+    private Information buildContactInformation(ResultSet resultSet) throws SQLException {
+        Information contactInfo = new Information();
+        contactInfo.setId(resultSet.getLong("id"));
+        contactInfo.setProfileLink(resultSet.getString("profile_link"));
+        contactInfo.setEmail(resultSet.getString("email"));
+        contactInfo.setPhoneNumber(resultSet.getString("phone_number"));
+        contactInfo.setPhoneType(resultSet.getInt("phone_type"));
+        contactInfo.setAddress(resultSet.getString("address"));
+        contactInfo.setBirthMonth(resultSet.getDate("birth_month"));
+        contactInfo.setBirthDay(resultSet.getDate("birth_day"));
+        contactInfo.setBirthPrivacyPolicy(resultSet.getInt("birth_privacy_policy"));
+        contactInfo.setInstantContactMethod(resultSet.getString("instant_contact_method"));
+        return contactInfo;
     }
 }

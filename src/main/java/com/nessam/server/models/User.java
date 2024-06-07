@@ -51,7 +51,7 @@ public class User {
     public User() {
     }
 
-    public User(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity, Information information) {
+    public User(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
@@ -63,7 +63,8 @@ public class User {
         this.location = location;
         this.profession = profession;
         this.seekingOpportunity = seekingOpportunity;
-        this.information = information;
+        this.information= new Information();
+
     }
 
     public Long getId() {
