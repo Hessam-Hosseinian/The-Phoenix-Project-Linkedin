@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
+
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "email", length = 50, nullable = false)
+    @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", nullable = false)
@@ -47,10 +48,10 @@ public class User {
     @JoinColumn(name = "information_id", referencedColumnName = "id")
     private Information information;
 
-    // Constructors, getters, and setters
-    public User() {}
+    public User() {
+    }
 
-    public User(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) {
+    public User(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity, Information information) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
@@ -62,7 +63,7 @@ public class User {
         this.location = location;
         this.profession = profession;
         this.seekingOpportunity = seekingOpportunity;
-        information = new Information();
+        this.information = information;
     }
 
     public Long getId() {
@@ -161,13 +162,11 @@ public class User {
         this.seekingOpportunity = seekingOpportunity;
     }
 
-    public Information getContactInformation() {
+    public Information getInformation() {
         return information;
     }
 
-    public void setContactInformation(Information information) {
+    public void setInformation(Information information) {
         this.information = information;
     }
-    // Getters and setters
-    // ...
 }
