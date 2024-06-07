@@ -1,9 +1,8 @@
 package com.nessam.server.models;
 
 import jakarta.persistence.*;
-import com.nessam.server.models.Like;
+
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class Post {
     @Column(name = "content", nullable = false, length = 5000)
     private String content;
 
-    @Column(name = "file-path")
+    @Column(name = "file_path")
     private String filePath;
 
     @Column(name = "dateCreated")
@@ -31,7 +30,6 @@ public class Post {
     private String author;
 
 
-
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
@@ -39,7 +37,7 @@ public class Post {
     private List<Like> likes;
 
 
-    public Post(String title, String content, String author) {
+    public Post(long postId, String title, String content, String author, String dateCreated, String string) {
         this.title = title;
         this.content = content;
         this.author = author;
@@ -114,5 +112,6 @@ public class Post {
     public void setLikes(List<Like> likes) {
         this.likes = likes;
     }
+
 }
 

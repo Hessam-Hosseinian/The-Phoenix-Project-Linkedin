@@ -14,225 +14,127 @@ public class PostDAO {
 
     public PostDAO() throws SQLException {
         connection = DatabaseConnectionManager.getConnection();
-        createPostTable();
-        createCommentTable();
-        createLikeTable();
+        createTables();
     }
 
-    public void createPostTable() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS posts (" +
-                        "post_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                        "title VARCHAR(255) NOT NULL, " +
-                        "content TEXT, " +
-                        "file_path TEXT, " +
-                        "dateCreated TEXT, " +
-                        "author VARCHAR(255))"
-        );
-        statement.executeUpdate();
-    }
+    private void createTables() throws SQLException {
+        createTable("CREATE TABLE IF NOT EXISTS posts (" +
+                "post_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+                "title VARCHAR(255) NOT NULL, " +
+                "content TEXT, " +
+                "file_path TEXT, " +
+                "dateCreated TEXT, " +
+                "author VARCHAR(255))");
 
-    public void createCommentTable() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS comments (" +
-                        "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                        "content TEXT, " +
-                        "file_path TEXT, " +
-                        "dateCreated TEXT, " +
-                        "author VARCHAR(255), " +
-                        "fk_post_Id BIGINT NOT NULL, " +
-                        "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id) ON DELETE CASCADE)"
-        );
-        statement.executeUpdate();
-    }
-
-    public void createLikeTable() throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS likes (" +
-                "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
-                "liker VARCHAR(255) NOT NULL," +
+        createTable("CREATE TABLE IF NOT EXISTS comments (" +
+                "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+                "content TEXT, " +
+                "file_path TEXT, " +
+                "dateCreated TEXT, " +
+                "author VARCHAR(255), " +
                 "fk_post_Id BIGINT NOT NULL, " +
-                "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id)" +
-                ")";
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.executeUpdate();
+                "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id) ON DELETE CASCADE)");
+
+        createTable("CREATE TABLE IF NOT EXISTS likes (" +
+                "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+                "liker VARCHAR(255) NOT NULL, " +
+                "fk_post_Id BIGINT NOT NULL, " +
+                "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id) ON DELETE CASCADE)");
     }
 
-
-    public void savePost(Post post) throws SQLException {
-        String query = "INSERT INTO posts (title, content, dateCreated, author) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, post.getTitle());
-            statement.setString(2, post.getContent());
-            statement.setString(3, post.getDateCreated());
-            statement.setString(4, post.getAuthor());
-            statement.executeUpdate();
-
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    post.setId(generatedKeys.getLong(1));
-                }
-            }
+    private void createTable(String query) throws SQLException {
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(query);
         }
     }
 
-    public List<Post> getAllPosts() throws SQLException {
-        List<Post> posts = new ArrayList<>();
-        String query = "SELECT * FROM posts";
-        try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
-            while (resultSet.next()) {
-                Post post = mapResultSetToPost(resultSet);
-                post.setComments(getCommentsByPostId(post.getId()));
-                post.setLikes(getLikesByPostId(post.getId()));
-                posts.add(post);
-            }
+    public void addPost(Post post) throws SQLException {
+        String query = "INSERT INTO posts (title, content, file_path, dateCreated, author) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, post.getTitle());
+            preparedStatement.setString(2, post.getContent());
+            preparedStatement.setString(3, post.getFile_path());
+            preparedStatement.setString(4, post.getDateCreated());
+            preparedStatement.setString(5, post.getAuthor());
+            preparedStatement.executeUpdate();
         }
-        return posts;
-    }
-
-    public Post getPostById(long postId) throws SQLException {
-        String query = "SELECT * FROM posts WHERE post_Id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setLong(1, postId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Post post = mapResultSetToPost(rs);
-                    post.setComments(getCommentsByPostId(postId));
-                    post.setLikes(getLikesByPostId(postId));
-                    return post;
-                }
-            }
-        }
-        return null;
-
-    }
-
-    public List<Post> getPostsByAuthor(String author) throws SQLException {
-        List<Post> posts = new ArrayList<>();
-        String query = "SELECT * FROM posts WHERE author = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, author);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Post post = mapResultSetToPost(rs);
-                    post.setComments(getCommentsByPostId(post.getId()));
-                    post.setLikes(getLikesByPostId(post.getId()));
-                    posts.add(post);
-                }
-            }
-        }
-        return posts;
-    }
-
-    public Post getPostByAuthorAndTitle(String author, String title) throws SQLException {
-        String query = "SELECT * FROM posts WHERE author = ? AND title = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, author);
-            stmt.setString(2, title);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Post post = mapResultSetToPost(rs);
-                    post.setComments(getCommentsByPostId(post.getId()));
-                    post.setLikes(getLikesByPostId(post.getId()));
-                    return post;
-                }
-            }
-        }
-        return null;
     }
 
     public void updatePost(Post post) throws SQLException {
         String query = "UPDATE posts SET content = ? WHERE author = ? AND title = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, post.getContent());
-            stmt.setString(2, post.getAuthor());
-            stmt.setString(3, post.getTitle());
-            stmt.executeUpdate();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, post.getContent());
+            preparedStatement.setString(2, post.getAuthor());
+            preparedStatement.setString(3, post.getTitle());
+            preparedStatement.executeUpdate();
         }
     }
 
-    public void deleteAllPosts() throws SQLException {
-        String query = "DELETE FROM posts";
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate(query);
+    public Post getPostByAuthorAndTitle(String author, String title) throws SQLException {
+        String query = "SELECT * FROM posts WHERE author = ? AND title = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, author);
+            preparedStatement.setString(2, title);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return extractPost(resultSet);
+                } else {
+                    return null;
+                }
+            }
+        }
+    }
+
+    public List<Post> getPosts() throws SQLException {
+        String query = "SELECT * FROM posts";
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            List<Post> posts = new ArrayList<>();
+            while (resultSet.next()) {
+                posts.add(extractPost(resultSet));
+            }
+            return posts;
+        }
+    }
+
+    public List<Post> getPostsByAuthor(String author) throws SQLException {
+        String query = "SELECT * FROM posts WHERE author = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, author);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                List<Post> posts = new ArrayList<>();
+                while (resultSet.next()) {
+                    posts.add(extractPost(resultSet));
+                }
+                return posts;
+            }
         }
     }
 
     public void deletePostByAuthorAndTitle(String author, String title) throws SQLException {
         String query = "DELETE FROM posts WHERE author = ? AND title = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, author);
-            stmt.setString(2, title);
-            stmt.executeUpdate();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, author);
+            preparedStatement.setString(2, title);
+            preparedStatement.executeUpdate();
         }
     }
 
-    private List<Comment> getCommentsByPostId(long postId) throws SQLException {
-        List<Comment> comments = new ArrayList<>();
-        String query = "SELECT * FROM comments WHERE fk_post_Id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setLong(1, postId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    comments.add(mapResultSetToComment(rs));
-                }
-            }
+    public void deleteAllPosts() throws SQLException {
+        String query = "DELETE FROM posts";
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate(query);
         }
-        return comments;
     }
 
-    private List<Like> getLikesByPostId(long postId) throws SQLException {
-        List<Like> likes = new ArrayList<>();
-        String query = "SELECT * FROM likes WHERE fk_post_Id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setLong(1, postId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    likes.add(mapResultSetToLike(rs));
-                }
-            }
-        }
-        return likes;
-    }
-
-    private Comment mapResultSetToComment(ResultSet resultSet) throws SQLException {
-        Comment comment = new Comment();
-        comment.setId(resultSet.getLong("comment_Id"));
-        comment.setContent(resultSet.getString("content"));
-        comment.setDateCreated(resultSet.getString("dateCreated"));
-        comment.setAuthor(resultSet.getString("author"));
-        comment.setFilePath(resultSet.getString("file_path"));
-        return comment;
-    }
-
-    private Like mapResultSetToLike(ResultSet resultSet) throws SQLException {
-        Like like = new Like();
-        like.setId(resultSet.getLong("id"));
-        like.setLiker(resultSet.getString("liker"));
-        return like;
-    }
-
-    private Post mapResultSetToPost(ResultSet resultSet) throws SQLException {
-        Post post = new Post();
-        post.setId(resultSet.getLong("post_Id"));
-        post.setTitle(resultSet.getString("title"));
-        post.setContent(resultSet.getString("content"));
-        post.setDateCreated(resultSet.getString("dateCreated"));
-        post.setAuthor(resultSet.getString("author"));
-        return post;
-    }
-
-
-    public List<Post> searchInPosts(String keyword) throws SQLException {
-        List<Post> results = new ArrayList<>();
-        String sql = "SELECT post_Id, title, content, dateCreated, author FROM posts WHERE content LIKE ?";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, "%" + keyword + "%");
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    results.add(mapResultSetToPost(resultSet));
-                }
-            }
-        }
-        return results;
+    private Post extractPost(ResultSet resultSet) throws SQLException {
+        return new Post(
+                resultSet.getLong("post_Id"),
+                resultSet.getString("title"),
+                resultSet.getString("content"),
+                resultSet.getString("file_path"),
+                resultSet.getString("dateCreated"),
+                resultSet.getString("author")
+        );
     }
 }
