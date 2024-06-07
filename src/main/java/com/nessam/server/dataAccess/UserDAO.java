@@ -69,8 +69,8 @@ public class UserDAO {
         """;
         try (PreparedStatement userStmt = connection.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS)) {
             connection.setAutoCommit(false);
-            if (user.getContactInformation() != null) {
-                saveContactInformation(user.getContactInformation());
+            if (user.getInformation() != null) {
+                saveContactInformation(user.getInformation());
             }
             userStmt.setString(1, user.getEmail());
             userStmt.setString(2, user.getPassword());
@@ -83,7 +83,7 @@ public class UserDAO {
             userStmt.setString(9, user.getLocation());
             userStmt.setString(10, user.getProfession());
             userStmt.setString(11, user.getSeekingOpportunity());
-            userStmt.setObject(12, user.getContactInformation() != null ? user.getContactInformation().getId() : null);
+            userStmt.setObject(12, user.getInformation() != null ? user.getInformation().getId() : null);
             userStmt.executeUpdate();
             connection.commit();
         } catch (SQLException e) {
@@ -222,7 +222,7 @@ public class UserDAO {
         user.setSeekingOpportunity(resultSet.getString("seeking_opportunity"));
 
         Information contactInfo = getContactInformationByUserId(resultSet.getLong("id"));
-        user.setContactInformation(contactInfo);
+        user.setInformation(contactInfo);
 
         return user;
     }

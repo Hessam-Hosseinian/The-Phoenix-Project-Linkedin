@@ -4,14 +4,13 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
-
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "email", length = 50, nullable = false, unique = true)
+    @Column(name = "email", length = 50, nullable = false)
     private String email;
 
     @Column(name = "password", nullable = false)
@@ -48,8 +47,7 @@ public class User {
     @JoinColumn(name = "information_id", referencedColumnName = "id")
     private Information information;
 
-    public User() {
-    }
+    public User() {}
 
     public User(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) {
         this.email = email;
@@ -63,8 +61,17 @@ public class User {
         this.location = location;
         this.profession = profession;
         this.seekingOpportunity = seekingOpportunity;
-        this.information= new Information();
+        this.information = new Information();
+    }
 
+    // Getters and setters omitted for brevity
+
+    public Information getInformation() {
+        return information;
+    }
+
+    public void setInformation(Information information) {
+        this.information = information;
     }
 
     public Long getId() {
@@ -161,13 +168,5 @@ public class User {
 
     public void setSeekingOpportunity(String seekingOpportunity) {
         this.seekingOpportunity = seekingOpportunity;
-    }
-
-    public Information getInformation() {
-        return information;
-    }
-
-    public void setInformation(Information information) {
-        this.information = information;
     }
 }
