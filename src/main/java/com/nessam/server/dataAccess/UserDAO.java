@@ -1,7 +1,8 @@
 package com.nessam.server.dataAccess;
 
-import com.nessam.server.models.Information;
 import com.nessam.server.models.User;
+import com.nessam.server.models.UserContactInfo;
+import com.nessam.server.models.UserEducation;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,8 +14,9 @@ public class UserDAO {
 
     public UserDAO() throws SQLException {
         this.connection = DatabaseConnectionManager.getConnection();
+        createUserContactInfoTable();
         createUserTable();
-        createInformationTable();
+        createUserEducationTable();
 
     }
 
@@ -33,38 +35,55 @@ public class UserDAO {
                         location VARCHAR(255),
                         profession VARCHAR(255),
                         seeking_opportunity VARCHAR(255),
-                        information_id BIGINT
-
+                        contact_info_id BIGINT,
+                        FOREIGN KEY (contact_info_id) REFERENCES user_contact_info(id) ON DELETE SET NULL
                     )
                 """;
 
         try (PreparedStatement statement = connection.prepareStatement(userTableSql)) {
             statement.executeUpdate();
         }
-
     }
 
-    private void createInformationTable() throws SQLException {
-        String informationTableSql = """
-                    CREATE TABLE IF NOT EXISTS information (
+    private void createUserContactInfoTable() throws SQLException {
+        String contactInfoTableSql = """
+                    CREATE TABLE IF NOT EXISTS user_contact_info (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         profile_link VARCHAR(40),
                         email VARCHAR(40),
                         phone_number VARCHAR(40),
                         phone_type INT,
                         address VARCHAR(220),
-                        birth_month DATE,
-                        birth_day DATE,
+                        birth_month INT,
+                        birth_day INT,
                         birth_privacy_policy INT,
-                        instant_contact_method VARCHAR(40),
-                        user_id BIGINT,
-                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                        instant_contact_method VARCHAR(40)
                     )
                 """;
-        try (PreparedStatement statement = connection.prepareStatement(informationTableSql)) {
+        try (PreparedStatement statement = connection.prepareStatement(contactInfoTableSql)) {
             statement.executeUpdate();
         }
     }
+
+    private void createUserEducationTable() {
+        String educationTableSql = """
+                     CREATE TABLE IF NOT EXISTS UserEducation(
+                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                       degree VARCHAR(255) NOT NULL,
+                       institution VARCHAR(255) NOT NULL,
+                       start_Date VARCHAR(255) NOT NULL,
+                       end_Date VARCHAR(255),
+                       user_id BIGINT,
+                       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                     )
+                """;
+        try (PreparedStatement statement = connection.prepareStatement(educationTableSql)) {
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     private void executeUpdate(String sql) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -74,13 +93,13 @@ public class UserDAO {
 
     public void saveUser(User user) throws SQLException {
         String userSql = """
-                    INSERT INTO users (email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id)
+                    INSERT INTO users (email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, contact_info_id)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         try (PreparedStatement userStmt = connection.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS)) {
             connection.setAutoCommit(false);
-            if (user.getContactInformation() != null) {
-                saveContactInformation(user.getContactInformation());
+            if (user.getContactInfo() != null) {
+                saveUserContactInfo(user.getContactInfo());
             }
             userStmt.setString(1, user.getEmail());
             userStmt.setString(2, user.getPassword());
@@ -93,8 +112,10 @@ public class UserDAO {
             userStmt.setString(9, user.getLocation());
             userStmt.setString(10, user.getProfession());
             userStmt.setString(11, user.getSeekingOpportunity());
-            userStmt.setObject(12, user.getContactInformation() != null ? user.getContactInformation().getId() : null);
+            userStmt.setObject(12, user.getContactInfo() != null ? user.getContactInfo().getId() : null);
+
             userStmt.executeUpdate();
+
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
@@ -104,9 +125,9 @@ public class UserDAO {
         }
     }
 
-    private void saveContactInformation(Information contactInfo) throws SQLException {
+    public void saveUserContactInfo(UserContactInfo contactInfo) throws SQLException {
         String contactSql = """
-                    INSERT INTO information (profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method)
+                    INSERT INTO user_contact_info (profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
@@ -114,18 +135,40 @@ public class UserDAO {
             contactStmt.setString(1, contactInfo.getProfileLink());
             contactStmt.setString(2, contactInfo.getEmail());
             contactStmt.setString(3, contactInfo.getPhoneNumber());
-            contactStmt.setInt(4, contactInfo.getPhoneType());
+            contactStmt.setInt(4, contactInfo.getPhoneType().ordinal());
             contactStmt.setString(5, contactInfo.getAddress());
-            contactStmt.setDate(6, contactInfo.getBirthMonth());
-            contactStmt.setDate(7, contactInfo.getBirthDay());
-            contactStmt.setInt(8, contactInfo.getBirthPrivacyPolicy());
-            contactStmt.setString(9, contactInfo.getInstantContactMethod());
+            contactStmt.setInt(6, contactInfo.getBirthMonth().ordinal());
+            contactStmt.setInt(7, contactInfo.getBirthDay());
+            contactStmt.setInt(8, contactInfo.getBirthDisplayPolicy().ordinal());
+            contactStmt.setString(9, contactInfo.getInstantMessagingId());
 
             contactStmt.executeUpdate();
 
             try (ResultSet generatedKeys = contactStmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     contactInfo.setId(generatedKeys.getLong(1));
+                }
+            }
+        }
+    }
+    public void saveUserEducation(UserEducation education) throws SQLException {
+        String educationSql = """
+            INSERT INTO UserEducation (degree, institution, start_date, end_date)
+            VALUES (?, ?, ?, ?)
+        """;
+
+        try (PreparedStatement educationStmt = connection.prepareStatement(educationSql, Statement.RETURN_GENERATED_KEYS)) {
+            educationStmt.setString(1, education.getDegree());
+            educationStmt.setString(2, education.getInstitution());
+            educationStmt.setString(3, education.getStartDate());
+            educationStmt.setString(4, education.getEndDate());
+//            educationStmt.setLong(5, getUserByEmail().getId());
+
+            educationStmt.executeUpdate();
+
+            try (ResultSet generatedKeys = educationStmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    education.setId(generatedKeys.getLong(1));
                 }
             }
         }
@@ -146,7 +189,7 @@ public class UserDAO {
 
     public void updateUser(User user) throws SQLException {
         String sql = """
-                    UPDATE users SET password = ?, first_name = ?, last_name = ?, additional_name = ?, profile_picture = ?, background_picture = ?, title = ?, location = ?, profession = ?, seeking_opportunity = ?, information_id = ? WHERE email = ?
+                    UPDATE users SET password = ?, first_name = ?, last_name = ?, additional_name = ?, profile_picture = ?, background_picture = ?, title = ?, location = ?, profession = ?, seeking_opportunity = ?, contact_info_id = ? WHERE email = ?
                 """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -160,7 +203,7 @@ public class UserDAO {
             statement.setString(8, user.getLocation());
             statement.setString(9, user.getProfession());
             statement.setString(10, user.getSeekingOpportunity());
-            statement.setObject(11, user.getContactInformation() != null ? user.getContactInformation().getId() : null);
+            statement.setObject(11, user.getContactInfo() != null ? user.getContactInfo().getId() : null);
             statement.setString(12, user.getEmail());
 
             statement.executeUpdate();
@@ -169,7 +212,7 @@ public class UserDAO {
 
     public User getUserByEmail(String email) throws SQLException {
         String sql = """
-                    SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id
+                    SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, contact_info_id
                     FROM users WHERE email = ?
                 """;
 
@@ -179,7 +222,7 @@ public class UserDAO {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     User user = mapResultSetToUser(resultSet);
-                    user.setContactInformation(getContactInformationById(resultSet.getLong("information_id")));
+                    user.setContactInfo(getUserContactInfoById(resultSet.getLong("contact_info_id")));
                     return user;
                 }
             }
@@ -190,7 +233,7 @@ public class UserDAO {
 
     public User getUserByEmailAndPassword(String email, String password) throws SQLException {
         String sql = """
-                    SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id
+                    SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, contact_info_id
                     FROM users WHERE email = ? AND password = ?
                 """;
 
@@ -201,7 +244,7 @@ public class UserDAO {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     User user = mapResultSetToUser(resultSet);
-                    user.setContactInformation(getContactInformationById(resultSet.getLong("information_id")));
+                    user.setContactInfo(getUserContactInfoById(resultSet.getLong("contact_info_id")));
                     return user;
                 }
             }
@@ -212,7 +255,7 @@ public class UserDAO {
 
     public List<User> getAllUsers() throws SQLException {
         String sql = """
-                    SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id
+                    SELECT id, email, password, first_name, last_name, additional_name, profile_picture, background_picture, title, location, profession, seeking_opportunity, contact_info_id
                     FROM users
                 """;
 
@@ -221,7 +264,8 @@ public class UserDAO {
         try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 User user = mapResultSetToUser(resultSet);
-                user.setContactInformation(getContactInformationById(resultSet.getLong("information_id")));
+                user.setContactInfo(getUserContactInfoById(resultSet.getLong("contact_info_id")));
+                user.setEducation(getUserEducations(resultSet.getLong("id")));
                 users.add(user);
             }
         }
@@ -229,7 +273,27 @@ public class UserDAO {
         return users;
     }
 
+    public List<UserEducation> getUserEducations(long userId) throws SQLException {
+        String educationSql = "SELECT * FROM UserEducation WHERE user_id = ?";
+        List<UserEducation> educations = new ArrayList<>();
 
+        try (PreparedStatement educationStmt = connection.prepareStatement(educationSql)) {
+            educationStmt.setLong(1, userId);
+            try (ResultSet resultSet = educationStmt.executeQuery()) {
+                while (resultSet.next()) {
+                    UserEducation education = new UserEducation();
+                    education.setId(resultSet.getLong("id"));
+                    education.setDegree(resultSet.getString("degree"));
+                    education.setInstitution(resultSet.getString("institution"));
+                    education.setStartDate(resultSet.getString("start_Date"));
+                    education.setEndDate(resultSet.getString("end_Date"));
+//                    education.setUserId(resultSet.getLong("user_id"));
+                    educations.add(education);
+                }
+            }
+        }
+        return educations;
+    }
 
     private User mapResultSetToUser(ResultSet resultSet) throws SQLException {
         User user = new User();
@@ -248,14 +312,14 @@ public class UserDAO {
         return user;
     }
 
-    private Information getContactInformationById(Long id) throws SQLException {
+    private UserContactInfo getUserContactInfoById(Long id) throws SQLException {
         if (id == null) {
             return null;
         }
 
         String sql = """
                     SELECT id, profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method
-                    FROM information WHERE id = ?
+                    FROM user_contact_info WHERE id = ?
                 """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -263,17 +327,17 @@ public class UserDAO {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    Information contactInfo = new Information();
+                    UserContactInfo contactInfo = new UserContactInfo();
                     contactInfo.setId(resultSet.getLong("id"));
                     contactInfo.setProfileLink(resultSet.getString("profile_link"));
                     contactInfo.setEmail(resultSet.getString("email"));
                     contactInfo.setPhoneNumber(resultSet.getString("phone_number"));
-                    contactInfo.setPhoneType(resultSet.getInt("phone_type"));
+                    contactInfo.setPhoneType(UserContactInfo.PhoneType.values()[resultSet.getInt("phone_type")]);
                     contactInfo.setAddress(resultSet.getString("address"));
-                    contactInfo.setBirthMonth(resultSet.getDate("birth_month"));
-                    contactInfo.setBirthDay(resultSet.getDate("birth_day"));
-                    contactInfo.setBirthPrivacyPolicy(resultSet.getInt("birth_privacy_policy"));
-                    contactInfo.setInstantContactMethod(resultSet.getString("instant_contact_method"));
+                    contactInfo.setBirthMonth(UserContactInfo.Month.values()[resultSet.getInt("birth_month")]);
+                    contactInfo.setBirthDay(resultSet.getInt("birth_day"));
+                    contactInfo.setBirthDisplayPolicy(UserContactInfo.DisplayPolicy.values()[resultSet.getInt("birth_privacy_policy")]);
+                    contactInfo.setInstantMessagingId(resultSet.getString("instant_contact_method"));
                     return contactInfo;
                 }
             }
@@ -282,17 +346,51 @@ public class UserDAO {
         return null;
     }
 
+    public UserContactInfo getUserContactInfoByEmail(String email) throws SQLException {
+        if (email == null) {
+            return null;
+        }
+
+        String sql = """
+                    SELECT id, profile_link, email, phone_number, phone_type, address, birth_month, birth_day, birth_privacy_policy, instant_contact_method
+                    FROM user_contact_info WHERE id = ?
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(3, email);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    UserContactInfo contactInfo = new UserContactInfo();
+                    contactInfo.setId(resultSet.getLong("id"));
+                    contactInfo.setProfileLink(resultSet.getString("profile_link"));
+                    contactInfo.setEmail(resultSet.getString("email"));
+                    contactInfo.setPhoneNumber(resultSet.getString("phone_number"));
+                    contactInfo.setPhoneType(UserContactInfo.PhoneType.values()[resultSet.getInt("phone_type")]);
+                    contactInfo.setAddress(resultSet.getString("address"));
+                    contactInfo.setBirthMonth(UserContactInfo.Month.values()[resultSet.getInt("birth_month")]);
+                    contactInfo.setBirthDay(resultSet.getInt("birth_day"));
+                    contactInfo.setBirthDisplayPolicy(UserContactInfo.DisplayPolicy.values()[resultSet.getInt("birth_privacy_policy")]);
+                    contactInfo.setInstantMessagingId(resultSet.getString("instant_contact_method"));
+                    return contactInfo;
+                }
+            }
+        }
+
+        return null;
+    }
 
     public List<User> searchByName(String keyword) throws SQLException {
         List<User> results = new ArrayList<>();
-        String sql = "SELECT id, email, password, first_name, last_name, additional_name," +
-                "profile_picture, background_picture, title, location, profession, seeking_opportunity, information_id FROM users WHERE first_name LIKE ? OR last_name LIKE ?";
+        String sql = "SELECT id, email, password, first_name, last_name, additional_name," + "profile_picture, background_picture, title, location, profession, seeking_opportunity, contact_info_id FROM users WHERE first_name LIKE ? OR last_name LIKE ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, "%" + keyword + "%");
             statement.setString(2, "%" + keyword + "%");
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    results.add(mapResultSetToUser(resultSet));
+                    User user = mapResultSetToUser(resultSet);
+                    user.setContactInfo(getUserContactInfoById(resultSet.getLong("contact_info_id")));
+                    results.add(user);
                 }
             }
         }

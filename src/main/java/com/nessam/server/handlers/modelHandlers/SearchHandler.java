@@ -78,10 +78,10 @@ public class SearchHandler implements HttpHandler {
             BetterLogger.INFO("Searching user with keyword: " + splittedPath[3]);
             return userController.searchUser(splittedPath[3]);
         }
-        else if (splittedPath[2].equals("searchPost")) {
-            BetterLogger.INFO("Searching post with keyword: " + splittedPath[3]);
-            return postController.searchPost(splittedPath[3]);
-        }
+//        else if (splittedPath[2].equals("searchPost")) {
+//            BetterLogger.INFO("Searching post with keyword: " + splittedPath[3]);
+//            return postController.searchPost(splittedPath[3]);
+//        }
         return "No search operation executed.";
     }
 }

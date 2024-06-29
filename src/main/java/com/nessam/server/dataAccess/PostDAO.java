@@ -3,6 +3,7 @@ package com.nessam.server.dataAccess;
 import com.nessam.server.models.Comment;
 import com.nessam.server.models.Post;
 import com.nessam.server.models.Like;
+import com.nessam.server.models.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,28 +19,11 @@ public class PostDAO {
     }
 
     private void createTables() throws SQLException {
-        createTable("CREATE TABLE IF NOT EXISTS posts (" +
-                "post_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                "title VARCHAR(255) NOT NULL, " +
-                "content TEXT, " +
-                "file_path TEXT, " +
-                "dateCreated TEXT, " +
-                "author VARCHAR(255))");
+        createTable("CREATE TABLE IF NOT EXISTS posts (" + "post_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "title VARCHAR(255) NOT NULL, " + "content TEXT, " + "file_path TEXT, " + "dateCreated TEXT, " + "author VARCHAR(255))");
 
-        createTable("CREATE TABLE IF NOT EXISTS comments (" +
-                "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                "content TEXT, " +
-                "file_path TEXT, " +
-                "dateCreated TEXT, " +
-                "author VARCHAR(255), " +
-                "fk_post_Id BIGINT NOT NULL, " +
-                "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id) ON DELETE CASCADE)");
+        createTable("CREATE TABLE IF NOT EXISTS comments (" + "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "content TEXT, " + "file_path TEXT, " + "dateCreated TEXT, " + "author VARCHAR(255), " + "fk_post_Id BIGINT NOT NULL, " + "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id) ON DELETE CASCADE)");
 
-        createTable("CREATE TABLE IF NOT EXISTS likes (" +
-                "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                "liker VARCHAR(255) NOT NULL, " +
-                "fk_post_Id BIGINT NOT NULL, " +
-                "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id) ON DELETE CASCADE)");
+        createTable("CREATE TABLE IF NOT EXISTS likes (" + "id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "liker VARCHAR(255) NOT NULL, " + "fk_post_Id BIGINT NOT NULL, " + "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id) ON DELETE CASCADE)");
     }
 
     private void createTable(String query) throws SQLException {
@@ -48,12 +32,12 @@ public class PostDAO {
         }
     }
 
-    public void addPost(Post post) throws SQLException {
+    public void savePost(Post post) throws SQLException {
         String query = "INSERT INTO posts (title, content, file_path, dateCreated, author) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, post.getTitle());
             preparedStatement.setString(2, post.getContent());
-            preparedStatement.setString(3, post.getFile_path());
+            preparedStatement.setString(3, post.getFilePath());
             preparedStatement.setString(4, post.getDateCreated());
             preparedStatement.setString(5, post.getAuthor());
             preparedStatement.executeUpdate();
@@ -77,7 +61,7 @@ public class PostDAO {
             preparedStatement.setString(2, title);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return extractPost(resultSet);
+                    return mapResultSetToPost(resultSet);
                 } else {
                     return null;
                 }
@@ -85,13 +69,12 @@ public class PostDAO {
         }
     }
 
-    public List<Post> getPosts() throws SQLException {
+    public List<Post> getAllPosts() throws SQLException {
         String query = "SELECT * FROM posts";
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
+        try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
             List<Post> posts = new ArrayList<>();
             while (resultSet.next()) {
-                posts.add(extractPost(resultSet));
+                posts.add(mapResultSetToPost(resultSet));
             }
             return posts;
         }
@@ -104,9 +87,22 @@ public class PostDAO {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 List<Post> posts = new ArrayList<>();
                 while (resultSet.next()) {
-                    posts.add(extractPost(resultSet));
+                    posts.add(mapResultSetToPost(resultSet));
                 }
                 return posts;
+            }
+        }
+    }
+
+    public Post getPostById(Long Id) throws SQLException {
+        String query = "SELECT * FROM posts WHERE Id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setLong(1, Id);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                Post post = mapResultSetToPost(resultSet);
+
+
+                return post;
             }
         }
     }
@@ -127,14 +123,16 @@ public class PostDAO {
         }
     }
 
-    private Post extractPost(ResultSet resultSet) throws SQLException {
-        return new Post(
-                resultSet.getLong("post_Id"),
-                resultSet.getString("title"),
-                resultSet.getString("content"),
-                resultSet.getString("file_path"),
-                resultSet.getString("dateCreated"),
-                resultSet.getString("author")
-        );
+    private Post mapResultSetToPost(ResultSet resultSet) throws SQLException {
+        Post post = new Post();
+        post.setId(resultSet.getLong("post_Id"));
+        post.setTitle(resultSet.getString("title"));
+        post.setContent(resultSet.getString("content"));
+        post.setFilePath(resultSet.getString("file_path"));
+        post.setDateCreated(resultSet.getString("dateCreated"));
+        post.setAuthor(resultSet.getString("author"));
+
+        return post;
     }
+
 }

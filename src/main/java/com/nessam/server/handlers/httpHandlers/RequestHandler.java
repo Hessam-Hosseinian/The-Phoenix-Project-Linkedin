@@ -30,6 +30,10 @@ public class RequestHandler implements HttpHandler {
         String[] splittedPath = exchange.getRequestURI().getPath().split("/");
         if (method.equals("GET")) {
             handleGetRequest(splittedPath, exchange);
+
+        } else if (method.equals("POST")) {
+            handlePostRequest(splittedPath, exchange);
+
         } else {
             sendResponse(exchange, "Method not allowed", 405);
         }
@@ -86,5 +90,35 @@ public class RequestHandler implements HttpHandler {
         } catch (IOException e) {
             BetterLogger.ERROR(e.getMessage());
         }
+    }
+
+    private void handlePostRequest(String[] splittedPath, HttpExchange exchange) {
+
+        String response = "This is the response Posts";
+        int statusCode = 200;
+
+        String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response = "Unauthorized";
+            statusCode = 401;
+
+            sendResponse(exchange, response, statusCode);
+            BetterLogger.WARNING("Unauthorized access detected.");
+        } else {
+            String token = authHeader.substring(7);
+            Map<String, Object> tokenData = jwtManager.decodeToken(token);
+
+
+            if (tokenData == null) {
+                response = "Invalid or expired token";
+                statusCode = 401;
+                BetterLogger.WARNING("Invalid or expired token received.");
+                sendResponse(exchange, response, statusCode);
+
+            }
+        }
+        sendResponse(exchange, response, statusCode);
+
     }
 }

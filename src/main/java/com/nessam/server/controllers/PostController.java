@@ -20,6 +20,18 @@ public class PostController {
         this.objectMapper = new ObjectMapper();
     }
 
+    public void createPost(String title, String content, String author, String filePath) throws SQLException {
+        Post post = new Post();
+        post.setTitle(title);
+        post.setContent(content);
+        post.setAuthor(author);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        String dateCreated = formatter.format(new Date());
+        post.setDateCreated(dateCreated);
+        post.setFilePath(filePath);
+        postDAO.savePost(post);
+    }
+
     public void createPost(String title, String content, String author) throws SQLException {
         Post post = new Post();
         post.setTitle(title);
@@ -28,6 +40,7 @@ public class PostController {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         String dateCreated = formatter.format(new Date());
         post.setDateCreated(dateCreated);
+
         postDAO.savePost(post);
     }
 
@@ -49,7 +62,7 @@ public class PostController {
 
     public Post getPostByAuthorAndTitleAbsolut(String email, String title) throws SQLException, JsonProcessingException {
         Post post = postDAO.getPostByAuthorAndTitle(email, title);
-//        return posts != null ? objectMapper.writeValueAsString(posts) : "No Post";
+
         return post;
     }
 
@@ -92,8 +105,8 @@ public class PostController {
         return objectMapper.writeValueAsString(post);
     }
 
-    public String searchPost(String keyword) throws SQLException, JsonProcessingException {
-        List<Post> posts = postDAO.searchInPosts(keyword);
-        return objectMapper.writeValueAsString(posts);
-    }
+//    public String searchPost(String keyword) throws SQLException, JsonProcessingException {
+//        List<Post> posts = postDAO.searchInPosts(keyword);
+//        return objectMapper.writeValueAsString(posts);
+//    }
 }

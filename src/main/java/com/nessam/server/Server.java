@@ -33,21 +33,23 @@ public class Server {
 
             Files.createDirectories(Paths.get("src/main/java/com/nessam/server/assets"));
             server.createContext("/users", new UserHandler());
-
-//            server.createContext("/education", new EducationHandler());
             server.createContext("/req", new RequestHandler());
-            server.createContext("/follows", new FollowHandler());
-            server.createContext("/message", new MessageHandler());
-            server.createContext("/post", new PostHandler());
-            server.createContext("/likes", new LikeHandler());
-            server.createContext("/comment", new CommentHandler());
-            server.createContext("/search", new SearchHandler());
-            server.createContext("/hashtag", new HashtagHandler());
+//            server.createContext("/education", new EducationHandler());
+
+//            server.createContext("/follows", new FollowHandler());
+//            server.createContext("/message", new MessageHandler());
+//            server.createContext("/post", new PostHandler());
+//            server.createContext("/likes", new LikeHandler());
+//            server.createContext("/comment", new CommentHandler());
+//            server.createContext("/search", new SearchHandler());
+//            server.createContext("/hashtag", new HashtagHandler());
             server.setExecutor(null);
             server.start();
 
-        } catch (IOException | SQLException e) {
+        } catch (IOException e) {
             BetterLogger.ERROR(e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
     }

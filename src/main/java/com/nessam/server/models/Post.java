@@ -30,19 +30,23 @@ public class Post {
     private String author;
 
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likes;
-
-
-    public Post(long postId, String title, String content, String author, String dateCreated, String string) {
+    public Post(String title, String content, String author, String filePath) {
         this.title = title;
         this.content = content;
         this.author = author;
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         this.dateCreated = formatter.format(new Date());
+        this.filePath = filePath;
+    }
+
+    public Post(String title, String content, String author) {
+        this.title = title;
+        this.content = content;
+        this.author = author;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        this.dateCreated = formatter.format(new Date());
+        //without post image
     }
 
 
@@ -53,13 +57,6 @@ public class Post {
         return id;
     }
 
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
 
     public void setId(Long id) {
         this.id = id;
@@ -97,21 +94,12 @@ public class Post {
         this.author = author;
     }
 
-    public List<Comment> getComments() {
-        return comments;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
-
-    public List<Like> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(List<Like> likes) {
-        this.likes = likes;
-    }
-
 }
 

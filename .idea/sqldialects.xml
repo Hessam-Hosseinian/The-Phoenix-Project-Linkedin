@@ -4,6 +4,5 @@
     <file url="file://$PROJECT_DIR$/src/main/java/com/nessam/server/dataAccess/LikeDAO.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/nessam/server/dataAccess/PostDAO.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/nessam/server/dataAccess/UserDAO.java" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/java/com/nessam/server/dataAccess/tables.sql" dialect="MySQL" />
   </component>
 </project>
