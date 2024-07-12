@@ -16,34 +16,49 @@ public class UserDAO {
         this.connection = DatabaseConnectionManager.getConnection();
         createUserContactInfoTable();
         createUserTable();
-        createUserEducationTable();
+        createFilesTable();
+
 
     }
 
     private void createUserTable() throws SQLException {
         String userTableSql = """
-                    CREATE TABLE IF NOT EXISTS users (
-                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                        email VARCHAR(50) NOT NULL,
-                        password VARCHAR(255) NOT NULL,
-                        first_name VARCHAR(20),
-                        last_name VARCHAR(40),
-                        additional_name VARCHAR(40),
-                        profile_picture VARCHAR(255),
-                        background_picture VARCHAR(255),
-                        title VARCHAR(220),
-                        location VARCHAR(255),
-                        profession VARCHAR(255),
-                        seeking_opportunity VARCHAR(255),
-                        contact_info_id BIGINT,
-                        FOREIGN KEY (contact_info_id) REFERENCES user_contact_info(id) ON DELETE SET NULL
-                    )
-                """;
+                CREATE TABLE IF NOT EXISTS users (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    email VARCHAR(50) NOT NULL UNIQUE,
+                    password VARCHAR(255) NOT NULL,
+                    first_name VARCHAR(20),
+                    last_name VARCHAR(40),
+                    additional_name VARCHAR(40),
+                    profile_picture VARCHAR(255),
+                    background_picture VARCHAR(255),
+                    title VARCHAR(220),
+                    location VARCHAR(255),
+                    profession VARCHAR(255),
+                    seeking_opportunity VARCHAR(255),
+                    contact_info_id BIGINT,
+                    FOREIGN KEY (contact_info_id) REFERENCES user_contact_info(id) ON DELETE SET NULL
+                )
+            """;
 
         try (PreparedStatement statement = connection.prepareStatement(userTableSql)) {
             statement.executeUpdate();
         }
     }
+    private void createFilesTable() throws SQLException {
+        String filesTableSql = """
+                    CREATE TABLE IF NOT EXISTS files (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        path VARCHAR(255) NOT NULL,
+                        email_cc VARCHAR(255)
+                    )
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(filesTableSql)) {
+            statement.executeUpdate();
+        }
+    }
+
 
     private void createUserContactInfoTable() throws SQLException {
         String contactInfoTableSql = """
@@ -65,24 +80,6 @@ public class UserDAO {
         }
     }
 
-    private void createUserEducationTable() {
-        String educationTableSql = """
-                     CREATE TABLE IF NOT EXISTS UserEducation(
-                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                       degree VARCHAR(255) NOT NULL,
-                       institution VARCHAR(255) NOT NULL,
-                       start_Date VARCHAR(255) NOT NULL,
-                       end_Date VARCHAR(255),
-                       user_id BIGINT,
-                       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-                     )
-                """;
-        try (PreparedStatement statement = connection.prepareStatement(educationTableSql)) {
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 
     private void executeUpdate(String sql) throws SQLException {
@@ -151,28 +148,7 @@ public class UserDAO {
             }
         }
     }
-    public void saveUserEducation(UserEducation education) throws SQLException {
-        String educationSql = """
-            INSERT INTO UserEducation (degree, institution, start_date, end_date)
-            VALUES (?, ?, ?, ?)
-        """;
 
-        try (PreparedStatement educationStmt = connection.prepareStatement(educationSql, Statement.RETURN_GENERATED_KEYS)) {
-            educationStmt.setString(1, education.getDegree());
-            educationStmt.setString(2, education.getInstitution());
-            educationStmt.setString(3, education.getStartDate());
-            educationStmt.setString(4, education.getEndDate());
-//            educationStmt.setLong(5, getUserByEmail().getId());
-
-            educationStmt.executeUpdate();
-
-            try (ResultSet generatedKeys = educationStmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    education.setId(generatedKeys.getLong(1));
-                }
-            }
-        }
-    }
 
     public void deleteUserByEmail(String email) throws SQLException {
         String sql = "DELETE FROM users WHERE email = ?";
@@ -230,6 +206,30 @@ public class UserDAO {
 
         return null;
     }
+    public User getUser(String userId) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE Id = ?");
+        statement.setString(1, userId);
+        ResultSet resultSet = statement.executeQuery();
+
+        if (resultSet.next()) {
+            User user = new User();
+            user.setId(resultSet.getLong("id"));
+            user.setEmail(resultSet.getString("email"));
+            user.setPassword(resultSet.getString("password"));
+            user.setFirstName(resultSet.getString("first_name"));
+            user.setLastName(resultSet.getString("last_name"));
+            user.setAdditionalName(resultSet.getString("additional_name"));
+            user.setProfilePicture(resultSet.getString("profile_picture"));
+            user.setBackgroundPicture(resultSet.getString("background_picture"));
+            user.setTitle(resultSet.getString("title"));
+            user.setLocation(resultSet.getString("location"));
+            user.setProfession(resultSet.getString("profession"));
+            user.setSeekingOpportunity(resultSet.getString("seeking_opportunity"));
+            return user;
+        }
+
+        return null; // User not found
+    }
 
     public User getUserByEmailAndPassword(String email, String password) throws SQLException {
         String sql = """
@@ -265,7 +265,7 @@ public class UserDAO {
             while (resultSet.next()) {
                 User user = mapResultSetToUser(resultSet);
                 user.setContactInfo(getUserContactInfoById(resultSet.getLong("contact_info_id")));
-                user.setEducation(getUserEducations(resultSet.getLong("id")));
+//                user.setEducation(getUserEducations(resultSet.getLong("id")));
                 users.add(user);
             }
         }
@@ -273,27 +273,6 @@ public class UserDAO {
         return users;
     }
 
-    public List<UserEducation> getUserEducations(long userId) throws SQLException {
-        String educationSql = "SELECT * FROM UserEducation WHERE user_id = ?";
-        List<UserEducation> educations = new ArrayList<>();
-
-        try (PreparedStatement educationStmt = connection.prepareStatement(educationSql)) {
-            educationStmt.setLong(1, userId);
-            try (ResultSet resultSet = educationStmt.executeQuery()) {
-                while (resultSet.next()) {
-                    UserEducation education = new UserEducation();
-                    education.setId(resultSet.getLong("id"));
-                    education.setDegree(resultSet.getString("degree"));
-                    education.setInstitution(resultSet.getString("institution"));
-                    education.setStartDate(resultSet.getString("start_Date"));
-                    education.setEndDate(resultSet.getString("end_Date"));
-//                    education.setUserId(resultSet.getLong("user_id"));
-                    educations.add(education);
-                }
-            }
-        }
-        return educations;
-    }
 
     private User mapResultSetToUser(ResultSet resultSet) throws SQLException {
         User user = new User();

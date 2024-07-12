@@ -1,9 +1,6 @@
 package com.nessam.server.dataAccess;
 
-import com.nessam.server.models.Comment;
-import com.nessam.server.models.Post;
-import com.nessam.server.models.Like;
-import com.nessam.server.models.User;
+import com.nessam.server.models.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -21,9 +18,9 @@ public class PostDAO {
     private void createTables() throws SQLException {
         createTable("CREATE TABLE IF NOT EXISTS posts (" + "post_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "title VARCHAR(255) NOT NULL, " + "content TEXT, " + "file_path TEXT, " + "dateCreated TEXT, " + "author VARCHAR(255))");
 
-        createTable("CREATE TABLE IF NOT EXISTS comments (" + "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "content TEXT, " + "file_path TEXT, " + "dateCreated TEXT, " + "author VARCHAR(255), " + "fk_post_Id BIGINT NOT NULL, " + "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id) ON DELETE CASCADE)");
+//        createTable("CREATE TABLE IF NOT EXISTS comments (" + "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "content TEXT, " + "file_path TEXT, " + "dateCreated TEXT, " + "author VARCHAR(255), " + "fk_post_Id BIGINT NOT NULL, " + "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id) ON DELETE CASCADE)");
 
-        createTable("CREATE TABLE IF NOT EXISTS likes (" + "id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "liker VARCHAR(255) NOT NULL, " + "fk_post_Id BIGINT NOT NULL, " + "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id) ON DELETE CASCADE)");
+//        createTable("CREATE TABLE IF NOT EXISTS likes (" + "id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "liker VARCHAR(255) NOT NULL, " + "fk_post_Id BIGINT NOT NULL, " + "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id) ON DELETE CASCADE)");
     }
 
     private void createTable(String query) throws SQLException {
@@ -74,7 +71,10 @@ public class PostDAO {
         try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
             List<Post> posts = new ArrayList<>();
             while (resultSet.next()) {
-                posts.add(mapResultSetToPost(resultSet));
+                Post post = mapResultSetToPost(resultSet);
+                post.setLikes(getPostLikes(post.getId()));
+                posts.add(post);
+
             }
             return posts;
         }
@@ -92,6 +92,25 @@ public class PostDAO {
                 return posts;
             }
         }
+    }
+
+    public List<Like> getPostLikes(long userId) throws SQLException {
+        String educationSql = "SELECT * FROM likes WHERE fk_post_Id = ?";
+        List<Like> likes = new ArrayList<>();
+
+        try (PreparedStatement educationStmt = connection.prepareStatement(educationSql)) {
+            educationStmt.setLong(1, userId);
+            try (ResultSet resultSet = educationStmt.executeQuery()) {
+                while (resultSet.next()) {
+                    Like like = new Like();
+                    like.setLiker(resultSet.getString("liker"));
+                    likes.add(like);
+
+
+                }
+            }
+        }
+        return likes;
     }
 
     public Post getPostById(Long Id) throws SQLException {
@@ -135,4 +154,34 @@ public class PostDAO {
         return post;
     }
 
+    public List<Post> searchInPosts(String keyword) throws SQLException {
+        List<Post> results = new ArrayList<>();
+        String sql = "SELECT post_id, title, content, file_path, dateCreated, author FROM posts WHERE title LIKE ? ";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, "%" + keyword + "%");
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Post post = mapResultSetToPost(resultSet);
+                    results.add(post);
+                }
+            }
+        }
+        return results;
+    }
+
+
+    public List<Post> searchInPostsContent(String keyword) throws SQLException {
+        List<Post> results = new ArrayList<>();
+        String sql = "SELECT post_id, title, content, file_path, dateCreated, author FROM posts WHERE content LIKE ? ";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, "%" + keyword + "%");
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Post post = mapResultSetToPost(resultSet);
+                    results.add(post);
+                }
+            }
+        }
+        return results;
+    }
 }

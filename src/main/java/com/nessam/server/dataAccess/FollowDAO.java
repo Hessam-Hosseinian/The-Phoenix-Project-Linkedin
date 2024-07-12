@@ -17,6 +17,7 @@ import java.util.List;
 
 public class FollowDAO {
     private final Connection connection;
+
     public FollowDAO() throws SQLException {
         connection = DatabaseConnectionManager.getConnection();
         createFollowTable();
@@ -88,15 +89,20 @@ public class FollowDAO {
         return follows;
     }
 
-    public boolean isFollowing(String followerId, String followedId) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM follows WHERE follower = ? AND followed = ?");
-        preparedStatement.setString(1, followerId);
-        preparedStatement.setString(2, followedId);
-        ResultSet resultSet = preparedStatement.executeQuery();
-        boolean isFollowing = resultSet.next();
-        return isFollowing;
-    }
 
+    public boolean isFollowing(String follower, String followed) throws SQLException {
+        String query = "SELECT COUNT(*) FROM follows WHERE follower = ? AND followed = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, follower);
+            statement.setString(2, followed);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
 
 
 }

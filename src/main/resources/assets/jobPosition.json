@@ -1,0 +1,14 @@
+{
+  "userEmail": "hessam@gmail.com",
+  "title": "Software Engineer",
+  "employmentType": "FULL_TIME",
+  "companyName": "Tech Solutions Inc.",
+  "workLocation": "Remote",
+  "workLocationType": "REMOTE",
+  "currentlyWorking": true,
+  "startDate": "2023-01-01",
+  "endDate": null,
+  "description": "Develops software solutions for various platforms and systems.",
+  "skills": "Java, Spring Boot, JavaScript, React",
+  "notifyNetwork": true
+}

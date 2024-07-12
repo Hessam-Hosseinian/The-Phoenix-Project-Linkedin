@@ -80,15 +80,17 @@ public class CommentHandler implements HttpHandler {
         }
     }
 
+    // Get ip:port/comment/emailOfPost/PostTitle
     private String handleGetRequest(String[] splittedPath) throws SQLException, JsonProcessingException {
-        if (splittedPath.length == 3) {
+        if (splittedPath.length == 4) {
             try {
-                long postId = Long.parseLong(splittedPath[2]);
-                String comments = commentController.getCommentsByPostId(postId);
-                BetterLogger.INFO("Successfully retrieved comments for post ID: " + postId);
+                String postTitle = splittedPath[3];
+                String postAuthor = splittedPath[2];
+                String comments = commentController.getCommentsByPostTitle(postTitle, postAuthor);
+                BetterLogger.INFO("Successfully retrieved comments for post titlE AND author: " + postTitle + postAuthor);
                 return comments;
             } catch (SQLException | JsonProcessingException | NumberFormatException e) {
-                BetterLogger.ERROR("Error fetching comments for post ID " + splittedPath[2] + ": " + e.getMessage());
+                BetterLogger.ERROR("Error fetching comments for post title or author " + splittedPath[2] + ": " + e.getMessage());
                 return "Error fetching comments";
             }
         }
@@ -111,11 +113,11 @@ public class CommentHandler implements HttpHandler {
 
         String content = splittedPath[4];
 
-        String filePath = ""; // Assuming no file path provided
+        String filePath = "";
 
         try {
             Post post = postController.getPostByAuthorAndTitleAbsolut(email, title);
-            System.out.println(post);
+
 
             commentController.createComment(content, filePath, author, post);
             BetterLogger.INFO("Successfully saved comment: " + author + " -> Post ID: " + post.getId());

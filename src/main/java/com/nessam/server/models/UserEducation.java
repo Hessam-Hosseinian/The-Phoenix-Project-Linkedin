@@ -3,60 +3,64 @@ package com.nessam.server.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "User_Education")
+@Table(name = "user_education")
 public class UserEducation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column(name = "institution", length = 40)
-    private String institution;
 
-    @Column(name = "degree", length = 40)
-    private String degree;
+    @Column(name = "school_name", length = 40, nullable = false)
+    private String schoolName;
 
-    @Column(name = "field_of_study", length = 40)
+    @Column(name = "field_of_study", length = 40, nullable = false)
     private String fieldOfStudy;
 
-    @Column(name = "start_date", length = 40)
-    private String startDate;
+    @Column(name = "start_date", nullable = false)
+    private String startDate; // Using String for simplicity, ideally use LocalDate
 
     @Column(name = "end_date")
-    private String endDate;
+    private String endDate; // Using String for simplicity, ideally use LocalDate
 
+    @Column(name = "grade", length = 40)
+    private String grade;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "activities", length = 500)
+    private String activities;
 
+    @Column(name = "description", length = 1000)
+    private String description;
+
+    @Column(name = "skill", length = 40)
+    private String skills;
+
+    @Column(name = "notify_network")
+    private Boolean notifyNetwork;
+
+    @Column(name = "user_email")
+    private String user_email;
 
     public UserEducation() {
     }
 
+    // Getters and Setters
 
-    public long getId() {
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getInstitution() {
-        return institution;
+    public String getSchoolName() {
+        return schoolName;
     }
 
-    public void setInstitution(String institution) {
-        this.institution = institution;
-    }
-
-    public String getDegree() {
-        return degree;
-    }
-
-    public void setDegree(String degree) {
-        this.degree = degree;
+    public void setSchoolName(String schoolName) {
+        this.schoolName = schoolName;
     }
 
     public String getFieldOfStudy() {
@@ -83,16 +87,51 @@ public class UserEducation {
         this.endDate = endDate;
     }
 
+    public String getGrade() {
+        return grade;
+    }
 
-    @Override
-    public String toString() {
-        return "UserEducation{" +
-                "id=" + id +
-                ", institution='" + institution + '\'' +
-                ", degree='" + degree + '\'' +
-                ", fieldOfStudy='" + fieldOfStudy + '\'' +
-                ", startDate='" + startDate + '\'' +
-                ", endDate='" + endDate + '\'' +
-                '}';
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
+    public String getActivities() {
+        return activities;
+    }
+
+    public void setActivities(String activities) {
+        this.activities = activities;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getSkills() {
+        return skills;
+    }
+
+    public void setSkills(String skills) {
+        this.skills = skills;
+    }
+
+    public Boolean getNotifyNetwork() {
+        return notifyNetwork;
+    }
+
+    public void setNotifyNetwork(Boolean notifyNetwork) {
+        this.notifyNetwork = notifyNetwork;
+    }
+
+    public String getUser_email() {
+        return user_email;
+    }
+
+    public void setUser_email(String user_email) {
+        this.user_email = user_email;
     }
 }

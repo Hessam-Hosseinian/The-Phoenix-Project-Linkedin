@@ -29,6 +29,9 @@ public class Post {
     @Column(name = "author")
     private String author;
 
+    @OneToMany(mappedBy = "likes", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes;
+
 
 
     public Post(String title, String content, String author, String filePath) {
@@ -100,6 +103,27 @@ public class Post {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
+    }
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", filePath='" + filePath + '\'' +
+                ", dateCreated='" + dateCreated + '\'' +
+                ", author='" + author + '\'' +
+                ", likes=" + likes +
+                '}';
     }
 }
 

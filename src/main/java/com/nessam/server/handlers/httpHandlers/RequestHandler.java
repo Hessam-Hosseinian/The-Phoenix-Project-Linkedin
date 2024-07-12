@@ -27,13 +27,28 @@ public class RequestHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) {
         String method = exchange.getRequestMethod();
+//        String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+//
+//        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+//            sendResponse(exchange, "Unauthorized", 401);
+//            BetterLogger.WARNING("Unauthorized access detected.");
+//            return;
+//        }
+//
+//        String token = authHeader.substring(7);
+//        Map<String, Object> tokenData = jwtManager.decodeToken(token);
+//
+//        if (tokenData == null) {
+//            sendResponse(exchange, "Invalid or expired token", 401);
+//            BetterLogger.WARNING("Invalid or expired token received.");
+//            return;
+//        }
+
         String[] splittedPath = exchange.getRequestURI().getPath().split("/");
         if (method.equals("GET")) {
             handleGetRequest(splittedPath, exchange);
-
         } else if (method.equals("POST")) {
-            handlePostRequest(splittedPath, exchange);
-
+            handlePostRequest( exchange);
         } else {
             sendResponse(exchange, "Method not allowed", 405);
         }
@@ -58,13 +73,9 @@ public class RequestHandler implements HttpHandler {
                 Map<String, Object> payload = new HashMap<>();
                 payload.put("email", userEmail);
                 String token = jwtManager.createToken(payload, 60); // Token valid for 60 minutes
-                System.out.println("Generated Token: " + token);
 
-                // Set the Authorization header with the token
                 headers.set("Authorization", "Bearer " + token);
 
-                System.out.println(exchange.getResponseHeaders());
-                System.out.println(exchange.getResponseHeaders().getFirst("Authorization"));
                 // Optionally decode the token for logging purposes
                 Map<String, Object> decodedPayload = jwtManager.decodeToken(token);
                 if (decodedPayload != null) {
@@ -81,6 +92,28 @@ public class RequestHandler implements HttpHandler {
         }
     }
 
+    private void handlePostRequest( HttpExchange exchange) {
+
+        String method = exchange.getRequestMethod();
+        String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            sendResponse(exchange, "Unauthorized", 401);
+            BetterLogger.WARNING("Unauthorized access detected.");
+            return;
+        }
+
+        String token = authHeader.substring(7);
+        Map<String, Object> tokenData = jwtManager.decodeToken(token);
+
+        if (tokenData == null) {
+            sendResponse(exchange, "Invalid or expired token", 401);
+            BetterLogger.WARNING("Invalid or expired token received.");
+            return;
+        }
+        sendResponse(exchange, "Logged in successfully", 200);
+    }
+
     private void sendResponse(HttpExchange exchange, String response, int statusCode) {
         try {
             exchange.sendResponseHeaders(statusCode, response.getBytes().length);
@@ -90,35 +123,5 @@ public class RequestHandler implements HttpHandler {
         } catch (IOException e) {
             BetterLogger.ERROR(e.getMessage());
         }
-    }
-
-    private void handlePostRequest(String[] splittedPath, HttpExchange exchange) {
-
-        String response = "This is the response Posts";
-        int statusCode = 200;
-
-        String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response = "Unauthorized";
-            statusCode = 401;
-
-            sendResponse(exchange, response, statusCode);
-            BetterLogger.WARNING("Unauthorized access detected.");
-        } else {
-            String token = authHeader.substring(7);
-            Map<String, Object> tokenData = jwtManager.decodeToken(token);
-
-
-            if (tokenData == null) {
-                response = "Invalid or expired token";
-                statusCode = 401;
-                BetterLogger.WARNING("Invalid or expired token received.");
-                sendResponse(exchange, response, statusCode);
-
-            }
-        }
-        sendResponse(exchange, response, statusCode);
-
     }
 }

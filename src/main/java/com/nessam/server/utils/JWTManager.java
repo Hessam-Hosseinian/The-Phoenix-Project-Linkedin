@@ -18,7 +18,7 @@ public class JWTManager {
     public String createToken(Map<String, Object> payload, int expirationMinutes) {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
-        Date exp = new Date(nowMillis + (long) expirationMinutes * 60 * 1000);
+        Date exp = new Date(nowMillis + (long) expirationMinutes * 60 * 1000*60);
 
         return Jwts.builder().setClaims(payload).setIssuedAt(now).setExpiration(exp).signWith(secretKey, algorithm).compact();
     }
@@ -29,6 +29,15 @@ public class JWTManager {
             return new HashMap<>(claims);
         } catch (JwtException e) {
             System.out.println("Invalid or expired token: " + e.getMessage());
+            return null;
+        }
+    }
+    public Map<String, Object> decodeBearerToken(String bearerToken) {
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            String token = bearerToken.substring(7);
+            return decodeToken(token);
+        } else {
+            System.out.println("Invalid Bearer token format");
             return null;
         }
     }

@@ -2,38 +2,40 @@ package com.nessam.server.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.sql.Date;
 
 public class Message implements Comparable {
-    @Column(name = "message-id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "Id")
     private String id;
 
-    @Column(name = "sender")
+    @JsonProperty("sender")
     private String sender;
 
-    @Column(name = "receiver")
+    @JsonProperty("receiver")
     private String receiver;
 
-    @Column(name = "text")
+    @JsonProperty("text")
     private String text;
 
-    @Column(name = "createdat")
-    private String createdAt;
+    @JsonProperty("createdAt")
+    private long createdAt;
 
-    public Message () {
+    public Message() {
 
     }
 
-
     public Message(String id, String sender, String receiver, String text, long createdAt) {
         this.id = id;
-        this.receiver = receiver;
         this.sender = sender;
+        this.receiver = receiver;
         this.text = text;
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-        this.createdAt = formatter.format(new Date());
+        this.createdAt = createdAt;
     }
 
     public Message(String id, String sender, String receiver, String text) {
@@ -41,8 +43,7 @@ public class Message implements Comparable {
         this.sender = sender;
         this.receiver = receiver;
         this.text = text;
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-        this.createdAt = formatter.format(new Date());
+        this.createdAt = System.currentTimeMillis();
     }
 
     public Message(String sender, String receiver, String text) {
@@ -50,8 +51,8 @@ public class Message implements Comparable {
         this.sender = sender;
         this.receiver = receiver;
         this.text = text;
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-        this.createdAt = formatter.format(new Date());
+        this.createdAt = System.currentTimeMillis();
+
     }
 
     public String getId() {
@@ -86,22 +87,17 @@ public class Message implements Comparable {
         this.text = text;
     }
 
-    public String getCreatedAt() {
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
 
     @Override
     public String toString() {
-        return "Message{" +
-                "id='" + id + '\'' +
-                ", receiver='" + receiver + '\'' +
-                ", text='" + text + '\'' +
-                ", createdAt=" + createdAt +
-                '}';
+        return "Message{" + "id='" + id + '\'' + ", sender='" + sender + '\'' + ", receiver='" + receiver + '\'' + ", text='" + text + '\'' + ", createdAt=" + createdAt + '}';
     }
 
     @Override
@@ -111,8 +107,9 @@ public class Message implements Comparable {
 
         Message message = (Message) o;
 
-        if (!createdAt.equals(message.createdAt)) return false;
+        if (createdAt != message.createdAt) return false;
         if (!id.equals(message.id)) return false;
+        if (!sender.equals(message.sender)) return false;
         if (!receiver.equals(message.receiver)) return false;
         return text.equals(message.text);
     }
@@ -120,14 +117,15 @@ public class Message implements Comparable {
     @Override
     public int hashCode() {
         int result = id.hashCode();
+        result = 31 * result + sender.hashCode();
         result = 31 * result + receiver.hashCode();
         result = 31 * result + text.hashCode();
-        result = 31 * result + (int) (Integer.parseInt(createdAt) ^ (Integer.parseInt(createdAt)));
+        result = 31 * result + (int) (createdAt ^ (createdAt >>> 32));
         return result;
     }
 
     @Override
     public int compareTo(Object o) {
-        return (int)(Integer.parseInt(((Message)o).createdAt) -  Integer.parseInt(createdAt));
+        return (int) (((Message) o).createdAt - createdAt);
     }
 }

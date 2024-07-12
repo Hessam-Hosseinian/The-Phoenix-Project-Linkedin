@@ -19,6 +19,10 @@ public class Comment {
     @Column(name = "dateCreated")
     private String dateCreated;
 
+    @Column(name = "postAuthor")
+    private String postAuthor;
+    @Column(name =  "postTitle")
+    private String postTitle;
     @ManyToOne(fetch = FetchType.EAGER)
     private Post post;
 
@@ -69,5 +73,22 @@ public class Comment {
 
     public void setPost(Post post) {
         this.post = post;
+    }
+
+    public String getPostTitle() {
+        return postTitle;
+    }
+
+    public String getPostAuthor() {
+        return postAuthor;
+    }
+
+    public void setPostAuthor(String postAuthor) {
+        this.postAuthor = postAuthor;
+    }
+
+    public void setPostTitle(String postTitle) {
+        this.postTitle = postTitle;
+
     }
 }

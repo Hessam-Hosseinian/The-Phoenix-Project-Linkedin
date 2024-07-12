@@ -14,6 +14,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.Map;
 
 public class UserHandler implements HttpHandler {
 
@@ -68,7 +69,7 @@ public class UserHandler implements HttpHandler {
         os.close();
     }
 
-    private String handleGetRequest(String[] splittedPath) throws SQLException, JsonProcessingException {
+    public String handleGetRequest(String[] splittedPath) throws SQLException, JsonProcessingException {
         if (splittedPath.length == 2) {
             BetterLogger.INFO("Users received");
             return userController.getUsers();
@@ -77,12 +78,20 @@ public class UserHandler implements HttpHandler {
             BetterLogger.INFO("User contact info received");
             return userController.getUserContactInfoByUserId(userId);
 
-        }else if (splittedPath.length == 4 && splittedPath[2].equals("education")){
+        } else if (splittedPath.length == 4 && splittedPath[2].equals("education")) {
             String userId = splittedPath[3];
             BetterLogger.INFO("User contact info received");
             return userController.getUserContactInfoByUserId(userId);
-        }
-        else {
+        } else if (splittedPath.length == 4 && splittedPath[2].equals("jwt")) {
+            String token = "Bearer " + splittedPath[3];
+
+
+            Map<String, Object> tokenData = jwtManager.decodeBearerToken(token);
+            String userId = (String) tokenData.get("email");
+
+            BetterLogger.INFO("User contact info received");
+            return userController.getUserById(userId);
+        } else {
             String tmpUserEmail = splittedPath[splittedPath.length - 1];
             String response = userController.getUserById(tmpUserEmail);
             BetterLogger.INFO("User received");
@@ -90,7 +99,7 @@ public class UserHandler implements HttpHandler {
         }
     }
 
-    private String handlePostRequest(HttpExchange exchange, String[] splittedPath) throws IOException {
+    public String handlePostRequest(HttpExchange exchange, String[] splittedPath) throws IOException {
 
         if (splittedPath.length == 2) {
             try {
@@ -124,7 +133,7 @@ public class UserHandler implements HttpHandler {
                 JSONObject jsonObject = parseRequestBody(exchange);
 //                validateContactInfoDetails(jsonObject);
 
-                userController.creteUserEducation(jsonObject);
+//                userController.creteUserEducation(jsonObject);
 
                 BetterLogger.INFO("User education created successfully");
                 return "User contact info created successfully";
@@ -150,7 +159,7 @@ public class UserHandler implements HttpHandler {
         }
     }
 
-    private String handleDeleteRequest(String[] splittedPath) {
+    public String handleDeleteRequest(String[] splittedPath) {
         if (splittedPath.length == 2) {
             userController.deleteUsers();
             BetterLogger.INFO("All users deleted successfully");

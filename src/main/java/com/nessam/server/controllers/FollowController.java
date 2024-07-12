@@ -1,30 +1,25 @@
 package com.nessam.server.controllers;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nessam.server.dataAccess.FollowDAO;
 import com.nessam.server.models.Follow;
-import java.util.ArrayList;
-import java.util.List;
+
 import java.sql.SQLException;
-import java.sql.ResultSet;
+import java.util.List;
 
 public class FollowController {
 
     private final FollowDAO followDAO;
+
     public FollowController() throws SQLException {
         followDAO = new FollowDAO();
     }
-
-
-
 
     public void saveFollow(String follower, String followed) throws SQLException {
         Follow follow = new Follow(follower, followed);
         followDAO.saveFollow(follow);
     }
-
 
     public void deleteFollow(String follower, String followed) throws SQLException {
         Follow follow = new Follow(follower, followed);
@@ -51,5 +46,9 @@ public class FollowController {
         List<Follow> follows = followDAO.getAllFollow();
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(follows);
+    }
+
+    public boolean isFollowing(String follower, String followed) throws SQLException {
+        return followDAO.isFollowing(follower, followed);
     }
 }

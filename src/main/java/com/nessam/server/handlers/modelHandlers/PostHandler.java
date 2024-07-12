@@ -6,10 +6,15 @@ import com.nessam.server.utils.BetterLogger;
 import com.nessam.server.utils.JWTManager;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 public class PostHandler implements HttpHandler {
@@ -40,7 +45,9 @@ public class PostHandler implements HttpHandler {
         }
 
         String token = authHeader.substring(7);
+
         Map<String, Object> tokenData = jwtManager.decodeToken(token);
+
 
         if (tokenData == null) {
             respondWith(exchange, 401, "Invalid or expired token");
@@ -53,6 +60,7 @@ public class PostHandler implements HttpHandler {
         try {
             switch (method) {
                 case "GET":
+
                     response = handleGetRequest(splittedPath);
                     break;
                 case "POST":
@@ -78,7 +86,7 @@ public class PostHandler implements HttpHandler {
         respondWith(exchange, statusCode, response);
     }
 
-    private String handleGetRequest(String[] splittedPath) throws SQLException {
+    public String handleGetRequest(String[] splittedPath) throws SQLException {
         if (splittedPath.length == 2) {
             return getAllPosts();
         } else if (splittedPath.length == 3) {
@@ -127,12 +135,15 @@ public class PostHandler implements HttpHandler {
         }
     }
 
-    private String handlePostRequest(HttpExchange exchange) throws SQLException, IOException {
+    public String handlePostRequest(HttpExchange exchange) throws SQLException, IOException {
         JSONObject jsonObject = getRequestBody(exchange);
 
         String title = jsonObject.optString("title", null);
         String content = jsonObject.optString("content", null);
         String filePath = jsonObject.optString("file_path", null);
+
+
+
 
         if (postController.getPostByAuthorAndTitle(userEmail, title).equals("No Post")) {
             postController.createPost(title, content, userEmail, filePath);
@@ -140,11 +151,11 @@ public class PostHandler implements HttpHandler {
             return "Done!";
         } else {
             BetterLogger.WARNING("Post not saved: " + userEmail + " -> " + title);
-            return "This post is already saved use another title!";
+            return "This post is already saved, use another title!";
         }
     }
 
-    private String handlePutRequest(HttpExchange exchange) throws SQLException, IOException {
+    public String handlePutRequest(HttpExchange exchange) throws SQLException, IOException {
         JSONObject jsonObject = getRequestBody(exchange);
 
         String title = jsonObject.optString("title", null);
@@ -160,7 +171,7 @@ public class PostHandler implements HttpHandler {
         return "Post updated!";
     }
 
-    private String handleDeleteRequest(String[] splittedPath) throws SQLException {
+    public String handleDeleteRequest(String[] splittedPath) throws SQLException {
         if (splittedPath.length == 2) {
             postController.deletePosts();
             BetterLogger.INFO("Successfully deleted all posts");
@@ -196,11 +207,53 @@ public class PostHandler implements HttpHandler {
         }
     }
 
+    private String saveFile(FileItem item) throws Exception {
+        String fileName = item.getName();
+        String filePath = "/home/hessam/Desktop/" + fileName; // Ensure the directory exists
+        File storeFile = new File(filePath);
+        item.write(storeFile);
+        return filePath;
+    }
+
     public String getUserEmail() {
         return userEmail;
     }
 
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
+    }
+
+    private static class ServletRequestContext implements org.apache.commons.fileupload.RequestContext {
+        private final HttpExchange exchange;
+
+        public ServletRequestContext(HttpExchange exchange) {
+            this.exchange = exchange;
+        }
+
+        @Override
+        public String getCharacterEncoding() {
+            return "UTF-8";
+        }
+
+        @Override
+        public String getContentType() {
+            return exchange.getRequestHeaders().getFirst("Content-type");
+        }
+
+        @Override
+        public int getContentLength() {
+            try {
+                return Integer.parseInt(exchange.getRequestHeaders().getFirst("Content-length"));
+            } catch (NumberFormatException e) {
+                return -1;
+            }
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return exchange.getRequestBody();
+        }
+
+
     }
 }

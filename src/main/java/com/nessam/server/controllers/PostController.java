@@ -61,6 +61,7 @@ public class PostController {
     }
 
     public Post getPostByAuthorAndTitleAbsolut(String email, String title) throws SQLException, JsonProcessingException {
+
         Post post = postDAO.getPostByAuthorAndTitle(email, title);
 
         return post;
@@ -104,7 +105,15 @@ public class PostController {
         if (post == null) return null;
         return objectMapper.writeValueAsString(post);
     }
+    public String searchPost(String keyword) throws SQLException, JsonProcessingException {
+        List<Post> posts = postDAO.searchInPosts(keyword);
+        return objectMapper.writeValueAsString(posts);
+    }
 
+    public String searchPostHashtag(String keyword) throws SQLException, JsonProcessingException {
+        List<Post> posts = postDAO.searchInPostsContent(keyword);
+        return objectMapper.writeValueAsString(posts);
+    }
 //    public String searchPost(String keyword) throws SQLException, JsonProcessingException {
 //        List<Post> posts = postDAO.searchInPosts(keyword);
 //        return objectMapper.writeValueAsString(posts);

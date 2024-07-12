@@ -9,6 +9,7 @@ public class Like {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column (name = "liker")
     private String liker;
 
     @ManyToOne(fetch = FetchType.EAGER)

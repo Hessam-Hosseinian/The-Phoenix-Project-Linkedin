@@ -1,6 +1,7 @@
 package com.nessam.server.dataAccess;
 
 import com.nessam.server.models.Comment;
+import com.nessam.server.models.Post;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,18 +17,33 @@ public class CommentDAO {
     }
 
     public void createCommentTable() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS comments (" + "comment_Id BIGINT AUTO_INCREMENT PRIMARY KEY, " + "content TEXT, " + "file_path TEXT, " + "dateCreated TEXT, " + "author VARCHAR(255), " + "fk_post_Id BIGINT NOT NULL, " + "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id)" + ")");
+        PreparedStatement statement = connection.prepareStatement(
+                "CREATE TABLE IF NOT EXISTS comments (" +
+                        "Id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+                        "content TEXT, " +
+                        "file_path TEXT, " +
+                        "dateCreated TEXT, " +
+                        "author VARCHAR(255), " +
+                        "postTitle VARCHAR(255), " +
+                        "postAuthor VARCHAR(255), " +
+                        "fk_post_Id BIGINT NOT NULL, " +
+                        "FOREIGN KEY (fk_post_Id) REFERENCES posts(post_Id)" +
+                        ")"
+        );
         statement.executeUpdate();
     }
 
+
     public void saveComment(Comment comment) throws SQLException {
-        String query = "INSERT INTO comments (content, file_path, dateCreated, author, fk_post_Id) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO comments (content, file_path, dateCreated, author, fk_post_Id, postTitle, postAuthor) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, comment.getContent());
             statement.setString(2, comment.getFilePath());
             statement.setString(3, comment.getDateCreated());
             statement.setString(4, comment.getAuthor());
             statement.setLong(5, comment.getPost().getId());
+            statement.setString(6, comment.getPost().getTitle());
+            statement.setString(7, comment.getPost().getAuthor());
             statement.executeUpdate();
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -38,11 +54,16 @@ public class CommentDAO {
         }
     }
 
-    public List<Comment> getCommentsByPostId(long postId) throws SQLException {
+
+    public List<Comment> getCommentsByPostTitleAndAuthor(String postTitle, String postAuthor) throws SQLException {
         List<Comment> comments = new ArrayList<>();
-        String query = "SELECT * FROM comments WHERE fk_post_Id = ?";
+
+        String query = "SELECT * FROM comments WHERE postTitle = ? AND postAuthor = ?"; ;
+
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setLong(1, postId);
+            stmt.setString(1, postTitle);
+            stmt.setString(2, postAuthor);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     comments.add(mapResultSetToComment(rs));
@@ -52,8 +73,9 @@ public class CommentDAO {
         return comments;
     }
 
+
     public Comment getCommentById(long commentId) throws SQLException {
-        String query = "SELECT * FROM comments WHERE comment_Id = ?";
+        String query = "SELECT * FROM comments WHERE Id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setLong(1, commentId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -80,7 +102,7 @@ public class CommentDAO {
     }
 
     public void updateComment(Comment comment) throws SQLException {
-        String query = "UPDATE comments SET content = ?, file_path = ? WHERE comment_Id = ?";
+        String query = "UPDATE comments SET content = ?, file_path = ? WHERE Id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, comment.getContent());
             stmt.setString(2, comment.getFilePath());
@@ -90,7 +112,7 @@ public class CommentDAO {
     }
 
     public void deleteCommentById(long commentId) throws SQLException {
-        String query = "DELETE FROM comments WHERE comment_Id = ?";
+        String query = "DELETE FROM comments WHERE Id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setLong(1, commentId);
             stmt.executeUpdate();
@@ -107,14 +129,16 @@ public class CommentDAO {
 
     private Comment mapResultSetToComment(ResultSet resultSet) throws SQLException {
         Comment comment = new Comment();
-        comment.setId(resultSet.getLong("comment_Id"));
+        comment.setId(resultSet.getLong("Id"));
         comment.setContent(resultSet.getString("content"));
         comment.setFilePath(resultSet.getString("file_path"));
         comment.setDateCreated(resultSet.getString("dateCreated"));
         comment.setAuthor(resultSet.getString("author"));
+        comment.setPostTitle(resultSet.getString("postTitle"));
+        comment.setPostAuthor(resultSet.getString("postAuthor"));
         // Assuming you have a method to get Post by Id in PostDAO
-        PostDAO postDAO = new PostDAO();
-        comment.setPost(postDAO.getPostById(resultSet.getLong("fk_post_Id")));
+//        PostDAO postDAO = new PostDAO();
+//        comment.setPost(postDAO.getPostById(resultSet.getLong("fk_post_Id")));
 
         return comment;
     }

@@ -43,6 +43,7 @@ public class FollowHandler implements HttpHandler {
             BetterLogger.WARNING("Unauthorized access detected.");
         } else {
             String token = authHeader.substring(7);
+
             Map<String, Object> tokenData = jwtManager.decodeToken(token);
             if (tokenData == null) {
                 response = "Invalid or expired token";
@@ -80,7 +81,8 @@ public class FollowHandler implements HttpHandler {
         }
     }
 
-    private String handleGetRequest(String[] splittedPath) throws SQLException, JsonProcessingException {
+    // GET ip:port/follow/followers/userEmail
+    public String handleGetRequest(String[] splittedPath) throws SQLException, JsonProcessingException {
         if (splittedPath.length == 4) {
             if (splittedPath[2].equals("followers")) {
                 BetterLogger.INFO("Received request to retrieve followers records.");
@@ -89,6 +91,12 @@ public class FollowHandler implements HttpHandler {
                 BetterLogger.INFO("Received request to retrieve followings records.");
                 return followController.getFollows(splittedPath[3]);
             }
+        } else if (splittedPath.length == 5 && splittedPath[2].equals("check")) {
+            String follower = splittedPath[3];
+            String followed = splittedPath[4];
+            BetterLogger.INFO("Received request to check follow status: " + follower + " -> " + followed);
+            boolean isFollowing = followController.isFollowing(follower, followed);
+            return isFollowing ? "true" : "false";
         }
         BetterLogger.WARNING("Received request with wrong URL format.");
         return "WRONG URL";

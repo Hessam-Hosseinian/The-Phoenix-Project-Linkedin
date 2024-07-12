@@ -21,8 +21,8 @@ public class CommentController {
         this.objectMapper = new ObjectMapper();
     }
 
-    public String getCommentsByPostId(long postId) throws SQLException, JsonProcessingException {
-        List<Comment> comments = commentDAO.getCommentsByPostId(postId);
+    public String getCommentsByPostTitle(String postTitle, String postAuthor) throws SQLException, JsonProcessingException {
+        List<Comment> comments = commentDAO.getCommentsByPostTitleAndAuthor(postTitle, postAuthor);
         return objectMapper.writeValueAsString(comments);
     }
 

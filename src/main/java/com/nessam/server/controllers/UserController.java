@@ -2,6 +2,7 @@ package com.nessam.server.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nessam.server.dataAccess.JobPositionDAO;
 import com.nessam.server.dataAccess.UserDAO;
 import com.nessam.server.models.User;
 import com.nessam.server.models.UserContactInfo;
@@ -13,10 +14,12 @@ import java.util.List;
 
 public class UserController {
     private final UserDAO userDAO;
+//    private final JobPositionDAO jobPositionDAO;
     private final ObjectMapper objectMapper;
 
     public UserController() throws SQLException {
         this.userDAO = new UserDAO();
+//        this.jobPositionDAO = new JobPositionDAO();
         this.objectMapper = new ObjectMapper();
     }
 
@@ -107,17 +110,10 @@ public class UserController {
         }
 
     }
-    public String getUserEducations(Long userId) throws SQLException, JsonProcessingException {
-        List<UserEducation> educations = userDAO.getUserEducations(userId);
-        return objectMapper.writeValueAsString(educations);
-    }
 
 
-    public void creteUserEducation(JSONObject jsonObject) throws SQLException {
-        UserEducation userEducation = jsonToUserEducation(jsonObject);
 
-        userDAO.saveUserEducation(userEducation);
-    }
+
     private User jsonToUser(JSONObject jsonObject) {
         User user = new User();
         user.setEmail(jsonObject.getString("email"));
@@ -147,15 +143,5 @@ public class UserController {
         return contactInfo;
     }
 
-    private UserEducation jsonToUserEducation(JSONObject jsonObject) throws SQLException {
 
-        UserEducation education = new UserEducation();
-        education.setInstitution(jsonObject.getString("institution"));
-        education.setDegree(jsonObject.optString("degree"));
-        education.setFieldOfStudy(jsonObject.getString("fieldOfStudy"));
-        education.setStartDate(jsonObject.optString("startDate"));
-        education.setEndDate(jsonObject.optString("endDate"));
-
-        return education;
-    }
 }
