@@ -2,15 +2,18 @@ package com.nessam.server.models;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "users")
+
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "email", length = 50, nullable = false)
+    @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", nullable = false)
@@ -43,36 +46,18 @@ public class User {
     @Column(name = "seeking_opportunity")
     private String seekingOpportunity;
 
+
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "information_id", referencedColumnName = "id")
-    private Information information;
+    @JoinColumn(name = "contact_info_id", referencedColumnName = "id")
+    private UserContactInfo contactInfo;
 
-    public User() {}
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserEducation> education;
 
-    public User(String email, String password, String firstName, String lastName, String additionalName, String profilePicture, String backgroundPicture, String title, String location, String profession, String seekingOpportunity) {
-        this.email = email;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.additionalName = additionalName;
-        this.profilePicture = profilePicture;
-        this.backgroundPicture = backgroundPicture;
-        this.title = title;
-        this.location = location;
-        this.profession = profession;
-        this.seekingOpportunity = seekingOpportunity;
-        this.information = new Information();
+
+    public User() {
     }
 
-    // Getters and setters omitted for brevity
-
-    public Information getInformation() {
-        return information;
-    }
-
-    public void setInformation(Information information) {
-        this.information = information;
-    }
 
     public Long getId() {
         return id;
@@ -168,5 +153,21 @@ public class User {
 
     public void setSeekingOpportunity(String seekingOpportunity) {
         this.seekingOpportunity = seekingOpportunity;
+    }
+
+    public List<UserEducation> getEducation() {
+        return education;
+    }
+
+    public void setEducation(List<UserEducation> education) {
+        this.education = education;
+    }
+
+    public UserContactInfo getContactInfo() {
+        return contactInfo;
+    }
+
+    public void setContactInfo(UserContactInfo contactInfo) {
+        this.contactInfo = contactInfo;
     }
 }
