@@ -1,28 +1,27 @@
 package com.nessam.server.handlers.modelHandlers;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nessam.server.controllers.UserController;
 import com.nessam.server.utils.BetterLogger;
 import com.nessam.server.utils.JWTManager;
 import com.nessam.server.utils.Validation;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.Map;
 
 public class UserHandler implements HttpHandler {
 
     private final JWTManager jwtManager;
-    private final Gson gson;
     private UserController userController;
 
     public UserHandler() {
         jwtManager = new JWTManager();
-        gson = new Gson();
         try {
             userController = new UserController();
         } catch (SQLException e) {
@@ -44,7 +43,7 @@ public class UserHandler implements HttpHandler {
                     response = handleGetRequest(splittedPath);
                     break;
                 case "POST":
-                    response = handlePostRequest(exchange);
+                    response = handlePostRequest(exchange, splittedPath);
                     break;
                 case "PUT":
                     response = handlePutRequest(exchange);
@@ -58,9 +57,9 @@ public class UserHandler implements HttpHandler {
                     break;
             }
         } catch (Exception e) {
-            BetterLogger.ERROR("Exception handling request: " + e);
-            response = "Internal server error";
+            response = "Internal Server Error";
             statusCode = 500;
+            BetterLogger.ERROR("Exception: " + e.getMessage());
         }
 
         exchange.sendResponseHeaders(statusCode, response.getBytes().length);
@@ -69,113 +68,95 @@ public class UserHandler implements HttpHandler {
         os.close();
     }
 
-    private String handleGetRequest(String[] splittedPath) {
-        try {
-            if (splittedPath.length == 2) {
-                BetterLogger.INFO("Fetching all users");
-                return userController.getUsers();
-            } else {
-                String userEmail = splittedPath[splittedPath.length - 1];
-                BetterLogger.INFO("Fetching user: " + userEmail);
-                String response = userController.getUserById(userEmail);
-                return response != null ? response : "No User";
-            }
-        } catch (SQLException | IOException e) {
-            BetterLogger.ERROR("Error fetching users: " + e);
-            return "Error fetching users";
+    public String handleGetRequest(String[] splittedPath) throws SQLException, JsonProcessingException {
+        if (splittedPath.length == 2) {
+            BetterLogger.INFO("Users received");
+            return userController.getUsers();
+        } else if (splittedPath.length == 4 && splittedPath[2].equals("contactInfo")) {
+            String userId = splittedPath[3];
+            BetterLogger.INFO("User contact info received");
+            return userController.getUserContactInfoByUserId(userId);
+
+        } else if (splittedPath.length == 4 && splittedPath[2].equals("education")) {
+            String userId = splittedPath[3];
+            BetterLogger.INFO("User contact info received");
+            return userController.getUserContactInfoByUserId(userId);
+        } else if (splittedPath.length == 4 && splittedPath[2].equals("jwt")) {
+            String token = "Bearer " + splittedPath[3];
+
+
+            Map<String, Object> tokenData = jwtManager.decodeBearerToken(token);
+            String userId = (String) tokenData.get("email");
+
+            BetterLogger.INFO("User contact info received");
+            return userController.getUserById(userId);
+        } else {
+            String tmpUserEmail = splittedPath[splittedPath.length - 1];
+            String response = userController.getUserById(tmpUserEmail);
+            BetterLogger.INFO("User received");
+            return response != null ? response : "No User";
         }
     }
 
-    private String handlePostRequest(HttpExchange exchange) throws IOException {
-        try {
-            InputStream requestBody = exchange.getRequestBody();
-            String jsonString = new BufferedReader(new InputStreamReader(requestBody))
-                    .lines()
-                    .reduce("", (accumulator, actual) -> accumulator + actual);
+    public String handlePostRequest(HttpExchange exchange, String[] splittedPath) throws IOException {
 
-            JsonObject jsonObject = gson.fromJson(jsonString, JsonObject.class);
+        if (splittedPath.length == 2) {
+            try {
+                JSONObject jsonObject = parseRequestBody(exchange);
+                validateUserDetails(jsonObject);
 
-            String email = jsonObject.get("email").getAsString();
-            String password = jsonObject.get("password").getAsString();
+                userController.createUser(jsonObject);
+                Files.createDirectories(Paths.get("src/main/resources/assets/users/user" + jsonObject.getString("email")));
 
-            if (!Validation.isValidEmail(email)) {
-                BetterLogger.INFO("Invalid email format");
-                return "Invalid email format";
+                BetterLogger.INFO("User created successfully");
+                return "User created successfully";
+            } catch (Exception e) {
+                BetterLogger.ERROR("Cannot create user: " + e.getMessage());
+                return "Error creating user";
             }
+        } else if (splittedPath.length == 3 && splittedPath[2].equals("contactInfo")) {
+            try {
+                JSONObject jsonObject = parseRequestBody(exchange);
 
-            if (!Validation.validatePassword(password)) {
-                BetterLogger.INFO("Invalid password format");
-                return "Invalid password format";
+
+                userController.createUserContactInfo(jsonObject);
+
+                BetterLogger.INFO("User contact info created successfully");
+                return "User contact info created successfully";
+            } catch (Exception e) {
+                BetterLogger.ERROR("Cannot create user contact info: " + e.getMessage());
+                return "Error creating user contact info";
             }
+        } else if (splittedPath.length == 3 && splittedPath[2].equals("education")) {
+            try {
+                JSONObject jsonObject = parseRequestBody(exchange);
 
-            userController.createUser(
-                    email,
-                    password,
-                    jsonObject.get("firstName").getAsString(),
-                    jsonObject.get("lastName").getAsString(),
-                    jsonObject.has("additionalName") ? jsonObject.get("additionalName").getAsString() : null,
-                    jsonObject.has("profilePicture") ? jsonObject.get("profilePicture").getAsString() : null,
-                    jsonObject.has("backgroundPicture") ? jsonObject.get("backgroundPicture").getAsString() : null,
-                    jsonObject.has("title") ? jsonObject.get("title").getAsString() : null,
-                    jsonObject.has("location") ? jsonObject.get("location").getAsString() : null,
-                    jsonObject.has("profession") ? jsonObject.get("profession").getAsString() : null,
-                    jsonObject.has("seekingOpportunity") ? jsonObject.get("seekingOpportunity").getAsString() : null
-            );
 
-            Files.createDirectories(Paths.get("src/main/resources/assets/users/user" + email));
-            BetterLogger.INFO("User created successfully");
-            return "User created successfully";
-        } catch (Exception e) {
-            BetterLogger.ERROR("Error creating user: " + e);
-            return "Error creating user";
+                BetterLogger.INFO("User education created successfully");
+                return "User contact info created successfully";
+            } catch (Exception e) {
+                BetterLogger.ERROR("Cannot create user contact info: " + e.getMessage());
+                return "Error creating user contact info";
+            }
         }
+        return "Error creating user";
     }
 
-    private String handlePutRequest(HttpExchange exchange) {
+    private String handlePutRequest(HttpExchange exchange) throws IOException {
         try {
-            InputStream requestBody = exchange.getRequestBody();
-            String jsonString = new BufferedReader(new InputStreamReader(requestBody))
-                    .lines()
-                    .reduce("", (accumulator, actual) -> accumulator + actual);
+            JSONObject jsonObject = parseRequestBody(exchange);
+            validateUserDetails(jsonObject);
 
-            JsonObject jsonObject = gson.fromJson(jsonString, JsonObject.class);
-
-            String email = jsonObject.get("email").getAsString();
-            String newPassword = jsonObject.get("newPassword").getAsString();
-
-            if (!Validation.validatePassword(newPassword)) {
-                BetterLogger.INFO("Invalid password format");
-                return "Invalid password format";
-            }
-
-            if (!Validation.matchingPasswords(newPassword, jsonObject.get("repeatedPass").getAsString())) {
-                BetterLogger.INFO("Passwords do not match");
-                return "Passwords do not match";
-            }
-
-            userController.createUser(
-                    email,
-                    newPassword,
-                    jsonObject.has("firstName") ? jsonObject.get("firstName").getAsString() : null,
-                    jsonObject.has("lastName") ? jsonObject.get("lastName").getAsString() : null,
-                    jsonObject.has("additionalName") ? jsonObject.get("additionalName").getAsString() : null,
-                    jsonObject.has("profilePicture") ? jsonObject.get("profilePicture").getAsString() : null,
-                    jsonObject.has("backgroundPicture") ? jsonObject.get("backgroundPicture").getAsString() : null,
-                    jsonObject.has("title") ? jsonObject.get("title").getAsString() : null,
-                    jsonObject.has("location") ? jsonObject.get("location").getAsString() : null,
-                    jsonObject.has("profession") ? jsonObject.get("profession").getAsString() : null,
-                    jsonObject.has("seekingOpportunity") ? jsonObject.get("seekingOpportunity").getAsString() : null
-            );
-
+            userController.updateUser(jsonObject);
             BetterLogger.INFO("User updated successfully");
             return "User updated successfully";
         } catch (Exception e) {
-            BetterLogger.ERROR("Error updating user: " + e);
+            BetterLogger.ERROR("Cannot update user: " + e.getMessage());
             return "Error updating user";
         }
     }
 
-    private String handleDeleteRequest(String[] splittedPath) {
+    public String handleDeleteRequest(String[] splittedPath) {
         if (splittedPath.length == 2) {
             userController.deleteUsers();
             BetterLogger.INFO("All users deleted successfully");
@@ -183,14 +164,34 @@ public class UserHandler implements HttpHandler {
         } else {
             String userEmail = splittedPath[splittedPath.length - 1];
             userController.deleteUser(userEmail);
+            BetterLogger.INFO("User deleted successfully");
+            return "User deleted successfully";
+        }
+    }
 
-            if (!userController.isUserExists(userEmail)) {
-                BetterLogger.INFO("User deleted successfully");
-                return "User deleted successfully";
-            } else {
-                BetterLogger.ERROR("No user with this email");
-                return "User deletion failed";
-            }
+    private JSONObject parseRequestBody(HttpExchange exchange) throws IOException {
+        InputStream requestBody = exchange.getRequestBody();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(requestBody));
+        StringBuilder body = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            body.append(line);
+        }
+        requestBody.close();
+        return new JSONObject(body.toString());
+    }
+
+    private void validateUserDetails(JSONObject jsonObject) {
+        boolean emailMatch = Validation.isValidEmail(jsonObject.optString("email"));
+        if (!emailMatch) {
+            BetterLogger.INFO("Incorrect email format");
+            throw new IllegalArgumentException("Incorrect email format");
+        }
+
+        boolean passwordValidation = Validation.validatePassword(jsonObject.optString("password"));
+        if (!passwordValidation) {
+            BetterLogger.INFO("Incorrect password format");
+            throw new IllegalArgumentException("Incorrect password format");
         }
     }
 }
